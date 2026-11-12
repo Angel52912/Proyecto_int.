@@ -1,0 +1,103 @@
+/* Base y componentes de la guía: botón principal, botón secundario, campo de texto. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-hueso);
+  color: var(--color-espresso);
+  font-family: var(--fuente-texto);
+  font-size: var(--texto-base);
+  line-height: 1.5;
+}
+
+#app {
+  min-height: 100dvh;
+  padding: var(--espacio-3);
+}
+
+h1 {
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-titulo);
+  margin: 0 0 var(--espacio-3);
+}
+
+h2 {
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-subtitulo);
+  margin: 0 0 var(--espacio-2);
+}
+
+.texto-secundario {
+  font-size: var(--texto-secundario);
+}
+
+.estado-cargando,
+.estado-error {
+  text-align: center;
+  padding: var(--espacio-4);
+}
+
+.estado-error {
+  color: var(--color-error);
+}
+
+.boton {
+  min-height: var(--tactil-min);
+  padding: 0 var(--espacio-3);
+  border: 2px solid var(--color-cuero);
+  border-radius: var(--radio);
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton--secundario {
+  background: transparent;
+  color: var(--color-cuero);
+}
+
+.boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  margin-bottom: var(--espacio-3);
+}
+
+.campo input,
+.campo textarea,
+.campo select {
+  min-height: var(--tactil-min);
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1px solid var(--color-arena);
+  border-radius: var(--radio);
+  background: #fff;
+  color: var(--color-espresso);
+  font: inherit;
+}
+
+.campo--error input,
+.campo--error textarea,
+.campo--error select {
+  border-color: var(--color-error);
+}
+
+.campo__error {
+  color: var(--color-error);
+  font-size: var(--texto-secundario);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-miel);
+  outline-offset: 2px;
+}

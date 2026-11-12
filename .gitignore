@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+js/vendor/
+.env
+.env.*
+!.env.example
+supabase/.branches/
+supabase/.temp/
+.claude/settings.local.json
+package-lock.json.bak

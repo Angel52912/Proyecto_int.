@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://*.tile.openstreetmap.org; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="theme-color" content="#7A4A2A">
+  <meta name="description" content="MiXanab: No lo tires, restáuralo. Talleres de talabartería y calzado en Mérida.">
+  <title>MiXanab</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="js/vendor/leaflet.css">
+</head>
+<body>
+  <main id="app" aria-live="polite">
+    <p class="estado-cargando">Cargando…</p>
+  </main>
+  <noscript>MiXanab necesita JavaScript para funcionar.</noscript>
+  <script src="js/vendor/supabase.js"></script>
+  <script src="js/vendor/leaflet.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

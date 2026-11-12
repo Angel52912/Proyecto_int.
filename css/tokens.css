@@ -1,0 +1,30 @@
+/* Tokens de diseño: ver docs/diseno.md */
+:root {
+  --color-cuero: #7a4a2a;
+  --color-cenote: #1f7a7a;
+  --color-miel: #e0a33a;
+  --color-espresso: #2b211b;
+  --color-hueso: #faf6f0;
+  --color-arena: #e7ded3;
+
+  /* Estados: por definir en Figma (valores provisionales). */
+  --color-exito: #2e7d4f;
+  --color-aviso: #b26a00;
+  --color-error: #b3261e;
+  --color-info: #1f7a7a;
+
+  --fuente-titulo: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fuente-texto: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --texto-titulo: 26px;
+  --texto-subtitulo: 20px;
+  --texto-base: 15px;
+  --texto-secundario: 13px;
+
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 16px;
+  --espacio-4: 24px;
+  --radio: 12px;
+  --tactil-min: 44px;
+}

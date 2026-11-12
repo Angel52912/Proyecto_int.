@@ -1,0 +1,32 @@
+{
+  "name": "mixanab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MiXanab: PWA para talleres de talabartería y calzado en Mérida, Yucatán.",
+  "type": "module",
+  "scripts": {
+    "dev": "http-server . -p 5500 -c-1",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --selectProjects unit",
+    "test:rls": "node --experimental-vm-modules node_modules/jest/bin/jest.js --selectProjects rls --passWithNoTests",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "vendor": "node scripts/vendor.mjs",
+    "postinstall": "node scripts/vendor.mjs",
+    "db:init": "npx supabase init",
+    "db:start": "npx supabase start",
+    "db:reset": "npx supabase db reset",
+    "db:stop": "npx supabase stop"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "http-server": "^14.1.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}
