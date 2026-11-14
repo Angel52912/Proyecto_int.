@@ -3,6 +3,8 @@ description: Implementa uno o varios casos de uso (ej. /implementar-cu CU-03)
 argument-hint: CU-01 [CU-07 ...]
 ---
 
+> Nota: este comando es para trabajo de **una sola persona de punta a punta**. El equipo usa `/implementar-backend` (Angel) e `/implementar-pantalla` (Milton y Abraham).
+
 Implementa: **$ARGUMENTS**
 
 Antes de escribir código:
