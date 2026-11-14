@@ -168,18 +168,18 @@ describe("quotes y orders: RLS", () => {
       expect((await intentar(c, "select id from public.orders")).error?.code).toBe(PERMISO_DENEGADO);
     });
 
-    test("el PIN (hash, intentos y bloqueo) no se puede leer ni con select *", async () => {
+    test("orders no tiene columnas de PIN (viven en private.order_pins) y select * no filtra nada", async () => {
       const e = await escenario();
+      await c.query("reset role");
+      const { rows } = await c.query(
+        "select column_name from information_schema.columns where table_schema = 'public' and table_name = 'orders' and column_name ~ 'pin'",
+      );
+      expect(rows).toEqual([]);
       for (const uid of [e.cliente, e.artesano]) {
         await actuarComo(c, uid);
-        for (const sql of [
-          "select delivery_pin_hash from public.orders",
-          "select pin_attempts from public.orders",
-          "select pin_locked_until from public.orders",
-          "select * from public.orders",
-        ]) {
-          expect((await intentar(c, sql)).error?.code).toBe(PERMISO_DENEGADO);
-        }
+        const todo = await intentar(c, "select * from public.orders");
+        expect(todo.error?.code).toBe(PERMISO_DENEGADO); // el grant sigue siendo por columna
+        expect((await intentar(c, "select delivery_pin_hash from public.orders")).error?.code).toBe("42703");
       }
     });
   });

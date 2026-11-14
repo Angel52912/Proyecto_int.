@@ -5,7 +5,7 @@ import { ApiError, traducirError } from "../../lib/apiError.js";
 import { validarImagen } from "../../lib/validate.js";
 import { exigirUuid } from "../requests/validar.js";
 
-// Sin delivery_pin_hash, pin_attempts ni pin_locked_until: la base de datos no los concede.
+// El PIN no está en `orders`: vive en private.order_pins y solo lo tocan las funciones de entrega.
 const COLUMNAS_ORDEN = "id, quote_id, request_id, client_id, workshop_id, phase, status, due_date, ready_at, delivered_at, created_at, updated_at";
 
 /**
