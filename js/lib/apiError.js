@@ -11,6 +11,8 @@ export const CODIGOS_ERROR = Object.freeze([
   "rate_limited",
   "role_already_set",
   "limit_reached",
+  "invalid_state",
+  "photo_required",
 ]);
 
 /** Error de la capa api: `code` es siempre uno de CODIGOS_ERROR. */
