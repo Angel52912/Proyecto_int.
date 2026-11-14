@@ -2,14 +2,19 @@
 // api.mock.js debe tener las mismas funciones, respuestas y errores.
 import { obtenerCliente } from "../../supabaseClient.js";
 import { ApiError, traducirError } from "../../lib/apiError.js";
-import { validarCodigo, validarCorreo } from "../../lib/validate.js";
+import { validarCodigo, validarCorreo, validarImagen } from "../../lib/validate.js";
 
+import { esRutaAvatar } from "./validar.js";
+
+const BUCKET_AVATARES = "avatars";
+const SEGUNDOS_URL_FIRMADA = 3600;
 const COLUMNAS_PERFIL = "id, role, full_name, avatar_path, active";
 const ROLES_ELEGIBLES = /** @type {ReadonlyArray<string>} */ (["client", "craftsman"]);
 
 /**
  * @typedef {{ id: string, role: "client" | "craftsman" | "admin" | null, full_name: string, avatar_path: string | null, active: boolean }} Perfil
  * @typedef {{ user_id: string, age: number | null, address: string | null }} DatosPrivadosCliente
+ * @typedef {{ path: string, url: string }} FotoPerfil
  */
 
 /**
@@ -102,9 +107,7 @@ export async function updateMyProfile(cambios) {
     fila.full_name = nombre;
   }
   if (cambios.avatar_path !== undefined) {
-    if (typeof cambios.avatar_path !== "string" || cambios.avatar_path.length < 1 || cambios.avatar_path.length > 300) {
-      throw new ApiError("invalid_input");
-    }
+    if (!esRutaAvatar(cambios.avatar_path) || !cambios.avatar_path?.startsWith(`${uid}/`)) throw new ApiError("invalid_input");
     fila.avatar_path = cambios.avatar_path;
   }
   if (Object.keys(fila).length === 0) throw new ApiError("invalid_input");
@@ -112,6 +115,73 @@ export async function updateMyProfile(cambios) {
   if (error) throw traducirError(error);
   if (!data) throw new ApiError("forbidden"); // RLS: sin rol, admin o cuenta desactivada
   return data;
+}
+
+/**
+ * Sube la foto de perfil al bucket privado `avatars` ({uid}/{uuid}) y la guarda en el perfil. Reemplaza a la anterior
+ * (se borran los archivos viejos de la carpeta). Solo cliente o artesano activo.
+ * @param {{ type: string, size: number }} archivo imagen jpeg, png o webp de hasta 5 MB
+ * @returns {Promise<FotoPerfil>}
+ */
+export async function addAvatar(archivo) {
+  if (!archivo || !validarImagen(archivo).valido) throw new ApiError("invalid_input");
+  const uid = await obtenerUid();
+  const cliente = obtenerCliente();
+  const perfil = await getMyProfile();
+
+  // Limpia lo que haya quedado en la carpeta (la política limita a 3 archivos por usuario).
+  const { data: existentes, error: errorLista } = await cliente.storage.from(BUCKET_AVATARES).list(uid);
+  if (errorLista) throw traducirError(errorLista);
+  const viejos = (existentes ?? []).map((f) => `${uid}/${f.name}`).filter((ruta) => ruta !== perfil.avatar_path);
+  if (viejos.length > 0) await cliente.storage.from(BUCKET_AVATARES).remove(viejos);
+
+  const path = `${uid}/${globalThis.crypto.randomUUID()}`;
+  const subida = await cliente.storage.from(BUCKET_AVATARES).upload(path, /** @type {File} */ (archivo), { contentType: archivo.type, upsert: false });
+  if (subida.error) throw traducirError(subida.error);
+
+  const { data, error } = await cliente.from("profiles").update({ avatar_path: path }).eq("id", uid).select(COLUMNAS_PERFIL).maybeSingle();
+  if (error || !data) {
+    await cliente.storage.from(BUCKET_AVATARES).remove([path]); // no deja archivos huérfanos
+    throw error ? traducirError(error) : new ApiError("forbidden"); // RLS: sin rol, admin o cuenta desactivada
+  }
+  if (perfil.avatar_path) await cliente.storage.from(BUCKET_AVATARES).remove([perfil.avatar_path]);
+  return { path, url: await urlFirmada(path) };
+}
+
+/**
+ * Quita la foto de perfil propia (ruta y archivo). No falla si no había.
+ * @returns {Promise<Perfil>}
+ */
+export async function removeAvatar() {
+  const uid = await obtenerUid();
+  const cliente = obtenerCliente();
+  const perfil = await getMyProfile();
+  const { data, error } = await cliente.from("profiles").update({ avatar_path: null }).eq("id", uid).select(COLUMNAS_PERFIL).maybeSingle();
+  if (error) throw traducirError(error);
+  if (!data) throw new ApiError("forbidden");
+  if (perfil.avatar_path) await cliente.storage.from(BUCKET_AVATARES).remove([perfil.avatar_path]);
+  return data;
+}
+
+/**
+ * URL firmada (1 h) de una foto de perfil: la propia o la de la contraparte con la que se comparte una solicitud.
+ * @param {string} avatarPath ruta `{uid}/{uuid}` (la trae `Perfil.avatar_path` o `Contraparte.avatar_path`)
+ * @returns {Promise<string>}
+ */
+export async function getAvatarUrl(avatarPath) {
+  if (!esRutaAvatar(avatarPath)) throw new ApiError("invalid_input");
+  await obtenerUid();
+  return urlFirmada(avatarPath);
+}
+
+/**
+ * @param {string} path
+ * @returns {Promise<string>}
+ */
+async function urlFirmada(path) {
+  const { data, error } = await obtenerCliente().storage.from(BUCKET_AVATARES).createSignedUrl(path, SEGUNDOS_URL_FIRMADA);
+  if (error) throw traducirError(error);
+  return data.signedUrl;
 }
 
 /** @returns {Promise<DatosPrivadosCliente | null>} `null` si aún no capturó sus datos */

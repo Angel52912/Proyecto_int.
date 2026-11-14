@@ -73,11 +73,24 @@ Perfil nuevo: `role: null`, `full_name: ''`, `active: true`. El nombre no se tom
 - **Roles permitidos:** sin rol. Una sola vez; no se puede cambiar desde la app.
 
 ### `updateMyProfile({ full_name?, avatar_path? })`
-- **Parámetros:** `full_name: string` (1 a 100, opcional), `avatar_path: string` (1 a 300, opcional). Al menos uno.
+- **Parámetros:** `full_name: string` (1 a 100, opcional), `avatar_path: string` (opcional; debe ser `{tu_uid}/{uuid}` en minúsculas, la ruta de un archivo ya subido con `addAvatar`). Al menos uno. Para subir o cambiar la foto usa `addAvatar`, no este método.
 - **Respuesta:** `Perfil` actualizado.
-- **Errores:** `not_authenticated`, `invalid_input`, `forbidden` (sin rol, admin o cuenta desactivada).
+- **Errores:** `not_authenticated`, `invalid_input` (incluye una ruta que no es `{tu_uid}/{uuid}`), `forbidden` (sin rol, admin o cuenta desactivada).
 - **Roles permitidos:** `client`, `craftsman` activos.
-- **Notas:** no puede modificar `role` ni `active` (grant por columna). La subida de foto al bucket `avatars` llega en otro CU; por ahora `avatar_path` es solo una ruta.
+- **Notas:** no puede modificar `role` ni `active` (grant por columna). Desde `0017` la base rechaza (`invalid_input`) cualquier `avatar_path` que no sea `{uid}/{uuid}` del propio usuario.
+
+### `addAvatar(archivo)` (bucket privado `avatars`)
+- **Parámetros:** `archivo: File` (jpeg, png o webp, máximo 5 MB; se comprime antes de subir).
+- **Respuesta:** `{ path, url }`: la ruta guardada en `Perfil.avatar_path` (`{uid}/{uuid}`) y una URL firmada de 1 h. Sube a `avatars/{uid}/{uuid}`, actualiza el perfil y borra la foto anterior y cualquier archivo huérfano de la carpeta (si el perfil no se actualiza, borra el archivo nuevo).
+- **Errores:** `not_authenticated`, `invalid_input` (tipo o tamaño), `forbidden` (sin rol, admin o cuenta desactivada).
+- **Roles permitidos:** `client`, `craftsman` activos. Máximo 3 archivos por usuario en el bucket.
+
+### `removeAvatar()`
+- **Respuesta:** `Perfil` con `avatar_path: null`; borra el archivo. No falla si no había foto. **Errores:** `not_authenticated`, `forbidden`. **Roles permitidos:** `client`, `craftsman` activos.
+
+### `getAvatarUrl(avatarPath)`
+- **Parámetros:** `avatarPath: string` (`{uid}/{uuid}`, lo trae `Perfil.avatar_path` o `Contraparte.avatar_path`). **Respuesta:** URL firmada de 1 h (`string`). Las fotos de perfil son privadas: solo las ve el propio usuario y la contraparte con la que comparte una solicitud (no `draft`); admin, sin rol y anónimo no. Hay que llamarla otra vez al caducar la URL.
+- **Errores:** `not_authenticated`, `invalid_input` (ruta mal formada), `forbidden` o `not_found` (la foto no existe o no se puede ver).
 
 ### `getMyClientPrivate()`
 - **Parámetros:** ninguno. **Respuesta:** `{ user_id, age, address } | null` (`null` si aún no los captura o si no es cliente).
