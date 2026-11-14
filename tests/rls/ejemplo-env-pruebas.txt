@@ -1,0 +1,4 @@
+# Copia este contenido a `.env.test` en la raíz (ignorado por Git) y llena el valor.
+# Debe ser el proyecto de PRUEBAS de Supabase, nunca el de desarrollo ni producción.
+# Cadena de conexión Postgres (Supabase → Project Settings → Database → Connection string).
+TEST_DATABASE_URL=
