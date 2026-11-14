@@ -186,7 +186,8 @@ $$;
 
 -- El cliente acepta o rechaza el presupuesto vigente.
 -- Aceptar: crea la orden en la misma transacción y avisa a ambas partes.
--- Rechazar (A1): la solicitud queda en `declined` y el chat se cierra.
+-- Rechazar (A1): el presupuesto queda `rejected`, la solicitud sigue en `quoted` y el chat abierto
+-- para que el artesano envíe otro. El intercambio termina al aceptar o al cancelar la solicitud.
 create function public.respond_quote(p_quote_id uuid, p_accept boolean)
 returns jsonb
 language plpgsql
@@ -253,8 +254,8 @@ begin
     return jsonb_build_object('quote_id', v_quote.id, 'status', 'accepted', 'order_id', v_order_id);
   end if;
 
+  -- La solicitud sigue en `quoted` y el chat abierto: el artesano puede enviar otro presupuesto.
   update public.quotes set status = 'rejected', responded_at = now() where id = v_quote.id;
-  update public.service_requests set status = 'declined' where id = v_request.id;
   insert into public.messages (request_id, sender_id, body, kind)
   values (v_request.id, null, 'Presupuesto rechazado por el cliente', 'system');
   insert into public.notifications (user_id, type, payload)
