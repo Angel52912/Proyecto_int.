@@ -20,7 +20,7 @@ Implementación:
 Cierre:
 9. Corre lint y pruebas con salida mínima y corrige fallos.
 10. Marca en `docs/requisitos.md` solo las casillas que funcionan y están probadas.
-11. Commit claro por CU, agregando archivos por nombre (no `git add -A`). No hagas push.
+11. Haz un commit por cada cambio lógico, a medida que funciona (reglas en la sección "Commits" de `CLAUDE.md`), agregando archivos por nombre (no `git add -A`). No hagas push.
 12. Resume en máximo 8 líneas y recuérdame `/usage` para la tabla de medición.
 
 Reglas: sin dependencias nuevas sin justificar; sin cambiar la matriz de permisos sin avisar; sin imprimir logs completos.

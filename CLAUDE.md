@@ -85,9 +85,18 @@ La PWA debe cargar en menos de 2 s con 3G/4G.
 3. Migración SQL con RLS (solo quien tiene Docker), lógica, pantallas y pruebas Jest (incluye pruebas de permisos por rol).
    Quien no tiene Docker trabaja con `api.mock.js` y `USAR_API_SIMULADA = true` en `js/config.js`.
 4. Correr lint y pruebas, y marcar el checklist del CU.
-5. Una rama y un commit claro por CU (`feat/cu-03-cotizacion`).
+5. Una rama por CU (`feat/cu-03-cotizacion`) con varios commits pequeños (ver "Commits").
 
 Orden sugerido: CU-01 → CU-07 → CU-02 → CU-03 → CU-04 → CU-05 → CU-06 → CU-08 → regresión.
+
+## Commits
+
+- Varios commits pequeños por CU: uno por cambio lógico (migración, función SQL, pantalla, pruebas, docs).
+- Formato `tipo(alcance): descripción`, en español, en imperativo y de menos de 72 caracteres.
+  Ejemplo: `feat(auth): agrega función set_my_role`.
+- Commitea solo cuando lint y pruebas pasan.
+- Agrega los archivos por nombre; nunca `git add -A`.
+- Sin commits de relleno y sin mezclar cambios no relacionados en un mismo commit.
 
 ## Reglas para Claude Code
 
