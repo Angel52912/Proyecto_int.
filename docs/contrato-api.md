@@ -145,7 +145,8 @@ Códigos nuevos en errores comunes:
 | Código | Significado |
 |---|---|
 | `invalid_state` | La acción no aplica al estado actual (enviar algo que no es borrador, cancelar fuera de `open` o `quoted`, taller que dejó de estar disponible, ya hay una solicitud viva con ese taller). |
-| `photo_required` | Se intentó enviar una solicitud sin fotos. |
+| `photo_required` | Se intentó enviar una solicitud sin fotos, o cambiar la fase de un pedido sin foto de avance. |
+| `confirmation_required` | Cambio de fase que no es `phase + 1` y falta `confirm: true` o la nota (CU-05, A1). |
 
 Tipos:
 - `Solicitud = { id, client_id, workshop_id, service_type: 'repair' | 'cleaning', description, status: 'draft' | 'open' | 'quoted' | 'accepted' | 'declined' | 'cancelled', submitted_at: string | null, created_at, photo_count: number }`.
@@ -254,4 +255,32 @@ Sin códigos de error nuevos.
 
 ### `getOrder(orderId)` (módulo `orders`)
 - **Respuesta:** `Orden`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no participa).
-- **Notas:** CU-05 y CU-06 agregarán fases, entrega y PIN en este módulo.
+- **Notas:** CU-06 agregará entrega y PIN en este módulo.
+
+## CU-05. Fases del pedido y fotos de avance (módulo `orders`)
+
+Estado: **backend listo para revisión** (migración `0012_order_phases`, sin aplicar). `api.js` y `api.mock.js` en `js/features/orders/`. Simulado: comparte estado con `requests`; el artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`.
+
+Tipos:
+- `Avance = { id, order_id, phase: 1 a 4, photo_path, note: string | null, corrected: boolean, created_by, created_at }`; `AvanceConFoto = Avance & { url }` (URL firmada de 1 h; el bucket `progress-photos` es privado).
+- Fases: 1 Inspección, 2 Desinfección/pretratamiento, 3 Limpieza/reparación, 4 Secado/detallado. La barra de progreso se calcula con `Orden.phase` (`phase / 4`).
+- `Notificacion.type` nuevos (ambos al cliente): `order_phase_changed` (`order_id`, `request_id`, `phase`, `corrected`) y `order_ready` (`order_id`, `request_id`). Al marcar listo se agrega además un mensaje de sistema en el chat.
+- Código de error nuevo: `confirmation_required` (el cambio es un salto o un retroceso y falta `confirm: true` o la nota).
+
+### `advanceOrderPhase(orderId, { phase, photo, note?, confirm? })` (RPC `advance_phase`)
+- **Parámetros:** `phase: 1 a 4`; `photo: File` (jpeg, png o webp, máximo 5 MB; **obligatoria siempre**); `note?: string` (máximo 500); `confirm?: boolean`. La api sube la foto a `progress-photos/{order_id}/{uuid}` y llama a la función; si falla, borra el archivo.
+- **Respuesta:** `{ order_id, phase, status, update: Avance }`. Efectos: actualiza `phase`, agrega el avance (append-only) y notifica `order_phase_changed` al cliente.
+- **Reglas:** solo `phase + 1` sin más trámite. Cualquier otra fase (salto o retroceso, A1) exige `confirm: true` y `note`, y el avance queda `corrected: true`. Misma fase que la actual = `invalid_input`.
+- **Errores:** `not_authenticated`, `invalid_input` (fase, nota, tipo o tamaño de la foto, ruta), `photo_required` (sin foto o el archivo no llegó a Storage), `inactive_user`, `forbidden` (no es artesano, o su taller está suspendido), `not_found` (la orden no existe o no es de su taller), `invalid_state` (la orden no está `in_progress`), `confirmation_required`.
+- **Roles permitidos:** `craftsman` activo dueño del taller.
+
+### `markOrderReady(orderId)` (RPC `mark_ready`)
+- **Respuesta:** `{ order_id, status: 'ready', phase: 4, ready_at }`. Notifica `order_ready` al cliente y agrega un mensaje de sistema al chat. No genera el PIN (CU-06).
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden`, `not_found`, `invalid_state` (no está `in_progress` o no está en la fase 4). **Roles permitidos:** `craftsman` activo dueño del taller.
+
+### `listOrderUpdates(orderId)`
+- **Respuesta:** `AvanceConFoto[]` del más antiguo al más reciente. Devuelve `[]` si no participa. **Errores:** `not_authenticated`, `invalid_input`. **Roles permitidos:** `client` dueño y `craftsman` del taller; el admin no accede.
+
+### `subscribeToOrderUpdates(orderId, alRecibir)`
+- **Parámetros:** `alRecibir: (avance: Avance) => void`. **Respuesta:** promesa de una función que cancela la suscripción. **Errores:** `not_authenticated`, `invalid_input`.
+- **Notas:** Realtime (INSERT en `order_updates`; trae `phase`, así que sirve para la barra de progreso). El aviso de "listo" llega por la notificación `order_ready` (`subscribeToNotifications`). No se escucha `orders` directamente porque Realtime no respeta los permisos por columna.

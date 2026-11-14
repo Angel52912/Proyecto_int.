@@ -12,6 +12,7 @@ export const ID_TALLER_SIMULADO = "00000000-0000-4000-8000-0000000000a1";
  * @typedef {{ id: string, request_id: string, sender_id: string | null, body: string, kind: string, quote_id: string | null, created_at: string }} MensajeSim
  * @typedef {{ id: string, request_id: string, amount_mxn: number, delivery_date: string, detail: Record<string, unknown>, status: "sent" | "accepted" | "rejected" | "superseded", created_at: string, responded_at: string | null }} CotizacionSim
  * @typedef {{ id: string, quote_id: string, request_id: string, client_id: string, workshop_id: string, phase: number, status: "in_progress" | "ready" | "delivered" | "cancelled", due_date: string, ready_at: string | null, delivered_at: string | null, created_at: string, updated_at: string }} OrdenSim
+ * @typedef {{ id: string, order_id: string, phase: number, photo_path: string, note: string | null, corrected: boolean, created_by: string, created_at: string }} AvanceSim
  */
 
 let contadorIds = 0;
@@ -40,6 +41,10 @@ function estadoInicial() {
     cotizaciones: [],
     /** @type {OrdenSim[]} */
     ordenes: [],
+    /** @type {AvanceSim[]} */
+    avances: [],
+    /** @type {Set<(avance: AvanceSim) => void>} */
+    escuchasAvances: new Set(),
     /** @type {{ id: string, user_id: string, type: string, payload: Record<string, unknown>, read_at: string | null, created_at: string }[]} */
     notificaciones: [],
     /** @type {Set<(mensaje: MensajeSim) => void>} */
