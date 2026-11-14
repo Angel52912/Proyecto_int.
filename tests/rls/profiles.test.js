@@ -151,13 +151,15 @@ describe("profiles y set_my_role", () => {
       const uid = await crearUsuario(c, correo());
       await asignarRol(c, uid, rol);
       await actuarComo(c, uid);
+      // Desde 0017 la ruta de la foto debe ser {uid}/{uuid}.
+      const ruta = `${uid}/11111111-1111-4111-8111-111111111111`;
       const r = await intentar(
         c,
-        "update public.profiles set full_name = 'Ana', avatar_path = 'x/y' where id = $1 returning full_name, avatar_path",
-        [uid],
+        "update public.profiles set full_name = 'Ana', avatar_path = $2 where id = $1 returning full_name, avatar_path",
+        [uid, ruta],
       );
       expect(r.error).toBeNull();
-      expect(r.rows).toEqual([{ full_name: "Ana", avatar_path: "x/y" }]);
+      expect(r.rows).toEqual([{ full_name: "Ana", avatar_path: ruta }]);
     });
 
     test("un usuario sin rol no modifica nada (0 filas)", async () => {

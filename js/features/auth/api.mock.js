@@ -1,7 +1,8 @@
 // Simulado en memoria de api.js (CU-01). Misma forma de respuesta y de errores que el real.
 // Código de verificación válido en el simulado: CODIGO_SIMULADO. No usa red ni Supabase.
 import { ApiError } from "../../lib/apiError.js";
-import { validarCodigo, validarCorreo } from "../../lib/validate.js";
+import { validarCodigo, validarCorreo, validarImagen } from "../../lib/validate.js";
+import { esRutaAvatar } from "./validar.js";
 
 export const CODIGO_SIMULADO = "123456";
 const ROLES_ELEGIBLES = /** @type {ReadonlyArray<string>} */ (["client", "craftsman"]);
@@ -86,15 +87,54 @@ export async function updateMyProfile(cambios) {
     fila.full_name = nombre;
   }
   if (cambios.avatar_path !== undefined) {
-    if (typeof cambios.avatar_path !== "string" || cambios.avatar_path.length < 1 || cambios.avatar_path.length > 300) {
-      throw new ApiError("invalid_input");
-    }
+    if (!esRutaAvatar(cambios.avatar_path) || !cambios.avatar_path?.startsWith(`${estado.uid}/`)) throw new ApiError("invalid_input");
     fila.avatar_path = cambios.avatar_path;
   }
   if (Object.keys(fila).length === 0) throw new ApiError("invalid_input");
   if (!estado.perfil.active || !ROLES_ELEGIBLES.includes(estado.perfil.role)) throw new ApiError("forbidden");
   Object.assign(estado.perfil, fila);
   return { ...estado.perfil };
+}
+
+const URL_AVATARES = "https://simulado.mixanab.test/avatars/";
+
+/**
+ * Sube la foto de perfil y la guarda en el perfil (reemplaza a la anterior). Solo cliente o artesano activo.
+ * @param {{ type: string, size: number }} archivo imagen jpeg, png o webp de hasta 5 MB
+ */
+export async function addAvatar(archivo) {
+  if (!archivo || !validarImagen(archivo).valido) throw new ApiError("invalid_input");
+  const uid = exigirSesion();
+  if (!estado.perfil.active || !ROLES_ELEGIBLES.includes(estado.perfil.role)) throw new ApiError("forbidden");
+  const path = `${uid}/${generarUuid()}`;
+  estado.perfil.avatar_path = path;
+  return { path, url: `${URL_AVATARES}${path}` };
+}
+
+/** Quita la foto de perfil propia. No falla si no había. */
+export async function removeAvatar() {
+  exigirSesion();
+  if (!estado.perfil.active || !ROLES_ELEGIBLES.includes(estado.perfil.role)) throw new ApiError("forbidden");
+  estado.perfil.avatar_path = null;
+  return { ...estado.perfil };
+}
+
+/**
+ * URL de una foto de perfil (la propia o la de la contraparte). El simulado no valida la contraparte.
+ * @param {string} avatarPath ruta `{uid}/{uuid}`
+ */
+export async function getAvatarUrl(avatarPath) {
+  if (!esRutaAvatar(avatarPath)) throw new ApiError("invalid_input");
+  exigirSesion();
+  return `${URL_AVATARES}${avatarPath}`;
+}
+
+let contadorAvatares = 0;
+
+/** @returns {string} uuid simulado en minúsculas (sin depender de crypto) */
+function generarUuid() {
+  contadorAvatares += 1;
+  return `00000000-0000-4000-8000-${String(contadorAvatares).padStart(12, "0")}`;
 }
 
 export async function getMyClientPrivate() {
