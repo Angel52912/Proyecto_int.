@@ -27,7 +27,7 @@ Definición de "activa" (D7): solicitud en `open` o `quoted`. Los `draft`, `acce
 - Se revocan los privilegios por defecto de `anon`. `authenticated` recibe solo lo necesario, incluso por columna.
 - Funciones: `security definer`, `search_path = ''`, nombres calificados, `execute` revocado a `public` y `anon`, concedido a `authenticated`. Cada una valida `auth.uid()`, rol y `profiles.active`.
 - Extensión: `pgcrypto` (schema `extensions`).
-- Helpers en `private`: `current_role()`, `is_admin()`, `is_active()`, `owns_workshop(id)`, `is_request_participant(id)`, `is_order_participant(id)`, `shares_request_with(uid)`.
+- Helpers en `private`: `current_user_role()` (no `current_role()`, que es palabra reservada de SQL), `is_admin()`, `is_active()`, `owns_workshop(id)`, `is_request_participant(id)`, `is_order_participant(id)`, `shares_request_with(uid)`.
 - Enums: `user_role` (client, craftsman, admin); `service_type` (repair, cleaning); `request_status` (draft, open, quoted, accepted, declined, cancelled); `quote_status` (sent, accepted, rejected, superseded); `order_status` (in_progress, ready, delivered, cancelled); `message_kind` (text, quote_card, system).
 
 ### Tablas
@@ -84,7 +84,7 @@ Todos los buckets: MIME jpeg, png o webp (sin SVG), máximo 5 MB. El cliente com
 El admin no tiene políticas en los buckets privados. Las políticas validan la ruta con regex UUID antes de castear.
 
 ## 3. Registro y rol
-1. Un trigger en `auth.users` crea `profiles(id, full_name)` con `role = null`. Nunca lee el rol de `user_metadata`.
+1. Un trigger en `auth.users` crea `profiles(id)` con `role = null` y `full_name` vacío. No lee `user_metadata` (ni rol ni nombre).
 2. `set_my_role(p_role)` acepta solo `client` o `craftsman`; hace `update ... where id = auth.uid() and role is null`. Si afecta 0 filas lanza `role_already_set`.
 3. `authenticated` no tiene `INSERT` en `profiles` ni `UPDATE(role)`.
 4. El admin se crea a mano con la clave de servicio.
