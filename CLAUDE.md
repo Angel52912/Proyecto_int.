@@ -4,12 +4,30 @@
 Conecta clientes con artesanos: mapa de talleres, cotización con fotos y chat, presupuesto,
 seguimiento en 4 fases, entrega con PIN/QR y calificación.
 
-- Equipo: José Cámara, Angel Rosado, Milton López, Cárdenas Encalada.
 - Cronograma: el del tablero de FigJam quedó desactualizado. La codificación empieza el 12 nov 2026 y
   el cronograma vigente está en Notion. Pega aquí los hitos nuevos (CU funcionales, regresión, piloto, despliegue y cierre).
 - Especificación: `docs/requisitos.md` (CU-01 a CU-08). Diseño: `docs/diseno.md`.
   Arquitectura y decisiones aprobadas: `docs/decisiones/0001-arquitectura.md`.
   Léelos antes de implementar cualquier caso de uso.
+
+## Equipo y responsabilidades
+
+- **Angel Rosado:** todo el backend. Dueño de `supabase/` (migraciones, RLS, funciones SQL, Storage), `js/features/*/api.js` y `js/supabaseClient.js`.
+- **Milton:** frontend (pantallas, `css/` y `js/features/*/pages` de su parte).
+- **Abraham:** frontend (igual, de su parte).
+- **José Cárdenas:** pruebas del backend. Dueño de `tests/rls/` y de la colección de Postman.
+
+Reparto de pantallas propuesto: Milton = Acceso + Artesano + Admin; Abraham = Cliente.
+El chat lo construye Abraham como componente reutilizable y Milton lo reutiliza.
+
+Reglas de convivencia:
+- El frontend trabaja contra el `api.js` simulado (modo `USAR_API_SIMULADA` de `js/config.js`), siguiendo `docs/contrato-api.md`. Cuando el backend de un CU se fusiona, se cambia a la versión real.
+- Nadie del frontend edita `supabase/`; nadie del backend edita `css/` ni pantallas, salvo acuerdo.
+- Todo cambio al contrato (nombres, parámetros, errores) se actualiza en `docs/contrato-api.md` en el mismo commit.
+- Solo Angel aplica migraciones al proyecto de desarrollo de Supabase. José prueba en un proyecto de pruebas aparte.
+- Cada persona hace commit con su propio usuario de GitHub.
+- Orden de entrega del backend: base + CU-01 → CU-07 → CU-03 → CU-04 → CU-05 → CU-06 → CU-02 → CU-08.
+- Comandos del equipo: `/implementar-backend` (Angel), `/implementar-pantalla` (Milton y Abraham), `/probar-backend` (José). `/implementar-cu` es para una sola persona de punta a punta.
 
 ## Comandos
 
