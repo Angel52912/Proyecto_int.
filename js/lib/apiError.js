@@ -10,6 +10,7 @@ export const CODIGOS_ERROR = Object.freeze([
   "invalid_code",
   "rate_limited",
   "role_already_set",
+  "limit_reached",
 ]);
 
 /** Error de la capa api: `code` es siempre uno de CODIGOS_ERROR. */
@@ -33,11 +34,12 @@ export class ApiError extends Error {
  */
 export function traducirError(error, porDefecto = "unexpected") {
   if (error instanceof ApiError) return error;
-  const e = /** @type {{ message?: string, code?: string, status?: number } | null} */ (error);
+  const e = /** @type {{ message?: string, code?: string, status?: number, statusCode?: string } | null} */ (error);
   const mensaje = typeof e?.message === "string" ? e.message : "";
   if (CODIGOS_ERROR.includes(mensaje)) return new ApiError(mensaje);
   if (e?.status === 429 || /rate_limit|over_.*_rate/i.test(e?.code ?? "")) return new ApiError("rate_limited");
-  if (e?.code === "42501") return new ApiError("forbidden");
+  if (e?.code === "42501" || e?.statusCode === "403") return new ApiError("forbidden");
+  if (e?.statusCode === "413" || e?.statusCode === "415") return new ApiError("invalid_input");
   if (e?.code === "23514" || e?.code === "22P02") return new ApiError("invalid_input");
   if (/otp_expired|otp_disabled/i.test(e?.code ?? "")) return new ApiError("invalid_code");
   return new ApiError(porDefecto);
