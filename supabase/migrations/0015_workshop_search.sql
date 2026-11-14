@@ -83,7 +83,7 @@ begin
      or (v_colonia is not null and char_length(v_colonia) > 100)
      or (p_postal_code is not null and p_postal_code !~ '^[0-9]{5}$')
      or (p_min_rating is not null and p_min_rating not between 1 and 5)
-     or (p_max_price is not null and p_max_price <= 0)
+     or (p_max_price is not null and (p_max_price <= 0 or p_max_price >= 100000000 or p_max_price = 'NaN'::numeric))
      or p_limit is null or p_limit not between 1 and 100
      or p_offset is null or p_offset < 0 then
     raise exception 'invalid_input';
