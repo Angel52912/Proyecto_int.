@@ -217,7 +217,7 @@ begin
     select p.id, p.role, p.full_name, p.active, p.created_at, u.email::text as email
       from public.profiles p
       join auth.users u on u.id = p.id
-     where (v_pattern is null or lower(p.full_name) like v_pattern or lower(u.email) like v_pattern)
+     where (v_pattern is null or lower(p.full_name) like v_pattern escape '\' or lower(u.email) like v_pattern escape '\')
        and (p_role is null or p.role = p_role)
        and (p_active is null or p.active = p_active)
   ),
@@ -327,8 +327,8 @@ begin
            w.rating_avg, w.rating_count, w.created_at
       from public.workshops w
       join public.profiles o on o.id = w.owner_id
-     where (v_pattern is null or lower(coalesce(w.name, '')) like v_pattern or lower(coalesce(w.colonia, '')) like v_pattern
-            or lower(o.full_name) like v_pattern)
+     where (v_pattern is null or lower(coalesce(w.name, '')) like v_pattern escape '\' or lower(coalesce(w.colonia, '')) like v_pattern escape '\'
+            or lower(o.full_name) like v_pattern escape '\')
        and (p_published is null or w.published = p_published)
        and (p_suspended is null or w.suspended = p_suspended)
   ),
