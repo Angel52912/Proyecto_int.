@@ -13,6 +13,7 @@ export const ID_TALLER_SIMULADO = "00000000-0000-4000-8000-0000000000a1";
  * @typedef {{ id: string, request_id: string, amount_mxn: number, delivery_date: string, detail: Record<string, unknown>, status: "sent" | "accepted" | "rejected" | "superseded", created_at: string, responded_at: string | null }} CotizacionSim
  * @typedef {{ id: string, quote_id: string, request_id: string, client_id: string, workshop_id: string, phase: number, status: "in_progress" | "ready" | "delivered" | "cancelled", due_date: string, ready_at: string | null, delivered_at: string | null, created_at: string, updated_at: string }} OrdenSim
  * @typedef {{ id: string, order_id: string, phase: number, photo_path: string, note: string | null, corrected: boolean, created_by: string, created_at: string }} AvanceSim
+ * @typedef {{ id: string, order_id: string, workshop_id: string, client_id: string, rating: number, tags: string[], comment: string | null, hidden: boolean, created_at: string }} ResenaSim
  */
 
 let contadorIds = 0;
@@ -30,7 +31,7 @@ function estadoInicial() {
     /** @type {string | null} */
     rol: "client",
     activo: true,
-    taller: { id: ID_TALLER_SIMULADO, owner_id: UID_ARTESANO, published: true, suspended: false, services: ["repair", "cleaning"] },
+    taller: { id: ID_TALLER_SIMULADO, owner_id: UID_ARTESANO, published: true, suspended: false, services: ["repair", "cleaning"], rating_avg: /** @type {number | null} */ (null), rating_count: 0 },
     /** @type {SolicitudSim[]} */
     solicitudes: [],
     /** @type {{ id: string, request_id: string, path: string }[]} */
@@ -43,6 +44,10 @@ function estadoInicial() {
     ordenes: [],
     /** @type {AvanceSim[]} */
     avances: [],
+    /** PIN de entrega por pedido (equivale a private.order_pins). @type {Map<string, { pin: string, attempts: number, lockedUntil: number | null }>} */
+    pins: new Map(),
+    /** @type {ResenaSim[]} */
+    resenas: [],
     /** @type {Set<(avance: AvanceSim) => void>} */
     escuchasAvances: new Set(),
     /** @type {{ id: string, user_id: string, type: string, payload: Record<string, unknown>, read_at: string | null, created_at: string }[]} */

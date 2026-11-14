@@ -41,7 +41,8 @@ Definición de "activa" (D7): solicitud en `open` o `quoted`. Los `draft`, `acce
 | `request_photos` | request_id, path (prefijo = request_id) |
 | `messages` | request_id, sender_id, body (1 a 2000), kind, quote_id |
 | `quotes` | request_id, amount_mxn (> 0), delivery_date, detail jsonb, status |
-| `orders` | quote_id (único), request_id, client_id, workshop_id, phase 1-4, status, due_date, delivery_pin_hash, pin_attempts, pin_locked_until, ready_at, delivered_at |
+| `orders` | quote_id (único), request_id, client_id, workshop_id, phase 1-4, status, due_date, ready_at, delivered_at |
+| `private.order_pins` | order_id (PK), pin_hash, attempts, locked_until, revealed_at. Esquema `private`, RLS activo y sin grants: solo las funciones del PIN la tocan (ver sección 4) |
 | `order_updates` | order_id, phase, photo_path (NOT NULL), note, corrected, created_by |
 | `reviews` | order_id (único), client_id, workshop_id, rating 1-5, tags[], comment (≤ 1000), hidden |
 | `notifications` | user_id, type, payload jsonb, read_at |
@@ -105,7 +106,8 @@ El admin no tiene políticas en los buckets privados. Las políticas validan la 
 | Admin | `admin_*` | Validan `is_admin()` y escriben `admin_actions` en la misma transacción. No autodesactivarse; siempre queda un admin activo. |
 
 PIN de entrega:
-- `reveal_delivery_pin` solo con la orden en `ready`: genera 6 dígitos con `gen_random_bytes`, guarda `crypt(pin, gen_salt('bf'))`, reinicia intentos y devuelve el PIN una sola vez. Cada llamada rota el PIN.
+- El hash, los intentos y el bloqueo viven en `private.order_pins` (migración `0013`), no en `orders`: Realtime envía la fila completa a quien pase el RLS y no respeta los permisos por columna, así que cualquier dato sensible en `orders` (publicada) se filtraría.
+- `reveal_delivery_pin` solo con la orden en `ready`: genera 6 dígitos con `gen_random_bytes`, guarda `crypt(pin, gen_salt('bf'))`, reinicia intentos (no levanta un bloqueo vigente) y devuelve el PIN una sola vez. Cada llamada rota el PIN.
 - `verify_delivery_pin`: solo el artesano dueño, orden en `ready`. 5 intentos y bloqueo de 15 minutos.
 - Un PIN incorrecto no lanza excepción (revertiría el contador). Devuelve `{ok, attempts_left, locked_until}`.
 - El QR codifica `order_id:pin` y usa la misma función.
