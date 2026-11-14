@@ -13,6 +13,7 @@ export const CODIGOS_ERROR = Object.freeze([
   "limit_reached",
   "invalid_state",
   "photo_required",
+  "confirmation_required",
 ]);
 
 /** Error de la capa api: `code` es siempre uno de CODIGOS_ERROR. */
