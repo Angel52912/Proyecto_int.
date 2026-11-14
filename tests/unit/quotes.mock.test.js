@@ -166,14 +166,24 @@ describe("respondQuote", () => {
     expect((await orders.listMyOrders()).map((o) => o.id)).toEqual([r.order_id]);
   });
 
-  test("A1: rechazar deja la solicitud en declined, sin orden, y cierra el chat", async () => {
+  test("A1: rechazar deja la solicitud cotizada, sin orden, con el chat abierto y permite un nuevo presupuesto", async () => {
     const { requestId, quoteId } = await cotizar();
     expect(await quotes.respondQuote(quoteId, false)).toEqual({ quote_id: quoteId, status: "rejected", order_id: null });
-    expect((await solicitudes.getRequest(requestId)).status).toBe("declined");
+    expect((await solicitudes.getRequest(requestId)).status).toBe("quoted");
     expect(await orders.listMyOrders()).toEqual([]);
-    expect(await codigoDe(chat.sendMessage(requestId, "Hola"))).toBe("forbidden");
+    await expect(chat.sendMessage(requestId, "Está caro, ¿puede bajar?")).resolves.toMatchObject({ kind: "text" });
     sim.fijarSesionSimulada({ rol: "craftsman" });
     expect((await solicitudes.listMyNotifications()).map((n) => n.type)).toContain("quote_rejected");
+    // Intercambio: el artesano envía otro presupuesto, el cliente lo rechaza de nuevo y luego acepta el tercero.
+    const segundo = await quotes.sendQuote(requestId, { ...PRESUPUESTO, amount_mxn: 300 });
+    sim.fijarSesionSimulada({ rol: "client" });
+    await quotes.respondQuote(segundo.id, false);
+    sim.fijarSesionSimulada({ rol: "craftsman" });
+    const tercero = await quotes.sendQuote(requestId, { ...PRESUPUESTO, amount_mxn: 250 });
+    sim.fijarSesionSimulada({ rol: "client" });
+    expect((await quotes.respondQuote(tercero.id, true)).status).toBe("accepted");
+    expect((await quotes.listQuotes(requestId)).map((q) => q.status)).toEqual(["rejected", "rejected", "accepted"]);
+    expect((await solicitudes.getRequest(requestId)).status).toBe("accepted");
   });
 
   test("responder dos veces o un presupuesto reemplazado lanza invalid_state", async () => {

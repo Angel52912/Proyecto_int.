@@ -182,19 +182,38 @@ describe("send_quote, respond_quote y cancel_request", () => {
       expect((await intentar(c, "insert into public.messages (request_id, body) values ($1, 'Gracias')", [solicitud])).error).toBeNull();
     });
 
-    test("A1: rechazar deja la solicitud en declined, sin orden, y avisa al artesano", async () => {
+    test("A1: rechazar deja la solicitud cotizada, sin orden, con el chat abierto, y avisa al artesano", async () => {
       const { cliente, artesano, solicitud, quote } = await cotizada();
       await actuarComo(c, cliente);
       const r = await responder(quote, false);
       expect(r.rows[0].r).toEqual({ quote_id: quote, status: "rejected", order_id: null });
       expect(await estadoQuote(quote)).toBe("rejected");
-      expect(await estadoSolicitud(solicitud)).toBe("declined");
+      expect(await estadoSolicitud(solicitud)).toBe("quoted");
       await c.query("reset role");
       expect((await c.query("select count(*)::int as total from public.orders where request_id = $1", [solicitud])).rows[0].total).toBe(0);
       expect(await tiposDeNotificacion(artesano)).toEqual(["quote_rejected"]);
-      // El chat se cierra.
+      // El chat sigue abierto.
       await actuarComo(c, cliente);
-      expect((await intentar(c, "insert into public.messages (request_id, body) values ($1, 'Hola')", [solicitud])).error?.code).toBe(PERMISO_DENEGADO);
+      expect((await intentar(c, "insert into public.messages (request_id, body) values ($1, 'Hola')", [solicitud])).error).toBeNull();
+    });
+
+    test("tras un rechazo el artesano envía otro presupuesto y el cliente lo acepta (varias rondas)", async () => {
+      const { cliente, artesano, solicitud, quote } = await cotizada();
+      await actuarComo(c, cliente);
+      await responder(quote, false);
+      await actuarComo(c, artesano);
+      const segundo = await enviar(solicitud, { monto: 200 });
+      expect(segundo.error).toBeNull();
+      await actuarComo(c, cliente);
+      await responder(segundo.rows[0].r.id, false);
+      await actuarComo(c, artesano);
+      const tercero = await enviar(solicitud, { monto: 150 });
+      await actuarComo(c, cliente);
+      expect((await responder(tercero.rows[0].r.id, true)).error).toBeNull();
+      expect(await estadoSolicitud(solicitud)).toBe("accepted");
+      await c.query("reset role");
+      const estados = (await c.query("select status from public.quotes where request_id = $1 order by created_at, id", [solicitud])).rows;
+      expect(estados.map((q) => q.status).sort()).toEqual(["accepted", "rejected", "rejected", "rejected"]);
     });
 
     test("responder dos veces o un presupuesto reemplazado lanza invalid_state", async () => {
