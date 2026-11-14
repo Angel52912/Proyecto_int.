@@ -341,3 +341,59 @@ Tipos:
 - **Parámetros:** `workshopId: uuid`; `ubicacion?: { lat, lng }` solo para calcular `distance_km`.
 - **Respuesta:** `PerfilTaller` (calificación, servicios, horario, precio "desde", `is_open` y fotos de trabajos).
 - **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe, no está publicado o está suspendido: no se distingue). **Roles permitidos:** `client` activo.
+
+## CU-08. Administración de la plataforma (módulo `admin`)
+
+Estado: **backend listo para revisión** (migración `0016_admin`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/admin/`. Simulado: 7 usuarios (2 admin, 2 clientes, 2 artesanos, 1 sin rol), 3 talleres, 3 reseñas, 4 solicitudes y 3 pedidos. Para actuar como admin: `fijarSesionSimulada({ rol: "admin" })` (el `reiniciarSimulacion()` del módulo ya lo deja así).
+
+**Acceso:** el admin es una cuenta interna creada a mano con la clave de servicio (no se elige en el registro). Inicia sesión con el acceso normal y `getMyProfile()` devuelve `role: 'admin'`; la pantalla del panel solo se muestra con ese rol. **Todas** las funciones exigen un admin activo: cliente, artesano, sin rol y admin inactivo reciben `forbidden` o `inactive_user`.
+
+**Qué NO ve el admin:** el contenido del chat, las fotos de solicitudes y de avance, la descripción de las solicitudes, los montos de los presupuestos, el PIN de entrega ni los datos privados del cliente (edad, dirección). No lee tablas: solo estas funciones.
+
+Convenciones:
+- Las listas devuelven `{ total, items }` (`total` = filas que cumplen los filtros, sin paginar). `limit` 1 a 100 (50 por defecto), `offset` >= 0. Orden: de la más reciente a la más antigua. `search` es una subcadena sin distinguir mayúsculas (máximo 100).
+- Las acciones aceptan `reason` opcional (máximo 300). Queda en la bitácora; **la pantalla debe mostrarlo con `textContent`** (es texto libre).
+- Se registran en la bitácora las acciones que **cambian datos** (desactivar/reactivar usuario, suspender/reactivar taller, ocultar/restaurar reseña), en la misma transacción. Consultar listas y el panel no genera entradas. La bitácora es append-only.
+- Un cambio al mismo valor que ya tiene lanza `invalid_state`.
+- Desactivar un usuario (`active = false`) le impide usar las funciones de la app, pero **no cierra su sesión ni cambia sus solicitudes o pedidos abiertos**; los usuarios no se eliminan.
+- Sin códigos de error nuevos.
+
+Tipos: `Panel`, `UsuarioAdmin = { id, role, full_name, email, active, created_at }` (el correo solo sale en esta lista), `TallerAdmin = { id, owner_id, owner_name, name, colonia, services, published, suspended, rating_avg, rating_count, created_at }`, `ResenaAdmin = { id, order_id, workshop_id, workshop_name, client_id, rating, tags, comment, hidden, created_at }`, `SolicitudAdmin = { id, client_id, workshop_id, workshop_name, service_type, status, submitted_at, created_at, updated_at }`, `PedidoAdmin = { id, request_id, client_id, workshop_id, workshop_name, phase, status, due_date, ready_at, delivered_at, created_at, updated_at }`, `AccionAdmin = { id, admin_id, admin_name, action, target_table, target_id, details, created_at }`.
+`Notificacion.type` nuevos (al dueño del taller): `workshop_suspended` y `workshop_reactivated` (`workshop_id`; no incluyen el motivo).
+Acciones de la bitácora (`action`): `user_deactivated`, `user_reactivated`, `workshop_suspended`, `workshop_reactivated`, `review_hidden`, `review_restored`.
+
+### `getDashboard()` (RPC `admin_dashboard`)
+- **Respuesta:** `{ users: { total, active, clients, craftsmen, admins, without_role }, workshops: { total, published, suspended }, requests: { total, open, quoted, accepted, cancelled }, orders: { total, in_progress, ready, delivered, cancelled }, reviews: { count, rating_avg: number | null } }`. Las solicitudes no cuentan los borradores; `published` cuenta los visibles en el mapa (publicados y no suspendidos); `reviews` solo cuenta las no ocultas.
+
+### `listUsers({ search?, role?, active?, limit?, offset? })` (RPC `admin_list_users`)
+- **Respuesta:** `{ total, items: UsuarioAdmin[] }`. `search` busca en nombre y correo. `role`: `client`, `craftsman` o `admin`.
+
+### `setUserActive(userId, active, reason?)` (RPC `admin_set_user_active`)
+- **Respuesta:** `{ id, active }`. Efecto: cambia `profiles.active` y registra `user_deactivated` o `user_reactivated`.
+- **A1:** el admin no puede desactivarse a sí mismo (`forbidden`) y siempre debe quedar al menos un admin activo (`invalid_state`). Las filas de admin se bloquean en orden estable, así que dos admins no pueden desactivarse mutuamente a la vez.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es admin, o intenta desactivarse a sí mismo), `not_found`, `invalid_state` (ya tenía ese valor, o dejaría sin admin activo).
+
+### `listWorkshops({ search?, published?, suspended?, limit?, offset? })` (RPC `admin_list_workshops`)
+- **Respuesta:** `{ total, items: TallerAdmin[] }`. `search` busca en nombre del taller, colonia y nombre del dueño.
+
+### `setWorkshopSuspended(workshopId, suspended, reason?)` (RPC `admin_set_workshop_suspended`)
+- **Respuesta:** `{ id, suspended }`. Suspender saca al taller del mapa y no recibe solicitudes ni presupuestos (despublicar efectivo; `published` no cambia, así que al reactivar vuelve a aparecer). Notifica al dueño.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden`, `not_found`, `invalid_state`.
+
+### `listReviews({ workshop_id?, hidden?, limit?, offset? })` (RPC `admin_list_reviews`)
+- **Respuesta:** `{ total, items: ResenaAdmin[] }` (incluye el comentario, para moderar).
+
+### `setReviewHidden(reviewId, hidden, reason?)` (RPC `admin_set_review_hidden`)
+- **Respuesta:** `{ id, hidden, workshop_id, rating_avg, rating_count }` con el promedio del taller ya recalculado sobre las reseñas no ocultas (`rating_avg` es `null` si no queda ninguna). Una reseña oculta solo la ve su autor.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden`, `not_found`, `invalid_state`.
+
+### `listRequests({ status?, limit?, offset? })` (RPC `admin_list_requests`)
+- **Respuesta:** `{ total, items: SolicitudAdmin[] }`, solo lectura. `status`: `open`, `quoted`, `accepted`, `declined` o `cancelled` (`draft` es `invalid_input`: los borradores no se listan).
+
+### `listOrders({ status?, limit?, offset? })` (RPC `admin_list_orders`)
+- **Respuesta:** `{ total, items: PedidoAdmin[] }`, solo lectura. `status`: `in_progress`, `ready`, `delivered` o `cancelled`.
+
+### `listActions({ admin_id?, action?, limit?, offset? })` (RPC `admin_list_actions`)
+- **Respuesta:** `{ total, items: AccionAdmin[] }`. `details` trae datos de contexto (p. ej. `reason`, `previous_active`, `workshop_id`, `rating`). Consultarla no genera otra entrada.
+
+**Errores comunes de las funciones de lista y panel:** `not_authenticated`, `invalid_input` (filtros, paginación o ids), `inactive_user`, `forbidden`. **Roles permitidos:** `admin` activo.
