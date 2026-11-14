@@ -227,7 +227,7 @@ Tipos:
 - `Notificacion.type` nuevos: `quote_received` (al cliente; `request_id`, `quote_id`), `quote_accepted` (al artesano; `request_id`, `quote_id`, `order_id`), `order_created` (al cliente; mismos campos), `quote_rejected` (al artesano; `request_id`, `quote_id`).
 
 Reglas: monto en MXN mayor que 0, máximo 2 decimales y menor a 100 000 000; fecha de entrega no anterior a hoy. Una sola cotización vigente (`sent`) por solicitud. Presupuesto reemplazado = `superseded`. Sin pago en la app.
-Estados de la solicitud: `send_quote` la deja en `quoted`; aceptar la pasa a `accepted` (el chat sigue abierto); rechazar la pasa a `declined` (terminal: el chat se cierra y el cliente puede abrir una solicitud nueva con ese taller).
+Estados de la solicitud: `send_quote` la deja en `quoted`; aceptar la pasa a `accepted` (el chat sigue abierto); rechazar deja el presupuesto en `rejected` y la solicitud en `quoted` con el chat abierto, para que el artesano envíe otro. Las rondas de presupuesto y rechazo se repiten hasta que el cliente acepta (`accepted`) o cancela la solicitud (`cancelRequest`). `declined` no se usa en este flujo.
 Sin códigos de error nuevos.
 
 ### `sendQuote(requestId, { amount_mxn, delivery_date, detail? })` (módulo `quotes`, RPC `send_quote`)
@@ -238,7 +238,7 @@ Sin códigos de error nuevos.
 
 ### `respondQuote(quoteId, aceptar)` (módulo `quotes`, RPC `respond_quote`)
 - **Parámetros:** `quoteId: uuid`; `aceptar: boolean`.
-- **Respuesta:** `{ quote_id, status: 'accepted' | 'rejected', order_id: string | null }`. Aceptar crea la orden (fase 1, `in_progress`, `due_date` = fecha del presupuesto), mensaje de sistema y notifica a ambos (`quote_accepted` al artesano, `order_created` al cliente). Rechazar (A1) deja `declined`, mensaje de sistema y `quote_rejected` al artesano; `order_id` es `null`.
+- **Respuesta:** `{ quote_id, status: 'accepted' | 'rejected', order_id: string | null }`. Aceptar crea la orden (fase 1, `in_progress`, `due_date` = fecha del presupuesto), mensaje de sistema y notifica a ambos (`quote_accepted` al artesano, `order_created` al cliente). Rechazar (A1) deja el presupuesto `rejected` (la solicitud sigue `quoted`), agrega un mensaje de sistema y notifica `quote_rejected` al artesano; `order_id` es `null`.
 - **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es de su solicitud), `invalid_state` (el presupuesto ya no está `sent` o la solicitud ya no está `quoted`).
 - **Roles permitidos:** `client` activo dueño de la solicitud.
 

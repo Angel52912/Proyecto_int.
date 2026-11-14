@@ -86,8 +86,7 @@ export async function respondQuote(quoteId, aceptar) {
 
   quote.responded_at = new Date().toISOString();
   if (!aceptar) {
-    quote.status = "rejected";
-    solicitud.status = "declined";
+    quote.status = "rejected"; // la solicitud sigue en `quoted` y el chat abierto
     agregarMensaje({ request_id: solicitud.id, sender_id: null, body: "Presupuesto rechazado por el cliente", kind: "system" });
     notificar(estado.taller.owner_id, "quote_rejected", { request_id: solicitud.id, quote_id: quote.id });
     return { quote_id: quote.id, status: /** @type {const} */ ("rejected"), order_id: null };
