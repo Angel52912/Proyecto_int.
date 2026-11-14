@@ -9,6 +9,7 @@ import {
   ESTADOS_SOLICITUD,
   ROLES,
   exigirFiltros,
+  validarAccion,
   validarBooleanoOpcional,
   validarBusqueda,
   validarMotivo,
@@ -330,7 +331,7 @@ export async function listOrders(filtros) {
 export async function listActions(filtros) {
   const f = exigirFiltros(filtros);
   const admin = validarUuidOpcional(f.admin_id);
-  const accion = validarBusqueda(f.action);
+  const accion = validarAccion(f.action);
   const pagina = validarPagina(f);
   exigirAdmin();
   const filas = datos.acciones

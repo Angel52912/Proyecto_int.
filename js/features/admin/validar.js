@@ -6,6 +6,7 @@ export const LIMITE_POR_DEFECTO = 50;
 export const LIMITE_MAXIMO = 100;
 export const MAX_BUSQUEDA = 100;
 export const MAX_MOTIVO = 300;
+export const MAX_ACCION = 50;
 export const ROLES = /** @type {ReadonlyArray<string>} */ (["client", "craftsman", "admin"]);
 export const ESTADOS_SOLICITUD = /** @type {ReadonlyArray<string>} */ (["open", "quoted", "accepted", "declined", "cancelled"]);
 export const ESTADOS_PEDIDO = /** @type {ReadonlyArray<string>} */ (["in_progress", "ready", "delivered", "cancelled"]);
@@ -46,6 +47,17 @@ export function validarBusqueda(texto) {
   if (texto === undefined || texto === null) return null;
   if (typeof texto !== "string" || texto.trim().length > MAX_BUSQUEDA) throw new ApiError("invalid_input");
   return texto.trim() === "" ? null : texto.trim();
+}
+
+/**
+ * Nombre de acción de la bitácora, opcional (máximo 50 caracteres; vacío = sin filtro).
+ * @param {unknown} accion
+ * @returns {string | null}
+ */
+export function validarAccion(accion) {
+  const texto = validarBusqueda(accion);
+  if (texto !== null && texto.length > MAX_ACCION) throw new ApiError("invalid_input");
+  return texto;
 }
 
 /**

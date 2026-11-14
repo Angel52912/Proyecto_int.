@@ -8,6 +8,7 @@ import {
   ESTADOS_SOLICITUD,
   ROLES,
   exigirFiltros,
+  validarAccion,
   validarBooleanoOpcional,
   validarBusqueda,
   validarMotivo,
@@ -157,7 +158,9 @@ export async function listOrders(filtros) {
  */
 export async function listActions(filtros) {
   const f = exigirFiltros(filtros);
-  const accion = validarBusqueda(f.action);
-  if (accion !== null && accion.length > 50) throw new ApiError("invalid_input");
-  return llamar("admin_list_actions", { p_admin_id: validarUuidOpcional(f.admin_id), p_action: accion, ...validarPagina(f) });
+  return llamar("admin_list_actions", {
+    p_admin_id: validarUuidOpcional(f.admin_id),
+    p_action: validarAccion(f.action),
+    ...validarPagina(f),
+  });
 }
