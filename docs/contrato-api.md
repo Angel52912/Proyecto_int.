@@ -317,3 +317,27 @@ Tipos:
 ### `listPendingReviews()` (A2)
 - **Respuesta:** `Orden[]` entregadas del cliente sin calificación, de la más reciente a la más antigua. Otros roles reciben `[]`. **Errores:** `not_authenticated`.
 - **Notas:** sustituye al recordatorio programado (no hay `pg_cron`): la pantalla la consulta al abrir y muestra el aviso; además llega la notificación `order_delivered` al entregar.
+
+## CU-02. Búsqueda de talleres en el mapa (módulo `map`)
+
+Estado: **backend listo para revisión** (migración `0015_workshop_search`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/map/`. Simulado: 5 talleres de muestra en Mérida (uno suspendido, otro sin calificación, uno siempre abierto y otro siempre cerrado); la sesión es la compartida de `requests` (cliente por defecto). Pruebas: `reiniciarSimulacion()`, `fijarTalleresSimulados(lista)` y `fijarSesionSimulada(...)`.
+
+Solo el **cliente activo** busca y ve perfiles. Artesano, admin y usuario sin rol reciben `forbidden`. Solo aparecen talleres publicados y no suspendidos; nunca se devuelve `owner_id`, `published` ni `suspended`.
+
+Formato de `hours` (duda 5 cerrada): `{ mon?: Rango[], ..., sun?: Rango[] }`, `Rango = { open: "HH:MM", close: "HH:MM" }`, hasta 2 rangos por día, `open < close`, hora local de Mérida (`America/Merida`). Día ausente o `[]` = cerrado. El rango es `[open, close)`: a la hora de cierre ya está cerrado. Un horario que cruza la medianoche se captura en dos días.
+
+Tipos:
+- `TallerBase = { id, name, address, colonia, postal_code: string | null, lat, lng, services: ('repair' | 'cleaning')[], hours: Horario, price_from: number, rating_avg: number | null, rating_count, distance_km: number | null, is_open: boolean }`. `distance_km` (2 decimales) es `null` si no se envió ubicación.
+- `ResultadoBusqueda = TallerBase & { profile_photo_url: string | null }`.
+- `PerfilTaller = TallerBase & { photos: { id, path, kind: 'profile' | 'work', sort, url }[] }`. Las fotos del taller son públicas; la de perfil va primero y luego los trabajos, del más reciente al más antiguo.
+
+### `searchWorkshops({ service, lat?, lng?, max_distance_km?, colonia?, postal_code?, min_rating?, open_now?, max_price?, limit?, offset? })` (RPC `search_workshops`)
+- **Parámetros:** `service: 'repair' | 'cleaning'` (obligatorio, paso 1 del CU). `lat` y `lng` van juntas (ubicación del cliente). `max_distance_km` (> 0 y máximo 500) **exige ubicación**. `colonia`: subcadena sin distinguir mayúsculas (máximo 100; vacío = sin filtro). `postal_code`: 5 dígitos. `min_rating`: 1 a 5 (excluye talleres sin calificación). `open_now: boolean`: solo los abiertos ahora. `max_price`: precio "desde" máximo (MXN). `limit`: 1 a 100 (50 por defecto). `offset` >= 0.
+- **Respuesta:** `ResultadoBusqueda[]`. Con ubicación va del más cercano al más lejano; sin ella (A1: el cliente escribe colonia o C.P.) va por calificación, luego por número de reseñas y nombre.
+- **A2 (sin resultados):** devuelve `[]`, no lanza; la pantalla muestra el aviso.
+- **Errores:** `not_authenticated`, `invalid_input` (cualquier parámetro fuera de rango, ubicación incompleta o `max_distance_km` sin ubicación), `inactive_user`, `forbidden` (no es cliente). **Roles permitidos:** `client` activo.
+
+### `getWorkshopProfile(workshopId, ubicacion?)` (RPC `get_workshop_profile`)
+- **Parámetros:** `workshopId: uuid`; `ubicacion?: { lat, lng }` solo para calcular `distance_km`.
+- **Respuesta:** `PerfilTaller` (calificación, servicios, horario, precio "desde", `is_open` y fotos de trabajos).
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe, no está publicado o está suspendido: no se distingue). **Roles permitidos:** `client` activo.

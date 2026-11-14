@@ -54,6 +54,8 @@ Restricciones:
 - Check en `workshops`: si `published`, los campos obligatorios no pueden ser nulos.
 - `order_updates` y `admin_actions` son append-only (sin UPDATE ni DELETE; trigger de bloqueo en `admin_actions`).
 
+Formato de `workshops.hours` (cierra la duda 5): `{ "mon": [{"open":"09:00","close":"18:00"}], "tue": [...], ..., "sun": [] }`. Claves `mon` a `sun`; de 0 a 2 rangos `HH:MM` (24 h) por día con `open < close`; día ausente o `[]` = cerrado. Es la hora local de Mérida (`America/Merida`, UTC-6 sin horario de verano). El rango es `[open, close)`: a la hora de cierre ya está cerrado. Para publicar se exige al menos un rango en la semana. Un horario que cruza la medianoche se captura como dos días (`22:00-23:59` y `00:00-02:00` del siguiente).
+
 ### Matriz RLS
 | Tabla | client | craftsman | admin | anon |
 |---|---|---|---|---|
@@ -101,6 +103,7 @@ El admin no tiene políticas en los buckets privados. Las políticas validan la 
 | Fases | `advance_phase(order, to, photo, note, confirm)` | `select ... for update`. Solo `phase + 1`. Un salto o retroceso exige `confirm = true` y nota, y marca `corrected`. La foto es obligatoria siempre. |
 | Listo | `mark_ready` | Exige fase 4. |
 | PIN | `reveal_delivery_pin`, `verify_delivery_pin` | Ver abajo. |
+| Búsqueda | `search_workshops`, `get_workshop_profile` | Solo cliente activo; solo talleres `published` y no `suspended`; nunca devuelven `owner_id`. Distancia con haversine (sin PostGIS) y "Abierto" con la hora de `America/Merida`. Migración `0015`. |
 | Reseña | `create_review` | Cliente de la orden, orden `delivered`, `unique(order_id)`. Sin política INSERT, UPDATE ni DELETE. |
 | Promedio | Trigger en `reviews` | Recalcula avg y count desde cero sobre las no ocultas. |
 | Admin | `admin_*` | Validan `is_admin()` y escriben `admin_actions` en la misma transacción. No autodesactivarse; siempre queda un admin activo. |
