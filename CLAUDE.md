@@ -131,6 +131,4 @@ Orden sugerido: CU-01 → CU-07 → CU-02 → CU-03 → CU-04 → CU-05 → CU-0
 2. "Python Flet" (apartado Prototipado) y "WhatsApp API" (cronograma) no aparecen en el resto del stack.
 3. Pago: los mockups dicen "pagas al recoger", así que no hay pasarela de pago.
 4. Tipografías Poppins e Inter: ¿archivos locales o solo fuentes del sistema?
-5. Formato exacto del jsonb `workshops.hours`.
-
-Resueltas (ver `docs/decisiones/0001-arquitectura.md`): OTP y PIN de 6 dígitos; varios talleres a la vez permitido (máximo 5 activas); cancelación en `open` o `quoted`.
+Resueltas (ver `docs/decisiones/0001-arquitectura.md`): formato del jsonb `workshops.hours` (claves `mon`..`sun`, hasta 2 rangos `HH:MM`, hora de Mérida); OTP y PIN de 6 dígitos; varios talleres a la vez permitido (máximo 5 activas); cancelación en `open` o `quoted`.
