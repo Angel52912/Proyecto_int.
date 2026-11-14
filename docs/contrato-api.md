@@ -181,7 +181,7 @@ Límites: descripción de 1 a 1000 caracteres, mensaje de 1 a 2000, máximo 5 fo
 ### `cancelRequest(requestId)` (RPC `cancel_request`, A2)
 - **Respuesta:** `{ id, status: 'cancelled' }`. Efectos: mensaje de sistema "Solicitud cancelada por el cliente" y notificación `request_cancelled` al artesano. El chat deja de admitir mensajes.
 - **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden`, `not_found`, `invalid_state` (solo se cancela en `open` o `quoted`).
-- **Roles permitidos:** `client` activo dueño. CU-04 extenderá la función para marcar también el presupuesto vigente.
+- **Roles permitidos:** `client` activo dueño. Desde la migración `0011` también marca como `rejected` el presupuesto vigente (si lo hay).
 
 ### `listMyRequests()`
 - **Respuesta:** `Solicitud[]`, de la más reciente a la más antigua. El cliente ve las suyas (con borradores); el artesano ve las de su taller sin borradores. Otros roles reciben `[]`.
@@ -215,3 +215,43 @@ Límites: descripción de 1 a 1000 caracteres, mensaje de 1 a 2000, máximo 5 fo
 ### `subscribeToMessages(requestId, alRecibir)`
 - **Parámetros:** `alRecibir: (mensaje: Mensaje) => void`. **Respuesta:** promesa de una función que cancela la suscripción.
 - **Errores:** `not_authenticated`, `invalid_input`. **Notas:** Realtime (INSERT en `messages`); recibe también los mensajes propios y los de sistema, así que la pantalla debe evitar duplicados por `id`.
+
+## CU-04. Presupuesto y orden de trabajo (módulos `quotes` y `orders`)
+
+Estado: **backend listo para revisión** (migración `0011_quotes_orders`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/quotes/`; `api.js` y `api.mock.js` (solo lectura) en `js/features/orders/`.
+Simulado: comparte estado con `requests` y `chat` (`js/features/requests/simulacion.js`). El artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`. La tarjeta de presupuesto aparece en `listMessages` como mensaje `kind: 'quote_card'` con `quote_id`.
+
+Tipos:
+- `Presupuesto = { id, request_id, amount_mxn: number, delivery_date: 'YYYY-MM-DD', detail: object, status: 'sent' | 'accepted' | 'rejected' | 'superseded', created_at, responded_at: string | null }`. `detail` es un objeto libre (p. ej. desglose); máximo 2000 caracteres al serializar.
+- `Orden = { id, quote_id, request_id, client_id, workshop_id, phase: 1 a 4, status: 'in_progress' | 'ready' | 'delivered' | 'cancelled', due_date, ready_at, delivered_at, created_at, updated_at }`. El PIN de entrega nunca se devuelve.
+- `Notificacion.type` nuevos: `quote_received` (al cliente; `request_id`, `quote_id`), `quote_accepted` (al artesano; `request_id`, `quote_id`, `order_id`), `order_created` (al cliente; mismos campos), `quote_rejected` (al artesano; `request_id`, `quote_id`).
+
+Reglas: monto en MXN mayor que 0, máximo 2 decimales y menor a 100 000 000; fecha de entrega no anterior a hoy. Una sola cotización vigente (`sent`) por solicitud. Presupuesto reemplazado = `superseded`. Sin pago en la app.
+Estados de la solicitud: `send_quote` la deja en `quoted`; aceptar la pasa a `accepted` (el chat sigue abierto); rechazar la pasa a `declined` (terminal: el chat se cierra y el cliente puede abrir una solicitud nueva con ese taller).
+Sin códigos de error nuevos.
+
+### `sendQuote(requestId, { amount_mxn, delivery_date, detail? })` (módulo `quotes`, RPC `send_quote`)
+- **Parámetros:** `requestId: uuid`; `amount_mxn: number`; `delivery_date: string` (`YYYY-MM-DD`); `detail?: object`.
+- **Respuesta:** `Presupuesto` en `sent`. Efectos: solicitud en `quoted`, tarjeta `quote_card` en el chat (remitente: el artesano), notificación `quote_received` al cliente. Si había uno vigente (A2, rectificar) queda `superseded`.
+- **Errores:** `not_authenticated`, `invalid_input` (monto, fecha, detalle o id), `inactive_user`, `forbidden` (no es artesano, o su taller está suspendido), `not_found` (la solicitud no existe, no es de su taller o es un borrador), `invalid_state` (solo en `open` o `quoted`).
+- **Roles permitidos:** `craftsman` activo dueño del taller.
+
+### `respondQuote(quoteId, aceptar)` (módulo `quotes`, RPC `respond_quote`)
+- **Parámetros:** `quoteId: uuid`; `aceptar: boolean`.
+- **Respuesta:** `{ quote_id, status: 'accepted' | 'rejected', order_id: string | null }`. Aceptar crea la orden (fase 1, `in_progress`, `due_date` = fecha del presupuesto), mensaje de sistema y notifica a ambos (`quote_accepted` al artesano, `order_created` al cliente). Rechazar (A1) deja `declined`, mensaje de sistema y `quote_rejected` al artesano; `order_id` es `null`.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es de su solicitud), `invalid_state` (el presupuesto ya no está `sent` o la solicitud ya no está `quoted`).
+- **Roles permitidos:** `client` activo dueño de la solicitud.
+
+### `getQuote(quoteId)` (módulo `quotes`)
+- **Respuesta:** `Presupuesto`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no participa). **Roles permitidos:** `client` dueño y `craftsman` del taller. El admin no accede.
+
+### `listQuotes(requestId)` (módulo `quotes`)
+- **Respuesta:** `Presupuesto[]` de la solicitud, del más antiguo al más reciente (historial completo; el vigente es el de `status: 'sent'`). Devuelve `[]` si no participa.
+- **Errores:** `not_authenticated`, `invalid_input`.
+
+### `listMyOrders()` (módulo `orders`)
+- **Respuesta:** `Orden[]` del cliente o del taller del artesano, de la más reciente a la más antigua. Otros roles reciben `[]`. **Errores:** `not_authenticated`.
+
+### `getOrder(orderId)` (módulo `orders`)
+- **Respuesta:** `Orden`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no participa).
+- **Notas:** CU-05 y CU-06 agregarán fases, entrega y PIN en este módulo.

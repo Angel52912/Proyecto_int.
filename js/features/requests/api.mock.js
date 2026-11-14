@@ -131,6 +131,13 @@ export async function cancelRequest(requestId) {
   if (!s) throw new ApiError("not_found");
   if (s.status !== "open" && s.status !== "quoted") throw new ApiError("invalid_state");
   s.status = "cancelled";
+  // CU-04: el presupuesto vigente queda rechazado (igual que cancel_request en 0011).
+  for (const q of estado.cotizaciones) {
+    if (q.request_id === s.id && q.status === "sent") {
+      q.status = "rejected";
+      q.responded_at = new Date().toISOString();
+    }
+  }
   agregarMensaje({ request_id: s.id, sender_id: null, body: "Solicitud cancelada por el cliente", kind: "system" });
   notificar(estado.taller.owner_id, "request_cancelled", { request_id: s.id });
   return { id: s.id, status: /** @type {const} */ ("cancelled") };
