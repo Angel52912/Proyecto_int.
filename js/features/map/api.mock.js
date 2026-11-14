@@ -167,7 +167,7 @@ function aTallerBase(t, origen) {
     lat: t.lat,
     lng: t.lng,
     services: [...t.services],
-    hours: structuredClone(t.hours),
+    hours: JSON.parse(JSON.stringify(t.hours)),
     price_from: t.price_from,
     rating_avg: t.rating_avg,
     rating_count: t.rating_count,
