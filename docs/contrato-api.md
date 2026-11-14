@@ -134,3 +134,84 @@ Tipos:
 - **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no es suya), `forbidden`. **Roles permitidos:** `craftsman` dueño.
 
 Notas de visibilidad (para CU-02): el cliente activo solo ve talleres `published` y no `suspended`, y sus fotos; el artesano solo ve el suyo; el admin no accede a estas tablas directamente (CU-08 usará funciones).
+
+## CU-03. Solicitud de cotización y chat (módulos `requests` y `chat`)
+
+Estado: **backend listo para revisión** (migraciones `0007_service_requests`, `0008_request_photos`, `0009_messages_notifications`, `0010_request_functions`; sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/requests/` y `js/features/chat/`.
+Simulado: ambos módulos comparten estado (`js/features/requests/simulacion.js`). La sesión por defecto es un cliente activo y hay un taller simulado publicado (`ID_TALLER_SIMULADO`, servicios `repair` y `cleaning`). Solo en el mock: `reiniciarSimulacion()`, `fijarSesionSimulada({ sesion, rol, activo })` (cambia a `craftsman` para actuar como el artesano de esa solicitud) y `fijarTallerSimulado({ published, suspended, services })`. Las URLs de fotos son `https://simulado.local/request-photos/{path}`.
+
+Códigos nuevos en errores comunes:
+
+| Código | Significado |
+|---|---|
+| `invalid_state` | La acción no aplica al estado actual (enviar algo que no es borrador, cancelar fuera de `open` o `quoted`, taller que dejó de estar disponible, ya hay una solicitud viva con ese taller). |
+| `photo_required` | Se intentó enviar una solicitud sin fotos. |
+
+Tipos:
+- `Solicitud = { id, client_id, workshop_id, service_type: 'repair' | 'cleaning', description, status: 'draft' | 'open' | 'quoted' | 'accepted' | 'declined' | 'cancelled', submitted_at: string | null, created_at, photo_count: number }`.
+- `FotoSolicitud = { id, path, url }` (`url` firmada, válida 1 h; el bucket es privado).
+- `Contraparte = { id, full_name, avatar_path: string | null }`.
+- `SolicitudDetalle = Solicitud & { photos: FotoSolicitud[], counterpart: Contraparte | null }`. `counterpart` es el artesano para el cliente (`null` si el taller ya no está publicado) y el cliente para el artesano.
+- `Notificacion = { id, type: string, payload: object, read_at: string | null, created_at }`. Tipos de esta etapa: `request_received` y `request_cancelled`, ambos con `payload.request_id`.
+- `Mensaje = { id, request_id, sender_id: string | null, body, kind: 'text' | 'quote_card' | 'system', quote_id: string | null, created_at }`. `sender_id` es `null` en los mensajes de sistema. `body` se muestra siempre con `textContent`, nunca como HTML.
+
+Límites: descripción de 1 a 1000 caracteres, mensaje de 1 a 2000, máximo 5 fotos por solicitud (`limit_reached`) y máximo 5 solicitudes activas por cliente (`open` o `quoted`, se valida al enviar). Solo una solicitud viva (`draft`, `open` o `quoted`) por cliente y taller.
+
+### `createRequestDraft({ workshop_id, service_type, description })` (módulo `requests`)
+- **Parámetros:** `workshop_id: uuid`, `service_type: 'repair' | 'cleaning'`, `description: string` (1 a 1000).
+- **Respuesta:** `Solicitud` en `draft`. Si ya hay un borrador para ese taller, lo reutiliza y le actualiza la descripción.
+- **Errores:** `not_authenticated`, `invalid_input`, `forbidden` (no es cliente activo, o el taller no está publicado, está suspendido o no ofrece ese servicio), `invalid_state` (ya hay una solicitud `open` o `quoted` con ese taller).
+- **Roles permitidos:** `client` activo.
+
+### `addRequestPhoto(requestId, archivo)`
+- **Parámetros:** `requestId: uuid`, `archivo: File` (jpeg, png o webp, máximo 5 MB; el frontend comprime antes).
+- **Respuesta:** `FotoSolicitud`. Sube al bucket privado `request-photos` (ruta `{request_id}/{uuid}`) y la registra.
+- **Errores:** `not_authenticated`, `invalid_input` (tipo o tamaño, A1), `forbidden` (no es una solicitud propia en `draft`), `limit_reached` (ya hay 5).
+- **Roles permitidos:** `client` dueño, solo con la solicitud en `draft`.
+
+### `removeRequestPhoto(photoId)`
+- **Respuesta:** `void` (borra el registro y el archivo). **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe, no es suya o la solicitud ya no es `draft`).
+- **Roles permitidos:** `client` dueño, solo en `draft`.
+
+### `submitRequest(requestId)` (RPC `submit_request`)
+- **Respuesta:** `{ id, status: 'open' }`. Efectos: agrega al chat el mensaje de sistema "Solicitud enviada" (el chat queda abierto) y notifica `request_received` al artesano dueño del taller.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es suya), `invalid_state` (no es `draft` o el taller ya no recibe solicitudes), `photo_required`, `limit_reached` (5 activas).
+- **Roles permitidos:** `client` activo dueño.
+
+### `cancelRequest(requestId)` (RPC `cancel_request`, A2)
+- **Respuesta:** `{ id, status: 'cancelled' }`. Efectos: mensaje de sistema "Solicitud cancelada por el cliente" y notificación `request_cancelled` al artesano. El chat deja de admitir mensajes.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden`, `not_found`, `invalid_state` (solo se cancela en `open` o `quoted`).
+- **Roles permitidos:** `client` activo dueño. CU-04 extenderá la función para marcar también el presupuesto vigente.
+
+### `listMyRequests()`
+- **Respuesta:** `Solicitud[]`, de la más reciente a la más antigua. El cliente ve las suyas (con borradores); el artesano ve las de su taller sin borradores. Otros roles reciben `[]`.
+- **Errores:** `not_authenticated`.
+
+### `getRequest(requestId)`
+- **Respuesta:** `SolicitudDetalle`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no participa).
+- **Roles permitidos:** `client` dueño y `craftsman` del taller (nunca ve borradores). El admin no accede.
+
+### `listMyNotifications({ unreadOnly? })`
+- **Respuesta:** `Notificacion[]` propias, de la más reciente a la más antigua (máximo 50). **Errores:** `not_authenticated`.
+
+### `markNotificationRead(notificationId)`
+- **Respuesta:** `Notificacion` con `read_at`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no es suya).
+
+### `subscribeToNotifications(alRecibir)`
+- **Parámetros:** `alRecibir: (notificacion: Notificacion) => void`. **Respuesta:** promesa de una función que cancela la suscripción.
+- **Errores:** `not_authenticated`. **Notas:** Realtime (INSERT en `notifications`); solo llegan las propias.
+
+### `listMessages(requestId, { limit?, before? })` (módulo `chat`)
+- **Parámetros:** `limit: number` (1 a 100, por defecto 50), `before: string` (ISO 8601; trae los anteriores a esa fecha, para paginar hacia atrás).
+- **Respuesta:** `Mensaje[]` del más antiguo al más reciente (los `limit` últimos).
+- **Errores:** `not_authenticated`, `invalid_input`, `not_found` (la solicitud no existe o el usuario no participa; un chat vacío devuelve `[]`).
+- **Roles permitidos:** `client` dueño y `craftsman` del taller.
+
+### `sendMessage(requestId, body)`
+- **Parámetros:** `body: string` (1 a 2000, se recorta). **Respuesta:** `Mensaje` con `kind: 'text'`; el remitente es siempre el usuario con sesión.
+- **Errores:** `not_authenticated`, `invalid_input`, `forbidden` (no participa o la solicitud no admite mensajes: solo en `open`, `quoted` o `accepted`).
+- **Roles permitidos:** `client` dueño y `craftsman` del taller, activos.
+
+### `subscribeToMessages(requestId, alRecibir)`
+- **Parámetros:** `alRecibir: (mensaje: Mensaje) => void`. **Respuesta:** promesa de una función que cancela la suscripción.
+- **Errores:** `not_authenticated`, `invalid_input`. **Notas:** Realtime (INSERT en `messages`); recibe también los mensajes propios y los de sistema, así que la pantalla debe evitar duplicados por `id`.
