@@ -255,7 +255,7 @@ Sin códigos de error nuevos.
 
 ### `getOrder(orderId)` (módulo `orders`)
 - **Respuesta:** `Orden`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no participa).
-- **Notas:** CU-06 agregará entrega y PIN en este módulo.
+- **Notas:** entrega y PIN están en la sección CU-06.
 
 ## CU-05. Fases del pedido y fotos de avance (módulo `orders`)
 
@@ -284,3 +284,36 @@ Tipos:
 ### `subscribeToOrderUpdates(orderId, alRecibir)`
 - **Parámetros:** `alRecibir: (avance: Avance) => void`. **Respuesta:** promesa de una función que cancela la suscripción. **Errores:** `not_authenticated`, `invalid_input`.
 - **Notas:** Realtime (INSERT en `order_updates`; trae `phase`, así que sirve para la barra de progreso). El aviso de "listo" llega por la notificación `order_ready` (`subscribeToNotifications`). No se escucha `orders` directamente porque Realtime no respeta los permisos por columna.
+
+## CU-06. Entrega con PIN y calificación (módulo `orders`)
+
+Estado: **backend listo para revisión** (migraciones `0013_order_pins` y `0014_delivery_reviews`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/orders/`. Simulado: comparte estado con `requests`; el cliente es la sesión por defecto y el artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`.
+
+Tipos:
+- `PinEntrega = { order_id, pin: string }` (6 dígitos). `ResultadoPin = { ok: boolean, attempts_left: 0 a 5, locked_until: string | null, status }`.
+- `Resena = { id, order_id, workshop_id, rating: 1 a 5, tags: string[], comment: string | null, hidden: boolean, created_at }`.
+- `Notificacion.type` nuevos: `order_delivered` (al cliente; `order_id`, `request_id`, `review_pending: true`) y `review_received` (al artesano; `order_id`, `review_id`, `rating`). Al entregar se agrega además un mensaje de sistema en el chat.
+- El PIN no está en `orders` ni en ninguna tabla de la API: vive en `private.order_pins` y solo lo tocan las funciones.
+- QR: codifica `${order_id}:${pin}`. `verifyDeliveryPin` acepta el texto del QR o solo el PIN.
+
+### `revealDeliveryPin(orderId)` (RPC `reveal_delivery_pin`)
+- **Respuesta:** `PinEntrega`. Solo con el pedido `ready`. **Cada llamada rota el PIN** (el anterior deja de servir) y reinicia los intentos, pero no levanta un bloqueo vigente. El PIN se devuelve solo aquí; no se puede volver a leer.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es suyo), `invalid_state` (el pedido no está `ready`). **Roles permitidos:** `client` activo dueño del pedido.
+
+### `verifyDeliveryPin(orderId, codigo)` (RPC `verify_delivery_pin`)
+- **Parámetros:** `codigo: string`, `123456` o `order_id:123456` (QR de este mismo pedido).
+- **Respuesta:** `ResultadoPin`. **Un PIN incorrecto NO lanza**: devuelve `{ ok: false, attempts_left, locked_until }`. A los 5 intentos fallidos el pedido se bloquea 15 minutos: `{ ok: false, attempts_left: 0, locked_until }` (también si se envía el PIN correcto durante el bloqueo). Si `ok` es `true` el pedido queda `delivered` (`delivered_at`), se agrega un mensaje de sistema y se notifica `order_delivered` al cliente.
+- **A1 (rechazar código inválido):** un código mal formado (no son 6 dígitos, o el QR es de otro pedido) lanza `invalid_input` y **no** cuenta como intento. Un PIN bien formado pero equivocado devuelve `ok: false`.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es artesano, o su taller está suspendido), `not_found` (no existe o no es de su taller), `invalid_state` (el pedido no está `ready`, o el cliente aún no generó el PIN). **Roles permitidos:** `craftsman` activo dueño del taller.
+
+### `createReview(orderId, { rating, comment?, tags? })` (RPC `create_review`)
+- **Parámetros:** `rating: 1 a 5` (entero); `comment?: string` (máximo 1000, se recorta; vacío = sin comentario); `tags?: string[]` (máximo 5, de 1 a 30 caracteres cada una).
+- **Respuesta:** `Resena`. Recalcula `rating_avg` (1 decimal) y `rating_count` del taller sobre las reseñas no ocultas y notifica `review_received` al artesano. **Sin edición** posterior.
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es suyo), `invalid_state` (el pedido no está `delivered` o ya tiene reseña). **Roles permitidos:** `client` activo dueño del pedido.
+
+### `getOrderReview(orderId)`
+- **Respuesta:** `Resena | null`. Ven la reseña los clientes y artesanos activos si no está oculta; el autor la ve aunque esté oculta. Admin, sin rol e inactivos reciben `null`. **Errores:** `not_authenticated`, `invalid_input`.
+
+### `listPendingReviews()` (A2)
+- **Respuesta:** `Orden[]` entregadas del cliente sin calificación, de la más reciente a la más antigua. Otros roles reciben `[]`. **Errores:** `not_authenticated`.
+- **Notas:** sustituye al recordatorio programado (no hay `pg_cron`): la pantalla la consulta al abrir y muestra el aviso; además llega la notificación `order_delivered` al entregar.

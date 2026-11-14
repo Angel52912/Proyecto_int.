@@ -2,7 +2,8 @@
 import { ApiError } from "../../lib/apiError.js";
 import { validarImagen } from "../../lib/validate.js";
 import { exigirUuid } from "../requests/validar.js";
-import { UID_ARTESANO, UID_CLIENTE, agregarMensaje, estado, exigirSesion, idSimulado, notificar } from "../requests/simulacion.js";
+import { UID_ARTESANO, UID_CLIENTE, agregarMensaje, estado, exigirClienteFuncion, exigirSesion, idSimulado, notificar } from "../requests/simulacion.js";
+import { INTENTOS_PIN, MINUTOS_BLOQUEO_PIN, extraerPin, validarResena } from "./validar.js";
 
 export { fijarSesionSimulada, reiniciarSimulacion } from "../requests/simulacion.js";
 
@@ -78,6 +79,126 @@ export async function markOrderReady(orderId) {
   agregarMensaje({ request_id: orden.request_id, sender_id: null, body: "Tu pedido está listo para entrega", kind: "system" });
   notificar(orden.client_id, "order_ready", { order_id: orden.id, request_id: orden.request_id });
   return { order_id: orden.id, status: orden.status, phase: orden.phase, ready_at: orden.ready_at };
+}
+
+/**
+ * El cliente genera el PIN de entrega (solo con el pedido `ready`). Cada llamada rota el PIN y reinicia los intentos,
+ * pero no levanta un bloqueo vigente.
+ * @param {string} orderId
+ */
+export async function revealDeliveryPin(orderId) {
+  exigirUuid(orderId);
+  exigirClienteFuncion();
+  const orden = estado.ordenes.find((o) => o.id === orderId && o.client_id === UID_CLIENTE);
+  if (!orden) throw new ApiError("not_found");
+  if (orden.status !== "ready") throw new ApiError("invalid_state");
+  const azar = new Uint32Array(1);
+  globalThis.crypto.getRandomValues(azar);
+  const pin = String(azar[0] % 1_000_000).padStart(6, "0");
+  const previo = estado.pins.get(orden.id);
+  estado.pins.set(orden.id, { pin, attempts: 0, lockedUntil: previo?.lockedUntil ?? null });
+  return { order_id: orden.id, pin };
+}
+
+/**
+ * El artesano confirma la entrega. Un PIN incorrecto no lanza: devuelve `{ ok: false, attempts_left, locked_until }`.
+ * @param {string} orderId
+ * @param {string} codigo `123456` o `order_id:123456`
+ */
+export async function verifyDeliveryPin(orderId, codigo) {
+  exigirUuid(orderId);
+  const pin = extraerPin(orderId, codigo);
+  const orden = exigirArtesanoDeOrden(orderId);
+  if (orden.status !== "ready") throw new ApiError("invalid_state");
+  const registro = estado.pins.get(orden.id);
+  if (!registro) throw new ApiError("invalid_state"); // el cliente aún no muestra el PIN
+
+  const ahora = Date.now();
+  if (registro.lockedUntil !== null && registro.lockedUntil > ahora) {
+    return { ok: false, attempts_left: 0, locked_until: new Date(registro.lockedUntil).toISOString(), status: orden.status };
+  }
+  if (registro.pin === pin) {
+    estado.pins.delete(orden.id);
+    orden.status = "delivered";
+    orden.delivered_at = new Date(ahora).toISOString();
+    orden.updated_at = orden.delivered_at;
+    agregarMensaje({ request_id: orden.request_id, sender_id: null, body: "Pedido entregado y resuelto", kind: "system" });
+    notificar(orden.client_id, "order_delivered", { order_id: orden.id, request_id: orden.request_id, review_pending: true });
+    return { ok: true, attempts_left: INTENTOS_PIN, locked_until: null, status: orden.status };
+  }
+  registro.attempts += 1;
+  if (registro.attempts >= INTENTOS_PIN) {
+    registro.attempts = 0;
+    registro.lockedUntil = ahora + MINUTOS_BLOQUEO_PIN * 60_000;
+    return { ok: false, attempts_left: 0, locked_until: new Date(registro.lockedUntil).toISOString(), status: orden.status };
+  }
+  registro.lockedUntil = null;
+  return { ok: false, attempts_left: INTENTOS_PIN - registro.attempts, locked_until: null, status: orden.status };
+}
+
+/**
+ * El cliente califica al artesano. Una reseña por pedido entregado; sin edición.
+ * @param {string} orderId
+ * @param {import("./validar.js").DatosResena} datos
+ */
+export async function createReview(orderId, datos) {
+  exigirUuid(orderId);
+  const valida = validarResena(datos);
+  exigirClienteFuncion();
+  const orden = estado.ordenes.find((o) => o.id === orderId && o.client_id === UID_CLIENTE);
+  if (!orden) throw new ApiError("not_found");
+  if (orden.status !== "delivered") throw new ApiError("invalid_state");
+  if (estado.resenas.some((r) => r.order_id === orden.id)) throw new ApiError("invalid_state");
+
+  /** @type {import("../requests/simulacion.js").ResenaSim} */
+  const resena = {
+    id: idSimulado(),
+    order_id: orden.id,
+    workshop_id: orden.workshop_id,
+    client_id: UID_CLIENTE,
+    rating: valida.rating,
+    tags: valida.tags,
+    comment: valida.comment,
+    hidden: false,
+    created_at: new Date().toISOString(),
+  };
+  estado.resenas.push(resena);
+  recalcularPromedio(orden.workshop_id);
+  notificar(UID_ARTESANO, "review_received", { order_id: orden.id, review_id: resena.id, rating: resena.rating });
+  return aResena(resena);
+}
+
+/** Recalcula el promedio del taller sobre las reseñas no ocultas (igual que el trigger de la base). */
+function recalcularPromedio(/** @type {string} */ workshopId) {
+  if (estado.taller.id !== workshopId) return;
+  const visibles = estado.resenas.filter((r) => r.workshop_id === workshopId && !r.hidden);
+  estado.taller.rating_count = visibles.length;
+  estado.taller.rating_avg = visibles.length === 0 ? null : Math.round((visibles.reduce((s, r) => s + r.rating, 0) / visibles.length) * 10) / 10;
+}
+
+/** @param {import("../requests/simulacion.js").ResenaSim} r */
+function aResena(r) {
+  return { id: r.id, order_id: r.order_id, workshop_id: r.workshop_id, rating: r.rating, tags: [...r.tags], comment: r.comment, hidden: r.hidden, created_at: r.created_at };
+}
+
+/** @param {string} orderId */
+export async function getOrderReview(orderId) {
+  exigirUuid(orderId);
+  exigirSesion();
+  if (!estado.activo || (estado.rol !== "client" && estado.rol !== "craftsman")) return null;
+  const resena = estado.resenas.find((r) => r.order_id === orderId);
+  if (!resena || (resena.hidden && !(estado.rol === "client" && resena.client_id === UID_CLIENTE))) return null;
+  return aResena(resena);
+}
+
+/** A2: pedidos entregados del cliente sin calificación, del más reciente al más antiguo. */
+export async function listPendingReviews() {
+  exigirSesion();
+  if (!estado.activo || estado.rol !== "client") return [];
+  return estado.ordenes
+    .filter((o) => o.client_id === UID_CLIENTE && o.status === "delivered" && !estado.resenas.some((r) => r.order_id === o.id))
+    .reverse()
+    .map((o) => ({ ...o }));
 }
 
 /** @param {string} orderId */

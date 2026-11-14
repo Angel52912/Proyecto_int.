@@ -103,7 +103,7 @@ El rol de `profiles` es nulo hasta que el usuario lo elige con `set_my_role`.
 | `request_photos` | id, request_id, path |
 | `messages` | id, request_id, sender_id, body, kind (texto, tarjeta de presupuesto o sistema), quote_id, created_at |
 | `quotes` | id, request_id, amount_mxn, delivery_date, detail (jsonb), status |
-| `orders` | id, quote_id, request_id, client_id, workshop_id, phase (1 a 4), status, due_date, delivery_pin_hash, pin_attempts, pin_locked_until, ready_at, delivered_at |
+| `orders` | id, quote_id, request_id, client_id, workshop_id, phase (1 a 4), status, due_date, ready_at, delivered_at (el PIN vive aparte en `private.order_pins`) |
 | `order_updates` | id, order_id, phase, photo_path (obligatoria), note, corrected, created_by, created_at |
 | `reviews` | id, order_id (único), client_id, workshop_id, rating (1 a 5), tags, comment, hidden |
 | `notifications` | id, user_id, type, payload (jsonb), read_at, created_at |
