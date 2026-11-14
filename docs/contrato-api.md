@@ -253,7 +253,7 @@ Sin códigos de error nuevos.
 ### `respondQuote(quoteId, aceptar)` (módulo `quotes`, RPC `respond_quote`)
 - **Parámetros:** `quoteId: uuid`; `aceptar: boolean`.
 - **Respuesta:** `{ quote_id, status: 'accepted' | 'rejected', order_id: string | null }`. Aceptar crea la orden (fase 1, `in_progress`, `due_date` = fecha del presupuesto), mensaje de sistema y notifica a ambos (`quote_accepted` al artesano, `order_created` al cliente). Rechazar (A1) deja el presupuesto `rejected` (la solicitud sigue `quoted`), agrega un mensaje de sistema y notifica `quote_rejected` al artesano; `order_id` es `null`.
-- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es de su solicitud), `invalid_state` (el presupuesto ya no está `sent` o la solicitud ya no está `quoted`).
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es de su solicitud), `invalid_state` (el presupuesto ya no está `sent`, la solicitud ya no está `quoted`, o al **aceptar** el taller está suspendido o su artesano desactivado; rechazar sí se puede).
 - **Roles permitidos:** `client` activo dueño de la solicitud.
 
 ### `getQuote(quoteId)` (módulo `quotes`)
@@ -325,6 +325,7 @@ Tipos:
 - **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden` (no es cliente), `not_found` (no existe o no es suyo), `invalid_state` (el pedido no está `delivered` o ya tiene reseña). **Roles permitidos:** `client` activo dueño del pedido.
 
 ### `getOrderReview(orderId)`
+- **Visibilidad (desde `0018`):** la API ya no devuelve `client_id` de las reseñas. Ve una reseña su autor (aunque esté oculta), cualquier cliente o artesano activo si no está oculta y el taller es visible (publicado, no suspendido y con dueño activo), y el artesano dueño del taller si no está oculta.
 - **Respuesta:** `Resena | null`. Ven la reseña los clientes y artesanos activos si no está oculta; el autor la ve aunque esté oculta. Admin, sin rol e inactivos reciben `null`. **Errores:** `not_authenticated`, `invalid_input`.
 
 ### `listPendingReviews()` (A2)
@@ -368,7 +369,7 @@ Convenciones:
 - Las acciones aceptan `reason` opcional (máximo 300). Queda en la bitácora; **la pantalla debe mostrarlo con `textContent`** (es texto libre).
 - Se registran en la bitácora las acciones que **cambian datos** (desactivar/reactivar usuario, suspender/reactivar taller, ocultar/restaurar reseña), en la misma transacción. Consultar listas y el panel no genera entradas. La bitácora es append-only.
 - Un cambio al mismo valor que ya tiene lanza `invalid_state`.
-- Desactivar un usuario (`active = false`) le impide usar las funciones de la app, pero **no cierra su sesión ni cambia sus solicitudes o pedidos abiertos**; los usuarios no se eliminan.
+- Desactivar un usuario (`active = false`) le impide usar las funciones de la app, pero **no cierra su sesión ni cambia sus solicitudes o pedidos abiertos**; los usuarios no se eliminan. Si es un artesano, su taller **deja de aparecer en el mapa, en el perfil y en nuevas solicitudes** (desde `0018`) hasta que se reactive; no cambia `published` ni `suspended`.
 - Sin códigos de error nuevos.
 
 Tipos: `Panel`, `UsuarioAdmin = { id, role, full_name, email, active, created_at }` (el correo solo sale en esta lista), `TallerAdmin = { id, owner_id, owner_name, name, colonia, services, published, suspended, rating_avg, rating_count, created_at }`, `ResenaAdmin = { id, order_id, workshop_id, workshop_name, client_id, rating, tags, comment, hidden, created_at }`, `SolicitudAdmin = { id, client_id, workshop_id, workshop_name, service_type, status, submitted_at, created_at, updated_at }`, `PedidoAdmin = { id, request_id, client_id, workshop_id, workshop_name, phase, status, due_date, ready_at, delivered_at, created_at, updated_at }`, `AccionAdmin = { id, admin_id, admin_name, action, target_table, target_id, details, created_at }`.
