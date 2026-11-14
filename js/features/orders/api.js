@@ -4,6 +4,7 @@ import { obtenerCliente } from "../../supabaseClient.js";
 import { ApiError, traducirError } from "../../lib/apiError.js";
 import { validarImagen } from "../../lib/validate.js";
 import { exigirUuid } from "../requests/validar.js";
+import { extraerPin, validarResena } from "./validar.js";
 
 // El PIN no está en `orders`: vive en private.order_pins y solo lo tocan las funciones de entrega.
 const COLUMNAS_ORDEN = "id, quote_id, request_id, client_id, workshop_id, phase, status, due_date, ready_at, delivered_at, created_at, updated_at";
@@ -127,6 +128,95 @@ export async function subscribeToOrderUpdates(orderId, alRecibir) {
   return () => {
     void cliente.removeChannel(canal);
   };
+}
+
+/**
+ * @typedef {{ order_id: string, pin: string }} PinEntrega
+ * @typedef {{ ok: boolean, attempts_left: number, locked_until: string | null, status: string }} ResultadoPin
+ * @typedef {{ id: string, order_id: string, workshop_id: string, rating: number, tags: string[], comment: string | null, hidden: boolean, created_at: string }} Resena
+ */
+
+/**
+ * El cliente genera y muestra el PIN de entrega (RPC `reveal_delivery_pin`). Solo con el pedido `ready`.
+ * Cada llamada rota el PIN. El QR codifica `${order_id}:${pin}`.
+ * @param {string} orderId
+ * @returns {Promise<PinEntrega>}
+ */
+export async function revealDeliveryPin(orderId) {
+  exigirUuid(orderId);
+  const { data, error } = await obtenerCliente().rpc("reveal_delivery_pin", { p_order_id: orderId });
+  if (error) throw traducirError(error);
+  return { order_id: data.order_id, pin: data.pin };
+}
+
+/**
+ * El artesano confirma la entrega con el PIN o el texto del QR (RPC `verify_delivery_pin`). Un PIN incorrecto NO
+ * lanza: devuelve `{ ok: false, attempts_left, locked_until }`. 5 intentos y bloqueo de 15 minutos.
+ * @param {string} orderId
+ * @param {string} codigo `123456` o `order_id:123456`
+ * @returns {Promise<ResultadoPin>}
+ */
+export async function verifyDeliveryPin(orderId, codigo) {
+  exigirUuid(orderId);
+  const pin = extraerPin(orderId, codigo);
+  const { data, error } = await obtenerCliente().rpc("verify_delivery_pin", { p_order_id: orderId, p_pin: pin });
+  if (error) throw traducirError(error);
+  return { ok: data.ok, attempts_left: data.attempts_left, locked_until: data.locked_until, status: data.status };
+}
+
+/**
+ * El cliente califica al artesano (RPC `create_review`). Una reseña por pedido entregado; sin edición.
+ * @param {string} orderId
+ * @param {import("./validar.js").DatosResena} datos
+ * @returns {Promise<Resena>}
+ */
+export async function createReview(orderId, datos) {
+  exigirUuid(orderId);
+  const valida = validarResena(datos);
+  const { data, error } = await obtenerCliente().rpc("create_review", {
+    p_order_id: orderId,
+    p_rating: valida.rating,
+    p_comment: valida.comment,
+    p_tags: valida.tags,
+  });
+  if (error) throw traducirError(error);
+  return data;
+}
+
+/**
+ * Reseña del pedido, o `null` si no hay (o está oculta y no es del usuario).
+ * @param {string} orderId
+ * @returns {Promise<Resena | null>}
+ */
+export async function getOrderReview(orderId) {
+  exigirUuid(orderId);
+  const { data, error } = await obtenerCliente()
+    .from("reviews")
+    .select("id, order_id, workshop_id, rating, tags, comment, hidden, created_at")
+    .eq("order_id", orderId)
+    .maybeSingle();
+  if (error) throw traducirError(error);
+  return data;
+}
+
+/**
+ * A2: pedidos entregados del cliente que aún no tienen calificación, del más reciente al más antiguo.
+ * @returns {Promise<Orden[]>}
+ */
+export async function listPendingReviews() {
+  const { data, error } = await obtenerCliente()
+    .from("orders")
+    .select(`${COLUMNAS_ORDEN}, reviews(id)`)
+    .eq("status", "delivered")
+    .order("delivered_at", { ascending: false });
+  if (error) throw traducirError(error);
+  return (data ?? [])
+    .filter((o) => (o.reviews ?? []).length === 0)
+    .map((o) => {
+      const { reviews, ...orden } = o;
+      void reviews; // solo sirve para el filtro; no forma parte de Orden
+      return orden;
+    });
 }
 
 /**
