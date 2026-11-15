@@ -46,7 +46,10 @@ export function ImagePlaceholder({ src, alt, width, height, rounded = true, icon
   const caja = document.createElement("div");
   caja.className = "ui-imagen" + (rounded ? " ui-imagen--redondeada" : "");
   if (width !== undefined) caja.style.width = typeof width === "number" ? `${width}px` : width;
-  if (height !== undefined) caja.style.height = typeof height === "number" ? `${height}px` : height;
+  if (height !== undefined) {
+    caja.style.height = typeof height === "number" ? `${height}px` : height;
+    caja.style.minHeight = "0";
+  }
 
   if (src !== undefined && src !== "") {
     const img = document.createElement("img");

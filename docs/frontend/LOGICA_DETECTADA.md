@@ -38,6 +38,9 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 07 | Chat | Adjuntar foto | 3 | Abre un `<input type="file">`; la imagen no se sube |
 | 07 | Chat | Ver presupuesto | 1 | Navega a `/pedido/1042/presupuesto` (fase 08) |
 | 07 | Chat | Volver | 1 | `window.history.back()` |
+| 08 | Presupuesto | Taller, desglose y totales | 2 | `js/mocks/budget.js`; los importes son texto y no se calculan |
+| 08 | Presupuesto | Aceptar o rechazar el presupuesto | 3 | `TODO(BACKEND)`; navega a `/pedido/1042` o `/chat/1042`; `respondQuote` existe pero exige sesión y UUID |
+| 08 | Presupuesto | Volver | 1 | `window.history.back()` |
 
 ## Contradicciones encontradas
 
@@ -50,3 +53,4 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 7. **Etiquetas del taller:** la fase 05 pide en el detalle `Suelas`, `Costuras` y `Limpieza`, mientras que la fase 04 muestra en la lista `Suelas · Costuras · Cuero`. El contrato no define etiquetas; se conservó `tags` para la lista y se añadió `detail_tags` (solo presentación) para el detalle.
 8. **Envío de la solicitud:** la fase 06 pide llamar a `onSubmit` si existe lógica Nivel 1. El backend de `requests` exige al menos una foto (`photo_required`) y la subida real es Nivel 3, así que el envío queda con `TODO(BACKEND)` y navega a `/pedidos`, como indica la fase.
 9. **Forma de los mensajes del chat:** el diseño usa `{ from, type, text, time, amount, delivery }`, mientras que el contrato define `Mensaje = { id, request_id, sender_id, body, kind, quote_id?, created_at }`. Se conservó la forma del diseño en `js/mocks/chat.js` (solo presentación) y se documentó en el propio mock. El servicio `js/features/chat/api.mock.js` existe (Nivel 1), pero exige sesión y un UUID de solicitud; el flujo de diseño usa el id `1042` y el modo simulado no tiene sesión, así que la pantalla no lo consume todavía.
+10. **Presupuesto:** los campos del diseño (`workshopName`, `rating`, `title`, `description`, `lines`, `total`, `delivery`, `time`, `notice`) son presentación; el contrato define `Presupuesto = { id, request_id, amount_mxn, delivery_date, detail, status, ... }`. El mock conserva ambos: `amount_mxn: 450` y `detail` con el desglose, además del `total` ya formateado. Aceptar/rechazar usa `TODO(BACKEND)` aunque `respondQuote` exista, porque exige sesión y un UUID y la fase indica que la respuesta real es Nivel 3.
