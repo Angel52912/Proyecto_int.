@@ -30,8 +30,8 @@
 .mapa__ubicar {
   position: fixed;
   z-index: 5;
-  right: max(var(--espacio-3), calc(50vw - 240px + var(--espacio-3)));
-  bottom: calc(var(--alto-nav) + 150px + env(safe-area-inset-bottom));
+  right: max(var(--espacio-3), calc((100% - 480px) / 2 + var(--espacio-3)));
+  bottom: calc(var(--alto-nav) + 190px + env(safe-area-inset-bottom));
   box-shadow: 0 2px 8px rgb(43 33 27 / 15%);
 }
 

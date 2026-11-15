@@ -58,6 +58,16 @@
   min-height: var(--tactil-min);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+
+.perfil-taller__horario summary::after {
+  content: "▾";
+  color: var(--color-cuero);
+}
+
+.perfil-taller__horario[open] summary::after {
+  content: "▴";
 }
 
 .horario {
