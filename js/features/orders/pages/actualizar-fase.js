@@ -55,11 +55,9 @@ function pintar({ pedido, solicitud }) {
   const marco = crear("label", { clase: "camara", attrs: { for: "foto-avance" } });
   const errorFoto = crear("p", { clase: "campo__error", attrs: { "aria-live": "polite" } });
   function pintarMarco() {
-    marco.replaceChildren(
-      vista ? crear("img", { clase: "camara__vista", attrs: { src: vista, alt: "Foto de avance elegida" } }) : null,
-      crear("span", { clase: "camara__texto" }, [icono("camara", { tam: 26 }), crear("span", { texto: vista ? "Cambiar foto" : "Tomar foto de avance" })]),
-      vista ? null : crear("span", { clase: "camara__obturador", attrs: { "aria-hidden": "true" } }),
-    );
+    const texto = crear("span", { clase: "camara__texto" }, [icono("camara", { tam: 26 }), crear("span", { texto: vista ? "Cambiar foto" : "Tomar foto de avance" })]);
+    if (vista) marco.replaceChildren(crear("img", { clase: "camara__vista", attrs: { src: vista, alt: "Foto de avance elegida" } }), texto);
+    else marco.replaceChildren(texto, crear("span", { clase: "camara__obturador", attrs: { "aria-hidden": "true" } }));
   }
   pintarMarco();
   entradaFoto.addEventListener("change", () => {
