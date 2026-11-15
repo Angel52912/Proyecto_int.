@@ -588,3 +588,25 @@ fieldset.campo {
 .campo--error > label {
   color: var(--color-error);
 }
+
+.acciones > .boton--icono {
+  flex: none;
+}
+
+a.aviso,
+a.boton-texto {
+  text-decoration: none;
+}
+
+.campo input,
+.campo textarea,
+.campo select {
+  width: 100%;
+  min-width: 0;
+}
+
+.filtros__fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--espacio-2);
+}
