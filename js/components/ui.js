@@ -186,9 +186,9 @@ export function Card({ onClick, padding, tone = "default", children } = {}) {
 
 /**
  * Campo de búsqueda con icono.
- * @param {{ placeholder: string, value?: string, onChange?: (valor: string) => void, rightSlot?: Node }} props
+ * @param {{ placeholder: string, value?: string, onChange?: (valor: string) => void, onFocus?: () => void, onEnter?: () => void, rightSlot?: Node }} props
  */
-export function SearchInput({ placeholder, value, onChange, rightSlot }) {
+export function SearchInput({ placeholder, value, onChange, onFocus, onEnter, rightSlot }) {
   const caja = document.createElement("div");
   caja.className = "ui-buscador";
   caja.appendChild(Icon({ name: "search", size: 18 }));
@@ -200,6 +200,12 @@ export function SearchInput({ placeholder, value, onChange, rightSlot }) {
   if (value !== undefined) input.value = value;
   if (onChange !== undefined) {
     input.addEventListener("input", () => onChange(input.value));
+  }
+  if (onFocus !== undefined) input.addEventListener("focus", onFocus);
+  if (onEnter !== undefined) {
+    input.addEventListener("keydown", (evento) => {
+      if (evento.key === "Enter") onEnter();
+    });
   }
   caja.appendChild(input);
 
@@ -288,10 +294,12 @@ export function SectionHeader({ title, actionLabel, onAction, href }) {
  * Fondo de mapa estilizado. No hay proveedor real (Nivel 3).
  * @param {{ height?: number | string, children?: Node | Node[] }} props
  */
-export function MapBackdrop({ height = 200, children } = {}) {
+export function MapBackdrop({ height, children } = {}) {
   const mapa = document.createElement("div");
   mapa.className = "ui-mapa";
-  mapa.style.height = typeof height === "number" ? `${height}px` : height;
+  if (height !== undefined) {
+    mapa.style.height = typeof height === "number" ? `${height}px` : height;
+  }
 
   for (const calle of ["h1", "h2", "h3", "v1", "v2", "v3"]) {
     const linea = document.createElement("div");

@@ -1,7 +1,7 @@
 # PROGRESO (el agente marca cada fase al terminarla, ANTES de su commit)
 
 - [x] Fase 01 — Fundación
-- [ ] Fase 02 — Inicio
+- [x] Fase 02 — Inicio
 - [ ] Fase 03 — Mapa
 - [ ] Fase 04 — Lista de talleres
 - [ ] Fase 05 — Detalle de taller

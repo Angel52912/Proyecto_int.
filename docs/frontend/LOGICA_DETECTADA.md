@@ -10,6 +10,11 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 01 | Base | Talleres de muestra para las fases 02–06 | 2 | `js/mocks/workshops.js` |
 | 01 | Base | Mapa de talleres | 3 | `js/components/ui.js` (`MapBackdrop`, `MapPin`): mapa estilizado, sin proveedor real |
 | 01 | Perfil (stub) | Perfil del usuario | 1 | `js/features/auth/index.js` (`getMyProfile`); el stub no lo consume todavía |
+| 02 | Inicio | Nombre del usuario | 2 | `js/mocks/orders.js` (`currentUser`); en modo simulado no hay sesión |
+| 02 | Inicio | Pedido en curso | 2 | `js/mocks/orders.js` (`currentOrder`) |
+| 02 | Inicio | Búsqueda de talleres | 3 | El buscador navega a `/mapa`; no filtra |
+| 02 | Inicio | Notificaciones | 3 | Botón sin acción |
+| 02 | Inicio | Vista previa del mapa | 3 | `MapBackdrop` estilizado, sin proveedor real |
 
 ## Contradicciones encontradas
 
