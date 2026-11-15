@@ -1,4 +1,5 @@
 import { REQUIERE_SESION } from "../../ui/sesion.js";
+import { renderActualizarFase } from "./pages/actualizar-fase.js";
 import { renderCalificar } from "./pages/calificar.js";
 import { renderPedidos } from "./pages/pedidos.js";
 import { renderRecoger } from "./pages/recoger.js";
@@ -12,4 +13,5 @@ export const rutas = [
   { path: "/pedido/:orderId/recoger", requiereSesion: REQUIERE_SESION, render: renderRecoger },
   { path: "/pedido/:orderId/calificar", requiereSesion: REQUIERE_SESION, render: renderCalificar },
   { path: "/artesano/tablero", requiereSesion: REQUIERE_SESION, render: renderTablero },
+  { path: "/artesano/pedido/:orderId", requiereSesion: REQUIERE_SESION, render: renderActualizarFase },
 ];

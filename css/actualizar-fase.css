@@ -1,0 +1,113 @@
+/* 21 · Actualizar fase (Artesano) */
+.actualizar-fase__formulario,
+.actualizar-fase__campos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.actualizar-fase__formulario > .texto-secundario {
+  margin: 0;
+  color: var(--color-gris);
+}
+
+.camara {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-3);
+  height: 180px;
+  overflow: hidden;
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-espresso);
+  color: var(--color-hueso);
+  cursor: pointer;
+}
+
+#foto-avance:focus-visible + .camara {
+  outline: 3px solid var(--color-miel);
+}
+
+.camara__vista {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.camara__texto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-1);
+  font-size: var(--texto-secundario);
+  text-shadow: 0 1px 4px rgb(0 0 0 / 60%);
+}
+
+.camara__obturador {
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--color-hueso);
+  border-radius: 50%;
+}
+
+.fases {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fases legend {
+  margin-bottom: var(--espacio-2);
+}
+
+.fase-opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: 48px;
+  padding: 0 var(--espacio-3);
+  border: 1px solid var(--color-arena);
+  border-radius: var(--radio);
+  background: #fff;
+  cursor: pointer;
+}
+
+.fase-opcion input {
+  accent-color: var(--color-cuero);
+}
+
+.fase-opcion--hecha {
+  color: var(--color-gris);
+}
+
+.fase-opcion--hecha .icono {
+  color: var(--color-cenote);
+}
+
+.fase-opcion--actual {
+  border-style: dashed;
+  cursor: default;
+}
+
+.fase-opcion:has(input:checked) {
+  border: 1.5px solid var(--color-cuero);
+  background: #f1e6dd;
+  font-weight: 600;
+}
+
+.actualizar-fase textarea {
+  width: 100%;
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1px solid var(--color-arena);
+  border-radius: var(--radio);
+  font: inherit;
+}
