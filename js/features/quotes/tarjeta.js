@@ -31,8 +31,8 @@ export function crearTarjetaPresupuesto(quoteId, opciones) {
         crearInsignia(estado.texto, estado.tono),
         crear("p", { clase: "tarjeta-presupuesto__monto", texto: `${formatearMxn(presupuesto.amount_mxn)} MXN` }),
         crear("p", { clase: "texto-secundario", texto: `Entrega: ${formatearFecha(presupuesto.delivery_date)}` }),
-        ruta ? enlace(ruta, { clase: "boton boton--cenote boton--bloque boton--chico", texto: opciones.textoBoton ?? "Ver presupuesto" }) : null,
       );
+      if (ruta) tarjeta.append(enlace(ruta, { clase: "boton boton--cenote boton--bloque boton--chico", texto: opciones.textoBoton ?? "Ver presupuesto" }));
     })
     .catch(() => {
       tarjeta.replaceChildren(crear("p", { clase: "texto-secundario", texto: "No pudimos cargar este presupuesto." }));
