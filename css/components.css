@@ -1489,3 +1489,146 @@ a.ui-card {
     justify-content: flex-start;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Solicitar cotizaci�n (fase 06)
+   --------------------------------------------------------------------------- */
+
+.cotizar {
+  padding-bottom: 76px;
+}
+
+.cotizar__grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  margin-top: var(--espacio-12);
+}
+
+.cotizar__columna {
+  min-width: 0;
+}
+
+.cotizar__taller {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+}
+
+.cotizar__taller-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cotizar__taller-para {
+  color: var(--color-text-muted);
+  font-size: var(--texto-mini);
+  line-height: var(--linea-mini);
+}
+
+.cotizar__taller-nombre {
+  color: var(--color-text);
+  font-size: var(--texto-cuerpo);
+  font-weight: 600;
+  line-height: var(--linea-cuerpo);
+}
+
+.cotizar__bloque {
+  min-width: 0;
+  margin-top: var(--espacio-20);
+}
+
+.cotizar__columna > .cotizar__bloque:first-child {
+  margin-top: 0;
+}
+
+.cotizar__etiqueta {
+  margin: 0 0 var(--espacio-12);
+  color: var(--color-text);
+  font-family: var(--fuente-texto);
+  font-size: var(--texto-pequeno);
+  font-weight: 500;
+  line-height: var(--linea-pequeno);
+}
+
+.cotizar__fotos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-2);
+}
+
+.cotizar__foto {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radio-sm);
+}
+
+.cotizar__agregar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-1);
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radio-sm);
+  background: transparent;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: var(--texto-mini);
+  font-weight: 500;
+  line-height: var(--linea-mini);
+  cursor: pointer;
+}
+
+.cotizar__servicios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+}
+
+.cotizar__descripcion textarea {
+  width: 100%;
+}
+
+.cotizar__acciones .ui-boton--ancho {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .cotizar {
+    padding-bottom: 0;
+  }
+
+  .cotizar__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--espacio-32);
+    margin-top: var(--espacio-20);
+  }
+
+  .cotizar__fotos {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cotizar__columna--derecha {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cotizar__acciones {
+    justify-content: flex-end;
+    margin-top: var(--espacio-32);
+  }
+
+  .cotizar__acciones .ui-boton--ancho {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 240px;
+  }
+}

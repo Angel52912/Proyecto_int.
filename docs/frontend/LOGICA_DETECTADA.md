@@ -29,6 +29,10 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 05 | Detalle de taller | Mensaje al taller | 3 | Navega a `/chat/1042`; el chat real llega en la fase 07 |
 | 05 | Detalle de taller | Solicitar cotización | 1 | Navega a `/taller/:tallerId/cotizar` (fase 06) |
 | 05 | Detalle de taller | Volver | 1 | `window.history.back()` |
+| 06 | Solicitar cotización | Taller del encabezado | 2 | `js/mocks/workshops.js` (`getWorkshopById`) |
+| 06 | Solicitar cotización | Selección de servicio y descripción | 1 | Estado local de `QuoteRequestScreen` |
+| 06 | Solicitar cotización | Fotos y vista previa | 2 | `URL.createObjectURL`; la subida real es Nivel 3 |
+| 06 | Solicitar cotización | Envío de la solicitud | 3 | `TODO(BACKEND)` y navegación a `/pedidos`; no se llama a `createRequestDraft`/`sendRequest` |
 
 ## Contradicciones encontradas
 
@@ -39,3 +43,4 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 5. **Git:** la fase pide `git add -A`; `CLAUDE.md` prohíbe ese comando. Se usa `git add` selectivo, con un solo commit por fase.
 6. **Mapa real:** el proyecto incluye Leaflet, pero no existe todavía un componente de mapa. Se implementó `MapBackdrop` estilizado como Nivel 3, sin conectar proveedor.
 7. **Etiquetas del taller:** la fase 05 pide en el detalle `Suelas`, `Costuras` y `Limpieza`, mientras que la fase 04 muestra en la lista `Suelas · Costuras · Cuero`. El contrato no define etiquetas; se conservó `tags` para la lista y se añadió `detail_tags` (solo presentación) para el detalle.
+8. **Envío de la solicitud:** la fase 06 pide llamar a `onSubmit` si existe lógica Nivel 1. El backend de `requests` exige al menos una foto (`photo_required`) y la subida real es Nivel 3, así que el envío queda con `TODO(BACKEND)` y navega a `/pedidos`, como indica la fase.
