@@ -27,4 +27,9 @@
   --espacio-4: 24px;
   --radio: 12px;
   --tactil-min: 44px;
+
+  /* Usados en los mockups de cliente y artesano. */
+  --color-gris: #7d6f66;
+  --radio-tarjeta: 14px;
+  --alto-nav: 60px;
 }
