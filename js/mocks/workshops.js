@@ -3,8 +3,9 @@
 //
 // Los campos de contrato (id, name, address, colonia, postal_code, lat, lng,
 // services, hours, price_from, rating_avg, rating_count, distance_km, is_open)
-// siguen docs/contrato-api.md. `tags`, `description` y `hours_label` son solo
-// texto de presentación: el contrato no define un catálogo de etiquetas.
+// siguen docs/contrato-api.md. `tags`, `detail_tags`, `description` y
+// `hours_label` son solo texto de presentación: el contrato no define un
+// catálogo de etiquetas ni de descripciones.
 
 /** @type {import("../features/workshop/validar.js").Horario} */
 const HORARIO_DON_CHUCHO = {
@@ -23,6 +24,7 @@ export const workshops = [
     name: "Talabartería Don Chucho",
     services: ["repair", "cleaning"],
     tags: ["Suelas", "Costuras", "Cuero"],
+    detail_tags: ["Suelas", "Costuras", "Limpieza"],
     rating_avg: 4.9,
     rating_count: 128,
     distance_km: 0.8,

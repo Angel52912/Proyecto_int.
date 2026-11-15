@@ -23,6 +23,12 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 04 | Lista de talleres | Orden por cercanía o calificación | 1 | Estado local; ordena el arreglo de muestra (permitido en la fase) |
 | 04 | Lista de talleres | Chip Precio y filtros reales | 3 | Solo cambia el chip activo |
 | 04 | Lista de talleres | Navegación al detalle | 1 | Router por hash |
+| 05 | Detalle de taller | Datos del taller | 2 | `js/mocks/workshops.js` (`getWorkshopById`) |
+| 05 | Detalle de taller | Etiquetas del detalle | 2 | `js/mocks/workshops.js` (`detail_tags`); el contrato no define un catálogo de etiquetas |
+| 05 | Detalle de taller | Trabajos recientes | 3 | 3 `ImagePlaceholder`; el mock no tiene fotos |
+| 05 | Detalle de taller | Mensaje al taller | 3 | Navega a `/chat/1042`; el chat real llega en la fase 07 |
+| 05 | Detalle de taller | Solicitar cotización | 1 | Navega a `/taller/:tallerId/cotizar` (fase 06) |
+| 05 | Detalle de taller | Volver | 1 | `window.history.back()` |
 
 ## Contradicciones encontradas
 
@@ -32,3 +38,4 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 4. **Mocks:** la fase pide `src/mocks/workshops.ts`; se creó `js/mocks/workshops.js` para respetar la estructura del proyecto. Los nombres de campo de contrato se conservan; `tags`, `description` y `hours_label` quedan marcados como texto de presentación.
 5. **Git:** la fase pide `git add -A`; `CLAUDE.md` prohíbe ese comando. Se usa `git add` selectivo, con un solo commit por fase.
 6. **Mapa real:** el proyecto incluye Leaflet, pero no existe todavía un componente de mapa. Se implementó `MapBackdrop` estilizado como Nivel 3, sin conectar proveedor.
+7. **Etiquetas del taller:** la fase 05 pide en el detalle `Suelas`, `Costuras` y `Limpieza`, mientras que la fase 04 muestra en la lista `Suelas · Costuras · Cuero`. El contrato no define etiquetas; se conservó `tags` para la lista y se añadió `detail_tags` (solo presentación) para el detalle.

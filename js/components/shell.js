@@ -68,14 +68,22 @@ export function SideNav({ activeItem } = {}) {
 
 /**
  * Contenedor principal de cada pantalla.
- * @param {{ activeNav?: "inicio" | "mapa" | "pedidos" | "perfil", hideNavOnMobile?: boolean, fullBleed?: boolean, maxWidth?: number, children?: Node | Node[] }} props
+ * @param {{ activeNav?: "inicio" | "mapa" | "pedidos" | "perfil", hideNavOnMobile?: boolean, fullBleed?: boolean, flush?: boolean, maxWidth?: number, children?: Node | Node[] }} props
  */
-export function AppShell({ activeNav, hideNavOnMobile = false, fullBleed = false, maxWidth = 1120, children } = {}) {
+export function AppShell({
+  activeNav,
+  hideNavOnMobile = false,
+  fullBleed = false,
+  flush = false,
+  maxWidth = 1120,
+  children,
+} = {}) {
   const shell = document.createElement("div");
   shell.className =
     "ui-shell" +
     (hideNavOnMobile ? " ui-shell--sin-nav-movil" : "") +
-    (fullBleed ? " ui-shell--completo" : "");
+    (fullBleed ? " ui-shell--completo" : "") +
+    (flush ? " ui-shell--flush" : "");
   shell.style.setProperty("--shell-max-width", `${maxWidth}px`);
 
   const main = document.createElement("main");

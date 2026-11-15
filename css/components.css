@@ -1270,3 +1270,222 @@ a.ui-card {
     height: 72px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Detalle de taller (fase 05)
+   --------------------------------------------------------------------------- */
+
+.ui-shell--flush .ui-shell__main {
+  max-width: none;
+  padding: 0;
+}
+
+@media (max-width: 1023px) {
+  .ui-shell--sin-nav-movil .ui-bottom-nav {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ui-shell--flush .ui-shell__main {
+    max-width: var(--shell-max-width, 1120px);
+    padding: var(--espacio-32);
+  }
+}
+
+.detalle {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.detalle__hero {
+  position: relative;
+}
+
+.detalle__foto {
+  height: 220px;
+  align-items: flex-start;
+  padding-top: 48px;
+  background: var(--color-tan);
+}
+
+.detalle__atras {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-color: var(--color-border);
+  border-radius: var(--radio-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.detalle__atras::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+
+.detalle__atras--hero {
+  position: absolute;
+  top: var(--espacio-3);
+  left: var(--espacio-3);
+  z-index: 2;
+}
+
+.detalle__atras--panel {
+  display: none;
+  align-self: flex-start;
+  margin-bottom: var(--espacio-12);
+}
+
+.detalle__panel {
+  position: relative;
+  margin-top: -24px;
+  padding: var(--espacio-20) var(--espacio-20) 96px;
+  background: var(--color-bg);
+  border-radius: var(--radio-lg) var(--radio-lg) 0 0;
+}
+
+.detalle__info {
+  min-width: 0;
+}
+
+.detalle__titulo {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-hero);
+  font-weight: 600;
+  line-height: var(--linea-hero);
+}
+
+.detalle__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--espacio-2);
+}
+
+.detalle__resenas {
+  color: var(--color-text-muted);
+  font-size: var(--texto-pequeno);
+  line-height: var(--linea-pequeno);
+}
+
+.detalle__direccion {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  margin-top: var(--espacio-1);
+  color: var(--color-text-muted);
+  font-size: var(--texto-pequeno);
+  line-height: var(--linea-pequeno);
+}
+
+.detalle__direccion:empty {
+  display: none;
+}
+
+.detalle__etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-12);
+}
+
+.detalle__etiquetas:empty {
+  display: none;
+}
+
+.detalle__descripcion {
+  margin: var(--espacio-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--texto-cuerpo);
+  line-height: var(--linea-cuerpo);
+}
+
+.detalle__trabajos {
+  margin-top: var(--espacio-4);
+}
+
+.detalle__galeria {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-12);
+}
+
+.detalle__trabajo {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radio-sm);
+}
+
+.detalle__acciones .ui-boton--ancho {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .detalle__foto {
+    height: 280px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .detalle {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas:
+      "hero info"
+      "trabajos info";
+    gap: var(--espacio-32);
+    align-items: start;
+    max-width: none;
+  }
+
+  .detalle__hero {
+    grid-area: hero;
+  }
+
+  .detalle__foto {
+    height: 360px;
+    align-items: center;
+    padding-top: 0;
+    border-radius: var(--radio-lg);
+  }
+
+  .detalle__atras--hero {
+    display: none;
+  }
+
+  .detalle__panel {
+    display: contents;
+    margin-top: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .detalle__info {
+    display: flex;
+    flex-direction: column;
+    grid-area: info;
+  }
+
+  .detalle__atras--panel {
+    display: inline-flex;
+    margin-bottom: var(--espacio-3);
+  }
+
+  .detalle__trabajos {
+    grid-area: trabajos;
+    margin-top: 0;
+  }
+
+  .detalle__acciones {
+    justify-content: flex-start;
+  }
+}

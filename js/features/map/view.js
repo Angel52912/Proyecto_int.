@@ -3,6 +3,7 @@
 
 import { AppShell } from "../../components/shell.js";
 import {
+  Button,
   Card,
   Chip,
   ImagePlaceholder,
@@ -13,6 +14,7 @@ import {
   PageHeader,
   SearchInput,
   SectionHeader,
+  StickyActionBar,
 } from "../../components/ui.js";
 import { Icon } from "../../components/icon.js";
 import { currentOrder, currentUser } from "../../mocks/orders.js";
@@ -476,19 +478,143 @@ export function WorkshopListScreen({ params } = {}) {
   return shell;
 }
 
-/** @returns {HTMLElement} */
-export function WorkshopDetailScreen() {
-  return crearPantalla("mapa", "Perfil del taller", true);
-}
-
 /**
- * Pantalla provisional de la fase 05.
- * @param {"inicio" | "mapa" | "pedidos" | "perfil"} activeNav
- * @param {string} titulo
- * @param {boolean} [hideNavOnMobile]
+ * Detalle de un taller (CU-02).
+ * @param {{ params?: Record<string, string> }} [contexto]
+ * @returns {HTMLElement}
  */
-function crearPantalla(activeNav, titulo, hideNavOnMobile = false) {
-  const encabezado = document.createElement("h1");
-  encabezado.textContent = titulo;
-  return AppShell({ activeNav, hideNavOnMobile, children: encabezado });
+export function WorkshopDetailScreen({ params } = {}) {
+  const taller = getWorkshopById(params?.tallerId ?? "") ?? workshops[0];
+
+  const contenido = document.createElement("div");
+  contenido.className = "detalle";
+  const shell = AppShell({
+    activeNav: "mapa",
+    hideNavOnMobile: true,
+    flush: true,
+    children: contenido,
+  });
+
+  function volver() {
+    window.history.back();
+  }
+
+  function crearBotonAtras(extra) {
+    const boton = Button({
+      variant: "icon",
+      leftIcon: "chevron-left",
+      ariaLabel: "Volver",
+      onClick: volver,
+    });
+    boton.classList.add("detalle__atras", extra);
+    return boton;
+  }
+
+  const hero = document.createElement("div");
+  hero.className = "detalle__hero";
+  const foto = ImagePlaceholder({
+    alt: taller.name,
+    rounded: false,
+    iconSize: 48,
+  });
+  foto.classList.add("detalle__foto");
+  hero.append(foto, crearBotonAtras("detalle__atras--hero"));
+
+  const panel = document.createElement("div");
+  panel.className = "detalle__panel";
+
+  const info = document.createElement("div");
+  info.className = "detalle__info";
+
+  const titulo = document.createElement("h1");
+  titulo.className = "detalle__titulo";
+  titulo.textContent = taller.name;
+
+  const meta = document.createElement("div");
+  meta.className = "detalle__meta";
+
+  if (typeof taller.rating_avg === "number") {
+    meta.appendChild(Rating({ value: Math.round(taller.rating_avg), size: 14 }));
+    const partes = [];
+    partes.push(
+      Number.isInteger(taller.rating_count)
+        ? `${taller.rating_avg.toFixed(1)} (${taller.rating_count} reseñas)`
+        : taller.rating_avg.toFixed(1)
+    );
+    if (typeof taller.distance_km === "number") partes.push(`${taller.distance_km} km`);
+    const resenas = document.createElement("span");
+    resenas.className = "detalle__resenas";
+    resenas.textContent = partes.join(" · ");
+    meta.appendChild(resenas);
+  }
+
+  const direccion = document.createElement("div");
+  direccion.className = "detalle__direccion";
+  if (taller.address !== "") {
+    direccion.append(
+      Icon({ name: "map-pin", size: 14, color: "var(--color-text-muted)" }),
+      document.createTextNode(taller.address)
+    );
+  }
+
+  const etiquetas = (taller.detail_tags ?? taller.tags ?? []).map((etiqueta) =>
+    Chip({
+      variant: "tag",
+      tone: etiqueta === "Limpieza" ? "teal" : "neutral",
+      children: etiqueta,
+    })
+  );
+  const filaEtiquetas = document.createElement("div");
+  filaEtiquetas.className = "detalle__etiquetas";
+  filaEtiquetas.append(...etiquetas);
+
+  const descripcion = document.createElement("p");
+  descripcion.className = "detalle__descripcion";
+  descripcion.textContent = taller.description;
+
+  const acciones = StickyActionBar({
+    children: [
+      Button({
+        variant: "icon",
+        leftIcon: "message",
+        ariaLabel: "Escribir al taller",
+        onClick: () => irA("/chat/1042"),
+      }),
+      Button({
+        variant: "primary",
+        fullWidth: true,
+        onClick: () => irA(`/taller/${taller.id}/cotizar`),
+        children: "Solicitar cotización",
+      }),
+    ],
+  });
+  acciones.classList.add("detalle__acciones");
+
+  info.appendChild(crearBotonAtras("detalle__atras--panel"));
+  info.appendChild(titulo);
+  if (meta.childElementCount > 0) info.appendChild(meta);
+  if (taller.address !== "") info.appendChild(direccion);
+  if (etiquetas.length > 0) info.appendChild(filaEtiquetas);
+  if (taller.description !== "") info.appendChild(descripcion);
+  info.appendChild(acciones);
+
+  const trabajos = document.createElement("section");
+  trabajos.className = "detalle__trabajos";
+  trabajos.appendChild(SectionHeader({ title: "Trabajos recientes" }));
+
+  const galeria = document.createElement("div");
+  galeria.className = "detalle__galeria";
+  for (let numero = 1; numero <= 3; numero += 1) {
+    const trabajo = ImagePlaceholder({
+      alt: `Trabajo reciente ${numero}`,
+      rounded: true,
+    });
+    trabajo.classList.add("detalle__trabajo");
+    galeria.appendChild(trabajo);
+  }
+  trabajos.appendChild(galeria);
+
+  panel.append(info, trabajos);
+  contenido.append(hero, panel);
+  return shell;
 }
