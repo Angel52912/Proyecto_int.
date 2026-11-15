@@ -41,6 +41,10 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 08 | Presupuesto | Taller, desglose y totales | 2 | `js/mocks/budget.js`; los importes son texto y no se calculan |
 | 08 | Presupuesto | Aceptar o rechazar el presupuesto | 3 | `TODO(BACKEND)`; navega a `/pedido/1042` o `/chat/1042`; `respondQuote` existe pero exige sesión y UUID |
 | 08 | Presupuesto | Volver | 1 | `window.history.back()` |
+| 09 | Seguimiento de pedido | Resumen, fase y porcentaje | 2 | `js/mocks/orders.js` (`orderDetail`); `progress` es texto de presentación y no se calcula |
+| 09 | Seguimiento de pedido | Pasos y fotos de avance | 3 | `TODO(BACKEND)`; los pasos y las `progressPhotos` son de muestra y las fotos no se suben |
+| 09 | Seguimiento de pedido | Escribir al taller | 1 | Navega a `/chat/1042` (fase 07) |
+| 09 | Seguimiento de pedido | Volver | 1 | `window.history.back()` |
 
 ## Contradicciones encontradas
 
@@ -54,3 +58,4 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 8. **Envío de la solicitud:** la fase 06 pide llamar a `onSubmit` si existe lógica Nivel 1. El backend de `requests` exige al menos una foto (`photo_required`) y la subida real es Nivel 3, así que el envío queda con `TODO(BACKEND)` y navega a `/pedidos`, como indica la fase.
 9. **Forma de los mensajes del chat:** el diseño usa `{ from, type, text, time, amount, delivery }`, mientras que el contrato define `Mensaje = { id, request_id, sender_id, body, kind, quote_id?, created_at }`. Se conservó la forma del diseño en `js/mocks/chat.js` (solo presentación) y se documentó en el propio mock. El servicio `js/features/chat/api.mock.js` existe (Nivel 1), pero exige sesión y un UUID de solicitud; el flujo de diseño usa el id `1042` y el modo simulado no tiene sesión, así que la pantalla no lo consume todavía.
 10. **Presupuesto:** los campos del diseño (`workshopName`, `rating`, `title`, `description`, `lines`, `total`, `delivery`, `time`, `notice`) son presentación; el contrato define `Presupuesto = { id, request_id, amount_mxn, delivery_date, detail, status, ... }`. El mock conserva ambos: `amount_mxn: 450` y `detail` con el desglose, además del `total` ya formateado. Aceptar/rechazar usa `TODO(BACKEND)` aunque `respondQuote` exista, porque exige sesión y un UUID y la fase indica que la respuesta real es Nivel 3.
+11. **Seguimiento de pedido:** el diseño usa `statusLabel`, `totalPhases`, `progress`, `steps` y `progressPhotos`, que no existen en `Orden` del contrato (`{ id, quote_id, request_id, client_id, workshop_id, phase, status, due_date, ready_at, delivered_at, created_at, updated_at }`). El mock `orderDetail` conserva los campos de contrato y añade los de presentación; `progress` se muestra tal cual, sin calcularlo. `js/features/orders/api.mock.js` existe (Nivel 1, solo lectura) pero exige sesión y un UUID de orden, mientras el flujo de diseño usa el id `1042`, así que la pantalla no lo consume todavía. El avance real de fases y las fotos son Nivel 3: quedan con `TODO(BACKEND)`.
