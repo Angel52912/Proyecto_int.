@@ -6,6 +6,7 @@ import { renderPerfilTaller } from "./pages/perfil-taller.js";
 
 /** @type {ReadonlyArray<import("../../router.js").Ruta>} */
 export const rutas = [
+  { path: "/", requiereSesion: REQUIERE_SESION, render: renderInicio },
   { path: "/inicio", requiereSesion: REQUIERE_SESION, render: renderInicio },
   { path: "/mapa", requiereSesion: REQUIERE_SESION, render: renderMapa },
   { path: "/talleres", requiereSesion: REQUIERE_SESION, render: renderTalleres },
