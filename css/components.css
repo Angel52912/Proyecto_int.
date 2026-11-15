@@ -439,3 +439,111 @@ fieldset.campo {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+.fila-entre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.linea-calificacion,
+.linea-icono {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-1);
+}
+
+.boton-circular {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tactil-min);
+  height: var(--tactil-min);
+  flex: none;
+  border: 1px solid var(--color-arena);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--color-espresso);
+  cursor: pointer;
+}
+
+.punto-aviso {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-error);
+  border: 2px solid #fff;
+}
+
+.buscador {
+  margin: 0;
+}
+
+.buscador input {
+  width: 100%;
+}
+
+.buscador__filtros {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tactil-min);
+  height: var(--tactil-min);
+  color: var(--color-cuero);
+}
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: var(--tactil-min);
+}
+
+.casilla input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-cuero);
+}
+
+.tarjeta__flecha {
+  color: var(--color-gris);
+  flex: none;
+}
+
+.pin-contenedor {
+  background: none;
+  border: 0;
+}
+
+.pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+  box-shadow: 0 2px 6px rgb(43 33 27 / 30%);
+}
+
+.pin .icono {
+  transform: rotate(45deg);
+}
+
+.pin--cenote {
+  background: var(--color-cenote);
+}
+
+.pin--seleccionado {
+  outline: 3px solid var(--color-miel);
+}
