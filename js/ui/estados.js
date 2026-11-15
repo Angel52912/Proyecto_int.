@@ -37,7 +37,7 @@ export function crearError(texto, reintentar = null) {
  * @template T
  * @param {HTMLElement} destino
  * @param {() => Promise<T>} cargar
- * @param {(datos: T) => Node | Node[]} pintar
+ * @param {(datos: T) => Node | Array<Node | null | undefined | false>} pintar Las entradas vacías se omiten.
  * @param {Record<string, string>} [mensajes] Mensajes específicos por código de error.
  * @returns {Promise<void>}
  */
@@ -45,7 +45,8 @@ export async function cargarEn(destino, cargar, pintar, mensajes = {}) {
   destino.replaceChildren(crearCargando());
   try {
     const datos = await cargar();
-    destino.replaceChildren(...[pintar(datos)].flat());
+    // replaceChildren convierte null en el texto "null": se filtran las entradas vacías.
+    destino.replaceChildren(.../** @type {Node[]} */ ([pintar(datos)].flat().filter(Boolean)));
   } catch (error) {
     destino.replaceChildren(crearError(mensajeDeError(error, mensajes), () => cargarEn(destino, cargar, pintar, mensajes)));
   }
