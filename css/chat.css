@@ -66,6 +66,10 @@
   margin: 0 auto;
 }
 
+.chat__anteriores[hidden] {
+  display: none;
+}
+
 .chat__lista {
   display: flex;
   flex-direction: column;

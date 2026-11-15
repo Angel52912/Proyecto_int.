@@ -30,7 +30,8 @@ export function folio(id) {
 function pintarConversacion(rol, solicitud) {
   const esCliente = rol === "client";
   const nombre = solicitud.counterpart?.full_name ?? (esCliente ? "Taller no disponible" : "Cliente");
-  const estado = ESTADO_SOLICITUD[solicitud.status] ?? ESTADO_SOLICITUD.open;
+  // Para el cliente una solicitud abierta está "Enviada"; para el artesano es "Nueva".
+  const estado = esCliente && solicitud.status === "open" ? { texto: "Enviada", tono: "miel" } : ESTADO_SOLICITUD[solicitud.status] ?? ESTADO_SOLICITUD.open;
 
   const chat = crearChat({
     requestId: solicitud.id,
@@ -73,7 +74,7 @@ function pintarConversacion(rol, solicitud) {
     );
   }
   if (!esCliente && (solicitud.status === "open" || solicitud.status === "quoted")) {
-    acciones.append(enlace(`/artesano/solicitud/${solicitud.id}`, { clase: "boton-texto", texto: "Enviar presupuesto" }));
+    acciones.append(enlace(`/artesano/solicitud/${solicitud.id}`, { clase: "boton-texto", texto: solicitud.status === "quoted" ? "Rectificar presupuesto" : "Enviar presupuesto" }));
   }
   if (solicitud.status === "accepted") {
     apiPedidos
