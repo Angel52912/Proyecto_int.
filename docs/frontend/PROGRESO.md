@@ -1,0 +1,13 @@
+# PROGRESO (el agente marca cada fase al terminarla, ANTES de su commit)
+
+- [x] Fase 01 — Fundación
+- [ ] Fase 02 — Inicio
+- [ ] Fase 03 — Mapa
+- [ ] Fase 04 — Lista de talleres
+- [ ] Fase 05 — Detalle de taller
+- [ ] Fase 06 — Solicitar cotización
+- [ ] Fase 07 — Chat
+- [ ] Fase 08 — Presupuesto
+- [ ] Fase 09 — Seguimiento de pedido
+- [ ] Fase 10 — Recoger pedido + Calificar
+- [ ] Fase 11 — Mis pedidos + revisión final
