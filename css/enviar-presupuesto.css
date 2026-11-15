@@ -1,0 +1,23 @@
+/* 19 · Enviar presupuesto (Artesano) */
+.enviar-presupuesto__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.enviar-presupuesto__descripcion {
+  margin-top: var(--espacio-2);
+}
+
+.enviar-presupuesto__formulario {
+  display: flex;
+  flex-direction: column;
+}
+
+.enviar-presupuesto__formulario .seccion__titulo {
+  margin-bottom: var(--espacio-2);
+}
+
+.enviar-presupuesto__formulario textarea {
+  min-height: 96px;
+}
