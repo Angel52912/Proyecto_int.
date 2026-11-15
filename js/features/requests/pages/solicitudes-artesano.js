@@ -42,7 +42,7 @@ function crearTarjetaSolicitud(detalle) {
 /** @returns {Promise<Node>} */
 export async function renderSolicitudesArtesano() {
   const resumen = crear("div", { clase: "resumenes" }, [crearResumen("Nuevas", "–", "cuero"), crearResumen("En taller", "–", "cenote"), crearResumen("Calificación", "–", "miel")]);
-  const lista = crear("div");
+  const lista = crear("div", { clase: "seccion" });
   const campana = crear("span", { clase: "boton-circular", attrs: { role: "img", "aria-label": "Avisos" } }, [icono("campana")]);
 
   const pantalla = crearPantalla({ rol: "craftsman", activa: "solicitudes", clase: "solicitudes-artesano" }, [
@@ -65,15 +65,18 @@ export async function renderSolicitudesArtesano() {
           crearResumen("En taller", String(pedidos.filter((p) => p.status === "in_progress").length), "cenote"),
           crearResumen("Calificación", taller?.rating_avg === null || taller?.rating_avg === undefined ? "Nuevo" : taller.rating_avg.toFixed(1), "miel"),
         );
-        if (taller === null) {
-          return crearVacio("Configura y publica tu taller para recibir solicitudes.", enlace("/artesano/taller", { clase: "boton", texto: "Configurar mi taller" }));
-        }
+        const sinPublicar =
+          taller === null || !taller.published
+            ? enlace("/artesano/taller", { clase: "aviso aviso--miel" }, [icono("reparacion", { tam: 18 }), crear("p", { texto: "Configura y publica tu taller para aparecer en el mapa y recibir solicitudes." })])
+            : null;
         // Primero las que esperan respuesta; las cerradas al final.
         const orden = { open: 0, quoted: 1, accepted: 2 };
         const visibles = [...detalles].sort((a, b) => (orden[a.status] ?? 3) - (orden[b.status] ?? 3));
-        return visibles.length === 0
-          ? crearVacio("Aún no tienes solicitudes. Te avisaremos cuando un cliente te escriba.")
-          : crear("ul", { clase: "lista" }, visibles.map(crearTarjetaSolicitud));
+        const contenido =
+          visibles.length === 0
+            ? crearVacio("Aún no tienes solicitudes. Te avisaremos cuando un cliente te escriba.")
+            : crear("ul", { clase: "lista" }, visibles.map(crearTarjetaSolicitud));
+        return sinPublicar ? [sinPublicar, contenido] : contenido;
       },
     );
   cargar();
