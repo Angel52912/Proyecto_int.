@@ -1,0 +1,29 @@
+/* 08 · Talleres por categoría */
+.filtros {
+  display: flex;
+  flex-direction: column;
+}
+
+.filtros[hidden] {
+  display: none;
+}
+
+.filtros__fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--espacio-2);
+}
+
+.filtros .texto-secundario {
+  margin: calc(-1 * var(--espacio-2)) 0 var(--espacio-2);
+  color: var(--color-gris);
+}
+
+.tarjeta-taller .foto {
+  width: 64px;
+  height: 64px;
+}
+
+.tarjeta-taller .insignia {
+  margin-top: var(--espacio-1);
+}
