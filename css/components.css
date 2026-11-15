@@ -547,3 +547,44 @@ fieldset.campo {
 .pin--seleccionado {
   outline: 3px solid var(--color-miel);
 }
+
+.pantalla__titulo {
+  margin: var(--espacio-2) 0 0;
+}
+
+.avatar--chico {
+  width: 32px;
+  height: 32px;
+  font-size: 11px;
+}
+
+.lista--separada {
+  gap: 0;
+}
+
+.lista--separada > li + li {
+  border-top: 1px solid var(--color-arena);
+}
+
+.campo__etiqueta {
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+}
+
+.chips--envolver-izq {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.campo--error .chips,
+.campo--error .taller__mapa,
+.campo--error .horario-fila {
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
+  border-radius: var(--radio);
+}
+
+.campo--error > .campo__etiqueta,
+.campo--error > label {
+  color: var(--color-error);
+}
