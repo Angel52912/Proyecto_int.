@@ -26,13 +26,18 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 05 | Detalle de taller | Datos del taller | 2 | `js/mocks/workshops.js` (`getWorkshopById`) |
 | 05 | Detalle de taller | Etiquetas del detalle | 2 | `js/mocks/workshops.js` (`detail_tags`); el contrato no define un catálogo de etiquetas |
 | 05 | Detalle de taller | Trabajos recientes | 3 | 3 `ImagePlaceholder`; el mock no tiene fotos |
-| 05 | Detalle de taller | Mensaje al taller | 3 | Navega a `/chat/1042`; el chat real llega en la fase 07 |
+| 05 | Detalle de taller | Mensaje al taller | 3 | Navega a `/chat/1042`; el chat de diseño llega en la fase 07 |
 | 05 | Detalle de taller | Solicitar cotización | 1 | Navega a `/taller/:tallerId/cotizar` (fase 06) |
 | 05 | Detalle de taller | Volver | 1 | `window.history.back()` |
 | 06 | Solicitar cotización | Taller del encabezado | 2 | `js/mocks/workshops.js` (`getWorkshopById`) |
 | 06 | Solicitar cotización | Selección de servicio y descripción | 1 | Estado local de `QuoteRequestScreen` |
 | 06 | Solicitar cotización | Fotos y vista previa | 2 | `URL.createObjectURL`; la subida real es Nivel 3 |
 | 06 | Solicitar cotización | Envío de la solicitud | 3 | `TODO(BACKEND)` y navegación a `/pedidos`; no se llama a `createRequestDraft`/`sendRequest` |
+| 07 | Chat | Cabecera, contexto y mensajes de muestra | 2 | `js/mocks/chat.js`; `js/features/chat/api.mock.js` existe pero exige sesión y UUID |
+| 07 | Chat | Envío de mensajes | 3 | `TODO(BACKEND)`; la burbuja se agrega en estado local con la hora actual |
+| 07 | Chat | Adjuntar foto | 3 | Abre un `<input type="file">`; la imagen no se sube |
+| 07 | Chat | Ver presupuesto | 1 | Navega a `/pedido/1042/presupuesto` (fase 08) |
+| 07 | Chat | Volver | 1 | `window.history.back()` |
 
 ## Contradicciones encontradas
 
@@ -44,3 +49,4 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 6. **Mapa real:** el proyecto incluye Leaflet, pero no existe todavía un componente de mapa. Se implementó `MapBackdrop` estilizado como Nivel 3, sin conectar proveedor.
 7. **Etiquetas del taller:** la fase 05 pide en el detalle `Suelas`, `Costuras` y `Limpieza`, mientras que la fase 04 muestra en la lista `Suelas · Costuras · Cuero`. El contrato no define etiquetas; se conservó `tags` para la lista y se añadió `detail_tags` (solo presentación) para el detalle.
 8. **Envío de la solicitud:** la fase 06 pide llamar a `onSubmit` si existe lógica Nivel 1. El backend de `requests` exige al menos una foto (`photo_required`) y la subida real es Nivel 3, así que el envío queda con `TODO(BACKEND)` y navega a `/pedidos`, como indica la fase.
+9. **Forma de los mensajes del chat:** el diseño usa `{ from, type, text, time, amount, delivery }`, mientras que el contrato define `Mensaje = { id, request_id, sender_id, body, kind, quote_id?, created_at }`. Se conservó la forma del diseño en `js/mocks/chat.js` (solo presentación) y se documentó en el propio mock. El servicio `js/features/chat/api.mock.js` existe (Nivel 1), pero exige sesión y un UUID de solicitud; el flujo de diseño usa el id `1042` y el modo simulado no tiene sesión, así que la pantalla no lo consume todavía.

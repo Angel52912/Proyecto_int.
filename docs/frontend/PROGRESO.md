@@ -6,7 +6,7 @@
 - [x] Fase 04 — Lista de talleres
 - [x] Fase 05 — Detalle de taller
 - [x] Fase 06 — Solicitar cotización
-- [ ] Fase 07 — Chat
+- [x] Fase 07 — Chat
 - [ ] Fase 08 — Presupuesto
 - [ ] Fase 09 — Seguimiento de pedido
 - [ ] Fase 10 — Recoger pedido + Calificar
