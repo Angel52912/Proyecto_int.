@@ -19,6 +19,10 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 03 | Mapa | Selección de taller con pines y tarjetas | 1 | Estado local de `MapScreen` |
 | 03 | Mapa | Filtros de chips | 3 | Solo cambia el chip activo; no filtra pines |
 | 03 | Mapa | Datos de los talleres | 2 | `js/mocks/workshops.js` (`workshops`, `getWorkshopById`) |
+| 04 | Lista de talleres | Talleres, tags y distancias | 2 | `js/mocks/workshops.js` |
+| 04 | Lista de talleres | Orden por cercanía o calificación | 1 | Estado local; ordena el arreglo de muestra (permitido en la fase) |
+| 04 | Lista de talleres | Chip Precio y filtros reales | 3 | Solo cambia el chip activo |
+| 04 | Lista de talleres | Navegación al detalle | 1 | Router por hash |
 
 ## Contradicciones encontradas
 

@@ -1143,3 +1143,130 @@ a.ui-card {
     gap: var(--espacio-12);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Lista de talleres (fase 04)
+   --------------------------------------------------------------------------- */
+
+.talleres__chips {
+  display: flex;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-12);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.talleres__chips::-webkit-scrollbar {
+  display: none;
+}
+
+.talleres__filtros {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-color: var(--color-border);
+  border-radius: var(--radio-sm);
+  color: var(--color-text);
+}
+
+.talleres__filtros::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+
+.talleres__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+  margin-top: var(--espacio-3);
+}
+
+.talleres__tarjeta {
+  padding: var(--espacio-12);
+  text-align: left;
+}
+
+.talleres__tarjeta-fila {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+}
+
+.talleres__foto {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+}
+
+.talleres__info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.talleres__nombre {
+  color: var(--color-text);
+  font-size: var(--texto-cuerpo);
+  font-weight: 600;
+  line-height: var(--linea-cuerpo);
+}
+
+.talleres__tags {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--texto-pequeno);
+  line-height: var(--linea-pequeno);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.talleres__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.talleres__distancia {
+  color: var(--color-text-muted);
+  font-size: var(--texto-mini);
+  line-height: var(--linea-mini);
+}
+
+.talleres__chevron {
+  display: inline-flex;
+  color: var(--color-text-subtle);
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .talleres__lista {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .talleres__chips {
+    flex-wrap: wrap;
+    margin-top: var(--espacio-3);
+  }
+
+  .talleres__lista {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--espacio-3);
+    margin-top: var(--espacio-20);
+  }
+
+  .talleres__tarjeta {
+    padding: var(--espacio-3);
+  }
+
+  .talleres__foto {
+    width: 72px;
+    height: 72px;
+  }
+}

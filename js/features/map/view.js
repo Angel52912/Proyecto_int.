@@ -10,6 +10,7 @@ import {
   MapPin,
   ProgressBar,
   Rating,
+  PageHeader,
   SearchInput,
   SectionHeader,
 } from "../../components/ui.js";
@@ -374,9 +375,105 @@ export function MapScreen() {
   return shell;
 }
 
-/** @returns {HTMLElement} */
-export function WorkshopListScreen() {
-  return crearPantalla("mapa", "Lista de talleres");
+const ORDENES_TALLERES = ["Más cercanos", "Mejor valorados", "Precio"];
+
+/**
+ * Lista de talleres filtrada por categoría (solo cambia el título).
+ * @param {{ params?: Record<string, string> }} [contexto]
+ * @returns {HTMLElement}
+ */
+export function WorkshopListScreen({ params } = {}) {
+  const titulo = params?.categoria === "limpieza" ? "Limpieza" : "Reparación";
+  const estado = { orden: "Más cercanos" };
+  const contenido = document.createElement("div");
+  const shell = AppShell({ activeNav: "mapa", children: contenido });
+
+  function crearCabecera() {
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "ui-boton ui-boton--icon talleres__filtros";
+    boton.setAttribute("aria-label", "Filtros");
+    boton.appendChild(Icon({ name: "filter", size: 18 }));
+    return PageHeader({ title: titulo, rightSlot: boton });
+  }
+
+  function crearChips() {
+    const fila = document.createElement("div");
+    fila.className = "talleres__chips";
+    for (const orden of ORDENES_TALLERES) {
+      fila.appendChild(
+        Chip({
+          variant: "filter",
+          active: estado.orden === orden,
+          onClick: () => {
+            estado.orden = orden;
+            pintar();
+          },
+          children: orden,
+        })
+      );
+    }
+    return fila;
+  }
+
+  /** @param {object} taller */
+  function crearTarjeta(taller) {
+    const tarjeta = Card({ onClick: () => irA(`/taller/${taller.id}`) });
+    tarjeta.classList.add("talleres__tarjeta");
+
+    const fila = document.createElement("span");
+    fila.className = "talleres__tarjeta-fila";
+
+    const foto = ImagePlaceholder({ alt: taller.name });
+    foto.classList.add("talleres__foto");
+
+    const info = document.createElement("span");
+    info.className = "talleres__info";
+
+    const nombre = document.createElement("span");
+    nombre.className = "talleres__nombre";
+    nombre.textContent = taller.name;
+
+    const tags = document.createElement("span");
+    tags.className = "talleres__tags";
+    tags.textContent = taller.tags.join(" · ");
+
+    const meta = document.createElement("span");
+    meta.className = "talleres__meta";
+    meta.appendChild(Rating({ value: Math.round(taller.rating_avg ?? 0), size: 12 }));
+    const distancia = document.createElement("span");
+    distancia.className = "talleres__distancia";
+    distancia.textContent = `${taller.distance_km} km`;
+    meta.appendChild(distancia);
+
+    info.append(nombre, tags, meta);
+
+    const chevron = document.createElement("span");
+    chevron.className = "talleres__chevron";
+    chevron.appendChild(Icon({ name: "chevron-right", size: 18 }));
+
+    fila.append(foto, info, chevron);
+    tarjeta.appendChild(fila);
+    return tarjeta;
+  }
+
+  function pintar() {
+    const lista = [...workshops];
+    if (estado.orden === "Más cercanos") {
+      lista.sort((a, b) => a.distance_km - b.distance_km);
+    } else if (estado.orden === "Mejor valorados") {
+      lista.sort((a, b) => (b.rating_avg ?? 0) - (a.rating_avg ?? 0));
+    }
+
+    const contenedor = document.createElement("div");
+    contenedor.className = "talleres__lista";
+    for (const taller of lista) contenedor.appendChild(crearTarjeta(taller));
+
+    contenido.replaceChildren(crearCabecera(), crearChips(), contenedor);
+  }
+
+  pintar();
+  return shell;
 }
 
 /** @returns {HTMLElement} */
@@ -385,7 +482,7 @@ export function WorkshopDetailScreen() {
 }
 
 /**
- * Pantalla provisional de las fases 03 a 05.
+ * Pantalla provisional de la fase 05.
  * @param {"inicio" | "mapa" | "pedidos" | "perfil"} activeNav
  * @param {string} titulo
  * @param {boolean} [hideNavOnMobile]
