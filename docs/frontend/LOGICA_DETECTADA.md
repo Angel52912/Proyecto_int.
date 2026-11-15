@@ -15,6 +15,10 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 02 | Inicio | Búsqueda de talleres | 3 | El buscador navega a `/mapa`; no filtra |
 | 02 | Inicio | Notificaciones | 3 | Botón sin acción |
 | 02 | Inicio | Vista previa del mapa | 3 | `MapBackdrop` estilizado, sin proveedor real |
+| 03 | Mapa | Mapa real y pines georreferenciados | 3 | `MapBackdrop` y `MapPin` estilizados; Leaflet está instalado pero no hay componente de mapa |
+| 03 | Mapa | Selección de taller con pines y tarjetas | 1 | Estado local de `MapScreen` |
+| 03 | Mapa | Filtros de chips | 3 | Solo cambia el chip activo; no filtra pines |
+| 03 | Mapa | Datos de los talleres | 2 | `js/mocks/workshops.js` (`workshops`, `getWorkshopById`) |
 
 ## Contradicciones encontradas
 

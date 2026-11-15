@@ -9,11 +9,13 @@ import {
   MapBackdrop,
   MapPin,
   ProgressBar,
+  Rating,
   SearchInput,
   SectionHeader,
 } from "../../components/ui.js";
 import { Icon } from "../../components/icon.js";
 import { currentOrder, currentUser } from "../../mocks/orders.js";
+import { getWorkshopById, workshops } from "../../mocks/workshops.js";
 
 /** @param {string} ruta */
 function irA(ruta) {
@@ -205,9 +207,171 @@ export function HomeScreen() {
   });
 }
 
+const FILTROS_MAPA = ["Todos", "Reparación", "Limpieza", "Abierto"];
+
+const PINES_MAPA = [
+  { tallerId: "los-hermanos", x: 14, y: 24 },
+  { tallerId: "la-ermita", x: 72, y: 15 },
+  { tallerId: "don-chucho", x: 33, y: 40 },
+  { tallerId: "santiago", x: 85, y: 49 },
+  { tallerId: "don-chucho", x: 27, y: 60 },
+];
+
 /** @returns {HTMLElement} */
 export function MapScreen() {
-  return crearPantalla("mapa", "Mapa");
+  const estado = { seleccionado: "don-chucho", filtro: "Todos" };
+  const contenido = document.createElement("div");
+  contenido.className = "mapa";
+  const shell = AppShell({ activeNav: "mapa", fullBleed: true, children: contenido });
+
+  /**
+   * @param {object} taller
+   * @param {{ seleccionada?: boolean, alPulsar: () => void }} opciones
+   */
+  function crearTarjeta(taller, { seleccionada = false, alPulsar }) {
+    const tarjeta = Card({ onClick: alPulsar, padding: 12 });
+    tarjeta.classList.add("mapa__tarjeta");
+    if (seleccionada) tarjeta.classList.add("mapa__tarjeta--seleccionada");
+
+    const fila = document.createElement("span");
+    fila.className = "mapa__tarjeta-fila";
+
+    const info = document.createElement("span");
+    info.className = "mapa__tarjeta-info";
+
+    const nombre = document.createElement("span");
+    nombre.className = "mapa__tarjeta-nombre";
+    nombre.textContent = taller.name;
+
+    const meta = document.createElement("span");
+    meta.className = "mapa__tarjeta-meta";
+    if (typeof taller.rating_avg === "number") {
+      meta.appendChild(Rating({ value: 5, size: 12 }));
+    }
+    const partes = [];
+    if (typeof taller.rating_avg === "number") partes.push(taller.rating_avg.toFixed(1));
+    if (typeof taller.distance_km === "number") partes.push(`${taller.distance_km} km`);
+    if (partes.length > 0) {
+      const texto = document.createElement("span");
+      texto.textContent = partes.join(" · ");
+      meta.appendChild(texto);
+    }
+    info.append(nombre, meta);
+
+    if (taller.hours_label !== "") {
+      info.appendChild(Chip({ variant: "status", tone: "green", children: taller.hours_label }));
+    }
+
+    const chevron = document.createElement("span");
+    chevron.className = "mapa__tarjeta-chevron";
+    chevron.appendChild(Icon({ name: "chevron-right", size: 18 }));
+
+    fila.append(ImagePlaceholder({ alt: taller.name, width: 56, height: 56 }), info, chevron);
+    tarjeta.appendChild(fila);
+    return tarjeta;
+  }
+
+  function crearLienzo() {
+    const lienzo = MapBackdrop();
+    lienzo.classList.add("mapa__lienzo");
+    for (const pin of PINES_MAPA) {
+      const taller = getWorkshopById(pin.tallerId);
+      lienzo.appendChild(
+        MapPin({
+          selected: estado.seleccionado === pin.tallerId,
+          x: pin.x,
+          y: pin.y,
+          ariaLabel: taller?.name ?? "Taller",
+          onClick: () => {
+            estado.seleccionado = pin.tallerId;
+            pintar();
+          },
+        })
+      );
+    }
+    return lienzo;
+  }
+
+  /** @param {string} clase */
+  function crearBuscador(clase) {
+    const caja = document.createElement("div");
+    caja.className = clase;
+    const buscador = SearchInput({
+      placeholder: "Buscar en Mérida",
+      rightSlot: Icon({ name: "filter", size: 18, color: "var(--color-text-muted)" }),
+    });
+    buscador.classList.add("mapa__buscador");
+    caja.appendChild(buscador);
+    return caja;
+  }
+
+  /** @param {string} clase */
+  function crearChips(clase) {
+    const fila = document.createElement("div");
+    fila.className = clase;
+    for (const filtro of FILTROS_MAPA) {
+      fila.appendChild(
+        Chip({
+          variant: "filter",
+          active: estado.filtro === filtro,
+          onClick: () => {
+            estado.filtro = filtro;
+            pintar();
+          },
+          children: filtro,
+        })
+      );
+    }
+    return fila;
+  }
+
+  function crearPanel() {
+    const panel = document.createElement("aside");
+    panel.className = "mapa__panel";
+    panel.setAttribute("aria-label", "Talleres");
+
+    const lista = document.createElement("div");
+    lista.className = "mapa__lista";
+    for (const taller of workshops) {
+      lista.appendChild(
+        crearTarjeta(taller, {
+          seleccionada: estado.seleccionado === taller.id,
+          alPulsar: () => {
+            if (estado.seleccionado === taller.id) irA(`/taller/${taller.id}`);
+            else {
+              estado.seleccionado = taller.id;
+              pintar();
+            }
+          },
+        })
+      );
+    }
+
+    panel.append(crearBuscador("mapa__buscador-caja"), crearChips("mapa__chips-panel"), lista);
+    return panel;
+  }
+
+  function pintar() {
+    const seleccionado = getWorkshopById(estado.seleccionado) ?? workshops[0];
+    const tarjetaMovil = document.createElement("div");
+    tarjetaMovil.className = "mapa__tarjeta-movil";
+    tarjetaMovil.appendChild(
+      crearTarjeta(seleccionado, {
+        alPulsar: () => irA(`/taller/${seleccionado.id}`),
+      })
+    );
+
+    contenido.replaceChildren(
+      crearLienzo(),
+      crearBuscador("mapa__buscador-movil"),
+      crearChips("mapa__chips-movil"),
+      tarjetaMovil,
+      crearPanel()
+    );
+  }
+
+  pintar();
+  return shell;
 }
 
 /** @returns {HTMLElement} */

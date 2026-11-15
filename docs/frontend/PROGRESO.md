@@ -2,7 +2,7 @@
 
 - [x] Fase 01 — Fundación
 - [x] Fase 02 — Inicio
-- [ ] Fase 03 — Mapa
+- [x] Fase 03 — Mapa
 - [ ] Fase 04 — Lista de talleres
 - [ ] Fase 05 — Detalle de taller
 - [ ] Fase 06 — Solicitar cotización
