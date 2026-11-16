@@ -10,8 +10,20 @@ import { rutas as rutasPresupuestos } from "./features/quotes/routes.js";
 import { rutas as rutasSolicitudes } from "./features/requests/routes.js";
 import { rutas as rutasTaller } from "./features/workshop/routes.js";
 
+/** @returns {Node} */
+function crearInicio() {
+  const seccion = document.createElement("section");
+  const titulo = document.createElement("h1");
+  titulo.textContent = "MiXanab";
+  const lema = document.createElement("p");
+  lema.textContent = "No lo tires, restáuralo.";
+  seccion.append(titulo, lema);
+  return seccion;
+}
+
 /** @type {ReadonlyArray<import("./router.js").Ruta>} */
 const rutas = [
+  { path: "/", render: crearInicio },
   ...rutasAuth,
   ...rutasMapa,
   ...rutasSolicitudes,
