@@ -13,9 +13,8 @@ import {
   TextArea,
 } from "../../components/ui.js";
 import { Icon } from "../../components/icon.js";
-import { orderDetail } from "../../mocks/orders.js";
+import { activeOrders, finishedOrders, orderDetail } from "../../mocks/orders.js";
 import { pickup } from "../../mocks/pickup.js";
-import { Pantalla } from "../../components/pantalla.js";
 
 /** @param {string} ruta */
 function irA(ruta) {
@@ -489,10 +488,171 @@ export function RatingScreen() {
   return AppShell({ activeNav: "pedidos", hideNavOnMobile: true, children: contenido });
 }
 
+/**
+ * @param {{id: string, item: string, workshopName: string, chipLabel: string, chipTone: "amber" | "teal" | "green", progress: number}} pedido
+ * @returns {HTMLElement}
+ */
+function crearTarjetaActiva(pedido) {
+  const tarjeta = Card({
+    padding: 12,
+    onClick: () => irA(`/pedido/${pedido.id}`),
+  });
+  tarjeta.classList.add("pedidos__tarjeta");
+
+  const fila = document.createElement("div");
+  fila.className = "pedidos__tarjeta-fila";
+
+  const foto = ImagePlaceholder({ alt: pedido.item, width: 56, height: 56 });
+  foto.classList.add("pedidos__foto");
+
+  const cuerpo = document.createElement("div");
+  cuerpo.className = "pedidos__cuerpo";
+
+  const superior = document.createElement("div");
+  superior.className = "pedidos__superior";
+
+  const item = document.createElement("span");
+  item.className = "pedidos__item";
+  item.textContent = pedido.item;
+
+  const chip = Chip({ variant: "status", tone: pedido.chipTone, children: pedido.chipLabel });
+  superior.append(item, chip);
+
+  const taller = document.createElement("span");
+  taller.className = "pedidos__taller";
+  taller.textContent = pedido.workshopName;
+
+  const progreso = ProgressBar({ value: pedido.progress });
+
+  cuerpo.append(superior, taller, progreso);
+  fila.append(foto, cuerpo);
+  tarjeta.appendChild(fila);
+  return tarjeta;
+}
+
+/**
+ * @param {{id: string, item: string, workshopName: string, date: string, chipLabel: string, chipTone: "green", stars: number}} pedido
+ * @returns {HTMLElement}
+ */
+function crearTarjetaTerminada(pedido) {
+  const tarjeta = Card({
+    padding: 12,
+    onClick: () => irA(`/pedido/${pedido.id}`),
+  });
+  tarjeta.classList.add("pedidos__tarjeta");
+
+  const fila = document.createElement("div");
+  fila.className = "pedidos__tarjeta-fila";
+
+  const foto = ImagePlaceholder({ alt: pedido.item, width: 56, height: 56 });
+  foto.classList.add("pedidos__foto");
+
+  const cuerpo = document.createElement("div");
+  cuerpo.className = "pedidos__cuerpo";
+
+  const superior = document.createElement("div");
+  superior.className = "pedidos__superior";
+
+  const item = document.createElement("span");
+  item.className = "pedidos__item";
+  item.textContent = pedido.item;
+
+  const chip = Chip({ variant: "status", tone: pedido.chipTone, children: pedido.chipLabel });
+  superior.append(item, chip);
+
+  const meta = document.createElement("span");
+  meta.className = "pedidos__meta";
+  meta.textContent = `${pedido.workshopName} · ${pedido.date}`;
+
+  const rating = document.createElement("div");
+  rating.className = "pedidos__rating";
+  rating.appendChild(Rating({ value: pedido.stars, size: 12 }));
+
+  cuerpo.append(superior, meta, rating);
+  fila.append(foto, cuerpo);
+  tarjeta.appendChild(fila);
+  return tarjeta;
+}
+
 /** @returns {HTMLElement} */
 export function MyOrdersScreen() {
-  return Pantalla({
-    activeNav: "pedidos",
-    titulo: "Mis pedidos",
+  /** @type {"activos" | "historial"} */
+  let tab = "activos";
+
+  const contenido = document.createElement("div");
+  contenido.className = "pedidos";
+
+  const titulo = document.createElement("h1");
+  titulo.className = "pedidos__titulo";
+  titulo.textContent = "Mis pedidos";
+
+  const tabs = document.createElement("div");
+  tabs.className = "pedidos__tabs";
+  tabs.setAttribute("role", "tablist");
+
+  const botonActivos = document.createElement("button");
+  botonActivos.type = "button";
+  botonActivos.className = "pedidos__tab";
+  botonActivos.setAttribute("role", "tab");
+  botonActivos.id = "tab-activos";
+  botonActivos.setAttribute("aria-controls", "panel-pedidos");
+
+  const botonHistorial = document.createElement("button");
+  botonHistorial.type = "button";
+  botonHistorial.className = "pedidos__tab";
+  botonHistorial.setAttribute("role", "tab");
+  botonHistorial.textContent = "Historial";
+  botonHistorial.id = "tab-historial";
+  botonHistorial.setAttribute("aria-controls", "panel-pedidos");
+
+  tabs.append(botonActivos, botonHistorial);
+
+  const panel = document.createElement("div");
+  panel.className = "pedidos__panel";
+  panel.id = "panel-pedidos";
+  panel.setAttribute("role", "tabpanel");
+
+  const render = () => {
+    botonActivos.textContent = `Activos (${activeOrders.length})`;
+    const esActivos = tab === "activos";
+
+    botonActivos.classList.toggle("pedidos__tab--activa", esActivos);
+    botonHistorial.classList.toggle("pedidos__tab--activa", !esActivos);
+    botonActivos.setAttribute("aria-selected", esActivos ? "true" : "false");
+    botonHistorial.setAttribute("aria-selected", esActivos ? "false" : "true");
+    panel.setAttribute("aria-labelledby", esActivos ? "tab-activos" : "tab-historial");
+
+    panel.replaceChildren();
+
+    if (esActivos) {
+      const listaActivos = document.createElement("div");
+      listaActivos.className = "pedidos__lista pedidos__lista--activos";
+      for (const pedido of activeOrders) listaActivos.appendChild(crearTarjetaActiva(pedido));
+      panel.appendChild(listaActivos);
+    }
+
+    const etiquetaTerminados = document.createElement("p");
+    etiquetaTerminados.className = "pedidos__terminados-etiqueta";
+    etiquetaTerminados.textContent = "Terminados";
+
+    const listaTerminados = document.createElement("div");
+    listaTerminados.className = "pedidos__lista pedidos__lista--terminados";
+    for (const pedido of finishedOrders) listaTerminados.appendChild(crearTarjetaTerminada(pedido));
+
+    panel.append(etiquetaTerminados, listaTerminados);
+  };
+
+  botonActivos.addEventListener("click", () => {
+    tab = "activos";
+    render();
   });
+  botonHistorial.addEventListener("click", () => {
+    tab = "historial";
+    render();
+  });
+
+  render();
+  contenido.append(titulo, tabs, panel);
+
+  return AppShell({ activeNav: "pedidos", children: contenido });
 }

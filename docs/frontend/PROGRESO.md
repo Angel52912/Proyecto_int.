@@ -10,4 +10,4 @@
 - [x] Fase 08 — Presupuesto
 - [x] Fase 09 — Seguimiento de pedido
 - [x] Fase 10 — Recoger pedido + Calificar
-- [ ] Fase 11 — Mis pedidos + revisión final
+- [x] Fase 11 — Mis pedidos + revisión final

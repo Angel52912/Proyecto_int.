@@ -2574,3 +2574,142 @@ a.ui-card {
     border-radius: var(--radio-lg);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Mis pedidos (fase 11)
+   --------------------------------------------------------------------------- */
+
+.pedidos {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.pedidos__titulo {
+  margin: var(--espacio-2) 0 0;
+  color: var(--color-text);
+  font-family: var(--fuente-titulo);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.pedidos__tabs {
+  display: flex;
+  gap: 0;
+  margin-top: var(--espacio-3);
+  padding: 4px;
+  background: var(--color-tan-strong);
+  border-radius: var(--radio-sm);
+}
+
+.pedidos__tab {
+  flex: 1;
+  height: 36px;
+  padding: 0 var(--espacio-2);
+  border: 0;
+  border-radius: var(--radio-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pedidos__tab--activa {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 1px 3px rgba(43, 33, 27, 0.08);
+}
+
+.pedidos__panel {
+  min-width: 0;
+}
+
+.pedidos__lista {
+  display: grid;
+  gap: var(--espacio-12);
+  margin-top: var(--espacio-3);
+}
+
+.pedidos__tarjeta.ui-card {
+  text-align: left;
+}
+
+.pedidos__tarjeta-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-12);
+}
+
+.pedidos__foto {
+  flex-shrink: 0;
+}
+
+.pedidos__cuerpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  min-width: 0;
+}
+
+.pedidos__superior {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.pedidos__item {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.pedidos__taller,
+.pedidos__meta {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.pedidos__terminados-etiqueta {
+  margin: var(--espacio-4) 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.pedidos__lista--terminados {
+  margin-top: var(--espacio-12);
+}
+
+.pedidos__rating .ui-rating {
+  gap: 2px;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .pedidos__lista--activos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .pedidos {
+    max-width: none;
+  }
+
+  .pedidos__tabs {
+    width: 320px;
+  }
+
+  .pedidos__lista--activos,
+  .pedidos__lista--terminados {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--espacio-3);
+  }
+}

@@ -11,6 +11,17 @@ export const currentOrder = {
   progress: 72,
 };
 
+/** @type {Array<{id: string, item: string, workshopName: string, chipLabel: string, chipTone: "amber" | "teal", progress: number}>} */
+export const activeOrders = [
+  { id: "1042", item: "Botas café", workshopName: "Talabartería Don Chucho", chipLabel: "Limpieza", chipTone: "amber", progress: 72 },
+  { id: "1043", item: "Tenis blancos", workshopName: "Taller La Ermita", chipLabel: "Cotización", chipTone: "teal", progress: 10 },
+];
+
+/** @type {Array<{id: string, item: string, workshopName: string, date: string, chipLabel: string, chipTone: "green", stars: number}>} */
+export const finishedOrders = [
+  { id: "1030", item: "Cinturón de piel", workshopName: "Calzado Los Hermanos", date: "2 oct", chipLabel: "Entregado", chipTone: "green", stars: 5 },
+];
+
 /**
  * Detalle del pedido en curso para el seguimiento (CU-05).
  * Los campos de contrato (id, request_id, workshop_id, phase, status, due_date)
