@@ -3,7 +3,7 @@
 import { obtenerCliente } from "../../supabaseClient.js";
 import { ApiError, traducirError } from "../../lib/apiError.js";
 import { validarImagen } from "../../lib/validate.js";
-import { validarDatosTaller } from "./validar.js";
+import { validarDatosTaller, validarPaginaResenas } from "./validar.js";
 
 const BUCKET = "workshop-photos";
 const TIPOS_FOTO = /** @type {ReadonlyArray<string>} */ (["profile", "work"]);
@@ -12,6 +12,8 @@ const COLUMNAS_TALLER =
 
 /**
  * @typedef {{ id: string, path: string, kind: "profile" | "work", sort: number, url: string }} FotoTaller
+ * @typedef {{ workshop_id: string, published: boolean, suspended: boolean, rating_avg: number | null, rating_count: number, orders: { total: number, in_progress: number, ready: number, delivered: number, on_time_pct: number | null }, requests: { open: number, quoted: number, accepted: number, cancelled: number } }} EstadisticasTaller
+ * @typedef {{ id: string, rating: number, tags: string[], comment: string | null, created_at: string }} ResenaPropia
  * @typedef {{ id: string, owner_id: string, name: string | null, address: string | null, colonia: string | null, postal_code: string | null, lat: number | null, lng: number | null, services: string[], hours: import("./validar.js").Horario | null, price_from: number | null, published: boolean, suspended: boolean, rating_avg: number | null, rating_count: number, photos: FotoTaller[] }} Taller
  */
 
@@ -149,4 +151,27 @@ export async function removeWorkshopPhoto(photoId) {
   if (!data) throw new ApiError("not_found");
   const borrado = await cliente.storage.from(BUCKET).remove([data.path]);
   if (borrado.error) throw traducirError(borrado.error);
+}
+
+/**
+ * Datos de la pantalla "Mi taller": calificación, pedidos por estado, % de entregas a tiempo y solicitudes por estado
+ * (RPC `get_my_workshop_stats`). Solo el artesano con taller.
+ * @returns {Promise<EstadisticasTaller>}
+ */
+export async function getMyWorkshopStats() {
+  const { data, error } = await obtenerCliente().rpc("get_my_workshop_stats");
+  if (error) throw traducirError(error);
+  return data;
+}
+
+/**
+ * Reseñas no ocultas del taller propio, de la más reciente a la más antigua. No trae quién las escribió
+ * (RPC `list_my_workshop_reviews`).
+ * @param {{ limit?: number, offset?: number }} [filtros]
+ * @returns {Promise<{ total: number, items: ResenaPropia[] }>}
+ */
+export async function listMyWorkshopReviews(filtros) {
+  const { data, error } = await obtenerCliente().rpc("list_my_workshop_reviews", validarPaginaResenas(filtros));
+  if (error) throw traducirError(error);
+  return data;
 }

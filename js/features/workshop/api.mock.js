@@ -2,7 +2,7 @@
 // Por defecto la sesión simulada es de un artesano activo; `fijarSesionSimulada` cambia eso (solo para pruebas).
 import { ApiError } from "../../lib/apiError.js";
 import { validarImagen } from "../../lib/validate.js";
-import { camposFaltantes, validarDatosTaller } from "./validar.js";
+import { camposFaltantes, validarDatosTaller, validarPaginaResenas } from "./validar.js";
 
 const UID_SIMULADO = "00000000-0000-4000-8000-000000000002";
 const ID_TALLER = "00000000-0000-4000-8000-0000000000a1";
@@ -17,12 +17,12 @@ function idSimulado() {
   return `00000000-0000-4000-8000-${String(contadorIds).padStart(12, "0")}`;
 }
 
-/** @type {{ sesion: boolean, rol: string | null, activo: boolean, taller: any, fotos: any[] }} */
+/** @type {{ sesion: boolean, rol: string | null, activo: boolean, taller: any, fotos: any[], resenas: any[], pedidos: any[], solicitudes: any[] }} */
 let estado = estadoInicial();
 
 /** @returns {typeof estado} */
 function estadoInicial() {
-  return { sesion: true, rol: "craftsman", activo: true, taller: null, fotos: [] };
+  return { sesion: true, rol: "craftsman", activo: true, taller: null, fotos: [], resenas: [], pedidos: [], solicitudes: [] };
 }
 
 /** Reinicia el estado (para pruebas). */
@@ -138,4 +138,64 @@ export async function removeWorkshopPhoto(photoId) {
   const indice = estado.fotos.findIndex((f) => f.id === photoId);
   if (estado.rol !== "craftsman" || indice === -1) throw new ApiError("not_found");
   estado.fotos.splice(indice, 1);
+}
+
+/**
+ * Datos de ejemplo para "Mi taller" (solo para pruebas y demostraciones): reseñas `{ id, rating, tags, comment, created_at, hidden? }`,
+ * pedidos `{ status, due_date, delivered_at }` y solicitudes `{ status }`.
+ * @param {{ resenas?: any[], pedidos?: any[], solicitudes?: any[] }} datos
+ */
+export function fijarDatosMiTallerSimulados(datos) {
+  Object.assign(estado, datos);
+}
+
+/** @param {string} fechaIso @returns {string} fecha (AAAA-MM-DD) en la hora de Mérida */
+function fechaEnMerida(fechaIso) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Merida", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(fechaIso));
+}
+
+/** Igual que `get_my_workshop_stats`. */
+export async function getMyWorkshopStats() {
+  exigirArtesano();
+  if (!estado.taller) throw new ApiError("not_found");
+  const cuenta = (/** @type {any[]} */ lista, /** @type {string} */ estadoBuscado) => lista.filter((x) => x.status === estadoBuscado).length;
+  const entregados = estado.pedidos.filter((p) => p.status === "delivered");
+  const aTiempo = entregados.filter((p) => fechaEnMerida(p.delivered_at) <= p.due_date).length;
+  const visibles = estado.resenas.filter((r) => !r.hidden);
+  const promedio = visibles.length === 0 ? null : Math.round((visibles.reduce((s, r) => s + r.rating, 0) / visibles.length) * 10) / 10;
+  return {
+    workshop_id: estado.taller.id,
+    published: estado.taller.published,
+    suspended: estado.taller.suspended,
+    rating_avg: estado.resenas.length > 0 ? promedio : estado.taller.rating_avg,
+    rating_count: estado.resenas.length > 0 ? visibles.length : estado.taller.rating_count,
+    orders: {
+      total: estado.pedidos.length,
+      in_progress: cuenta(estado.pedidos, "in_progress"),
+      ready: cuenta(estado.pedidos, "ready"),
+      delivered: entregados.length,
+      on_time_pct: entregados.length === 0 ? null : Math.round((1000 * aTiempo) / entregados.length) / 10,
+    },
+    requests: {
+      open: cuenta(estado.solicitudes, "open"),
+      quoted: cuenta(estado.solicitudes, "quoted"),
+      accepted: cuenta(estado.solicitudes, "accepted"),
+      cancelled: cuenta(estado.solicitudes, "cancelled"),
+    },
+  };
+}
+
+/**
+ * Igual que `list_my_workshop_reviews`: no ocultas, de la más reciente a la más antigua, sin datos del autor.
+ * @param {{ limit?: number, offset?: number }} [filtros]
+ */
+export async function listMyWorkshopReviews(filtros) {
+  const pagina = validarPaginaResenas(filtros);
+  exigirArtesano();
+  if (!estado.taller) throw new ApiError("not_found");
+  const filas = estado.resenas.filter((r) => !r.hidden).sort((a, b) => b.created_at.localeCompare(a.created_at));
+  return {
+    total: filas.length,
+    items: filas.slice(pagina.p_offset, pagina.p_offset + pagina.p_limit).map((r) => ({ id: r.id, rating: r.rating, tags: [...(r.tags ?? [])], comment: r.comment ?? null, created_at: r.created_at })),
+  };
 }

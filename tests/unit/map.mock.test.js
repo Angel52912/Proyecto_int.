@@ -85,12 +85,14 @@ describe("validarFiltros", () => {
       p_max_price: null,
       p_limit: 50,
       p_offset: 0,
+      p_search: null,
+      p_order: null,
     });
+    expect(validarFiltros({ search: "  Buen Paso ", order: "price" })).toMatchObject({ p_service: null, p_search: "Buen Paso", p_order: "price" });
     expect(validarFiltros({ service: "cleaning", colonia: "   " }).p_colonia).toBeNull();
   });
 
   test.each([
-    ["sin servicio", {}],
     ["servicio inválido", { service: "otro" }],
     ["lat sin lng", { service: "repair", lat: 20 }],
     ["lng sin lat", { service: "repair", lng: -89 }],
@@ -105,6 +107,10 @@ describe("validarFiltros", () => {
     ["precio cero", { service: "repair", max_price: 0 }],
     ["precio NaN", { service: "repair", max_price: Number.NaN }],
     ["colonia de más de 100 caracteres", { service: "repair", colonia: "x".repeat(101) }],
+    ["orden desconocido", { service: "repair", order: "otro" }],
+    ["orden por cercanía sin ubicación", { service: "repair", order: "distance" }],
+    ["texto de búsqueda de más de 100 caracteres", { service: "repair", search: "x".repeat(101) }],
+    ["texto de búsqueda que no es cadena", { service: "repair", search: 5 }],
     ["límite cero", { service: "repair", limit: 0 }],
     ["límite mayor a 100", { service: "repair", limit: 101 }],
     ["offset negativo", { service: "repair", offset: -1 }],
@@ -172,6 +178,30 @@ describe("searchWorkshops (simulado)", () => {
     expect(await mapa.searchWorkshops({ service: "repair", offset: 10 })).toEqual([]);
   });
 
+  test("sin servicio busca en todos los talleres (reparación y limpieza) sin repetirlos", async () => {
+    const r = await mapa.searchWorkshops({});
+    expect(ids(r)).toEqual([ID_TALLER_SIMULADO, ID_GINERES, ID_MONTEJO, ID_ITZIMNA]);
+  });
+
+  test("search busca en el nombre o la colonia sin distinguir mayúsculas; % y _ son literales", async () => {
+    expect(ids(await mapa.searchWorkshops({ search: "BUEN PASO" }))).toEqual([ID_TALLER_SIMULADO]);
+    expect(ids(await mapa.searchWorkshops({ search: "ginerés" }))).toEqual([ID_GINERES]);
+    expect(ids(await mapa.searchWorkshops({ service: "cleaning", search: "tenis" }))).toEqual([ID_ITZIMNA]);
+    expect(await mapa.searchWorkshops({ search: "%" })).toEqual([]);
+    expect(await mapa.searchWorkshops({ search: "   " })).toHaveLength(4);
+  });
+
+  test("order: rating, price y distance (con ubicación); sin order usa distance con ubicación y rating sin ella", async () => {
+    expect(ids(await mapa.searchWorkshops({ service: "repair", order: "price" }))).toEqual([ID_GINERES, ID_TALLER_SIMULADO, ID_MONTEJO]);
+    expect(ids(await mapa.searchWorkshops({ service: "repair", order: "rating" }))).toEqual([ID_TALLER_SIMULADO, ID_GINERES, ID_MONTEJO]);
+    // Con ubicación, "rating" ignora la cercanía.
+    const lejosPrimero = await mapa.searchWorkshops({ service: "repair", ...CENTRO, order: "rating" });
+    expect(ids(lejosPrimero)).toEqual([ID_TALLER_SIMULADO, ID_GINERES, ID_MONTEJO]);
+    const porDistancia = await mapa.searchWorkshops({ service: "repair", ...CENTRO, order: "distance" });
+    expect(ids(porDistancia)).toEqual(ids(await mapa.searchWorkshops({ service: "repair", ...CENTRO })));
+    expect(porDistancia[0].distance_km).toBe(0);
+  });
+
   test("A2: sin resultados devuelve [] y no lanza", async () => {
     expect(await mapa.searchWorkshops({ service: "repair", colonia: "no existe" })).toEqual([]);
     mapa.fijarTalleresSimulados([]);
@@ -199,7 +229,7 @@ describe("searchWorkshops (simulado)", () => {
   });
 
   test("filtros inválidos lanzan invalid_input antes de revisar la sesión", async () => {
-    expect(await codigoDe(mapa.searchWorkshops(/** @type {any} */ ({})))).toBe("invalid_input");
+    expect(await codigoDe(mapa.searchWorkshops(/** @type {any} */ ({ service: "otro" })))).toBe("invalid_input");
   });
 });
 

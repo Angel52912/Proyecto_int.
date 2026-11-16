@@ -142,6 +142,15 @@ Tipos:
 - **Errores:** `not_authenticated`, `invalid_input` (tipo, tamaño o `kind`), `not_found` (sin taller), `forbidden`, `limit_reached`.
 - **Roles permitidos:** `craftsman` activo, solo en su taller.
 
+### `getMyWorkshopStats()` (RPC `get_my_workshop_stats`, pantalla "Mi taller")
+- **Respuesta:** `{ workshop_id, published, suspended, rating_avg: number | null, rating_count, orders: { total, in_progress, ready, delivered, on_time_pct: number | null }, requests: { open, quoted, accepted, cancelled } }`. `on_time_pct` (1 decimal) es el % de pedidos entregados en o antes de la fecha prometida, con la hora de Mérida; es `null` si aún no hay entregados. Las solicitudes no cuentan los borradores.
+- **Errores:** `not_authenticated`, `inactive_user`, `forbidden` (no es artesano), `not_found` (aún no crea su taller). **Roles permitidos:** `craftsman` activo. Simulado: `fijarDatosMiTallerSimulados({ resenas, pedidos, solicitudes })`.
+
+### `listMyWorkshopReviews({ limit?, offset? })` (RPC `list_my_workshop_reviews`)
+- **Parámetros:** `limit` 1 a 100 (20 por defecto), `offset` >= 0.
+- **Respuesta:** `{ total, items: { id, rating, tags: string[], comment: string | null, created_at }[] }`: solo las reseñas **no ocultas** de su taller, de la más reciente a la más antigua. **No incluye quién las escribió** (`client_id` ni `order_id`).
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden`, `not_found`. **Roles permitidos:** `craftsman` activo.
+
 ### `removeWorkshopPhoto(photoId)`
 - **Parámetros:** `photoId: string`. **Respuesta:** `void` (borra el registro y el archivo).
 - **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no es suya), `forbidden`. **Roles permitidos:** `craftsman` dueño.
@@ -210,6 +219,12 @@ Límites: descripción de 1 a 1000 caracteres, mensaje de 1 a 2000, máximo 5 fo
 
 ### `markNotificationRead(notificationId)`
 - **Respuesta:** `Notificacion` con `read_at`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no es suya).
+
+### `countUnreadNotifications()`
+- **Respuesta:** `number`: las notificaciones propias sin leer (para el contador de la campana). **Errores:** `not_authenticated`. Con `subscribeToNotifications` se mantiene al día sin volver a consultar.
+
+### `markAllNotificationsRead()`
+- **Respuesta:** `{ updated: number }`: cuántas notificaciones propias pendientes se marcaron como leídas (0 si no había). **Errores:** `not_authenticated`.
 
 ### `subscribeToNotifications(alRecibir)`
 - **Parámetros:** `alRecibir: (notificacion: Notificacion) => void`. **Respuesta:** promesa de una función que cancela la suscripción.
@@ -345,11 +360,12 @@ Tipos:
 - `ResultadoBusqueda = TallerBase & { profile_photo_url: string | null }`.
 - `PerfilTaller = TallerBase & { photos: { id, path, kind: 'profile' | 'work', sort, url }[] }`. Las fotos del taller son públicas; la de perfil va primero y luego los trabajos, del más reciente al más antiguo.
 
-### `searchWorkshops({ service, lat?, lng?, max_distance_km?, colonia?, postal_code?, min_rating?, open_now?, max_price?, limit?, offset? })` (RPC `search_workshops`)
-- **Parámetros:** `service: 'repair' | 'cleaning'` (obligatorio, paso 1 del CU). `lat` y `lng` van juntas (ubicación del cliente). `max_distance_km` (> 0 y máximo 500) **exige ubicación**. `colonia`: subcadena sin distinguir mayúsculas (máximo 100; vacío = sin filtro). `postal_code`: 5 dígitos. `min_rating`: 1 a 5 (excluye talleres sin calificación). `open_now: boolean`: solo los abiertos ahora. `max_price`: precio "desde" máximo (MXN). `limit`: 1 a 100 (50 por defecto). `offset` >= 0.
-- **Respuesta:** `ResultadoBusqueda[]`. Con ubicación va del más cercano al más lejano; sin ella (A1: el cliente escribe colonia o C.P.) va por calificación, luego por número de reseñas y nombre.
+### `searchWorkshops({ service?, search?, order?, lat?, lng?, max_distance_km?, colonia?, postal_code?, min_rating?, open_now?, max_price?, limit?, offset? })` (RPC `search_workshops`)
+- **Parámetros:** `service?: 'repair' | 'cleaning'` (opcional desde `0019`: sin él se buscan los talleres de **todos** los servicios, sin repetirlos). `search?: string`: subcadena sin distinguir mayúsculas en el **nombre o la colonia** del taller (máximo 100; vacío = sin filtro; sirve para el buscador "Buscar taller o colonia"). `order?: 'distance' | 'rating' | 'price'`: `distance` (más cercanos, **exige** `lat` y `lng`), `rating` (mejor valorados) o `price` (precio "desde" ascendente); por defecto `distance` con ubicación y `rating` sin ella; en todos los casos desempata por calificación, número de reseñas y nombre. `lat` y `lng` van juntas (ubicación del cliente). `max_distance_km` (> 0 y máximo 500) **exige ubicación**. `colonia`: subcadena sin distinguir mayúsculas (máximo 100; vacío = sin filtro). `postal_code`: 5 dígitos. `min_rating`: 1 a 5 (excluye talleres sin calificación). `open_now: boolean`: solo los abiertos ahora. `max_price`: precio "desde" máximo (MXN). `limit`: 1 a 100 (50 por defecto). `offset` >= 0.
+- **Respuesta:** `ResultadoBusqueda[]`, en el orden de `order`. Con ubicación y sin `order`, del más cercano al más lejano; sin ella (A1: el cliente escribe colonia o C.P.), por calificación, luego por número de reseñas y nombre.
 - **A2 (sin resultados):** devuelve `[]`, no lanza; la pantalla muestra el aviso.
-- **Errores:** `not_authenticated`, `invalid_input` (cualquier parámetro fuera de rango, ubicación incompleta o `max_distance_km` sin ubicación), `inactive_user`, `forbidden` (no es cliente). **Roles permitidos:** `client` activo.
+- **Errores:** `not_authenticated`, `invalid_input` (cualquier parámetro fuera de rango, ubicación incompleta, `max_distance_km` u `order: 'distance'` sin ubicación, `order` desconocido o `search` de más de 100 caracteres), `inactive_user`, `forbidden` (no es cliente). **Roles permitidos:** `client` activo.
+- **Notas:** filtrar y ordenar en el servidor evita perder resultados cuando hay más de `limit` talleres; la pantalla ya no necesita ordenar ni filtrar por texto por su cuenta.
 
 ### `getWorkshopProfile(workshopId, ubicacion?)` (RPC `get_workshop_profile`)
 - **Parámetros:** `workshopId: uuid`; `ubicacion?: { lat, lng }` solo para calcular `distance_km`.

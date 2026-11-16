@@ -186,11 +186,14 @@ export async function searchWorkshops(filtros) {
   exigirClienteActivo();
   const origen = p.p_lat === null || p.p_lng === null ? null : { lat: p.p_lat, lng: p.p_lng };
   const colonia = p.p_colonia?.toLowerCase() ?? null;
+  const busqueda = p.p_search?.toLowerCase() ?? null;
+  const orden = p.p_order ?? (origen ? "distance" : "rating");
 
   const filas = talleres
     .filter((t) => t.published && !t.suspended)
-    .filter((t) => t.services.includes(/** @type {"repair" | "cleaning"} */ (p.p_service)))
+    .filter((t) => p.p_service === null || t.services.includes(/** @type {"repair" | "cleaning"} */ (p.p_service)))
     .filter((t) => colonia === null || t.colonia.toLowerCase().includes(colonia))
+    .filter((t) => busqueda === null || t.name.toLowerCase().includes(busqueda) || t.colonia.toLowerCase().includes(busqueda))
     .filter((t) => p.p_postal_code === null || t.postal_code === p.p_postal_code)
     .filter((t) => p.p_min_rating === null || (t.rating_avg !== null && t.rating_avg >= p.p_min_rating))
     .filter((t) => p.p_max_price === null || t.price_from <= p.p_max_price)
@@ -199,9 +202,12 @@ export async function searchWorkshops(filtros) {
     .filter(({ base }) => !p.p_open_now || base.is_open);
 
   filas.sort((a, b) => {
-    if (origen) {
+    if (orden === "distance") {
       const porDistancia = /** @type {number} */ (a.base.distance_km) - /** @type {number} */ (b.base.distance_km);
       if (porDistancia !== 0) return porDistancia;
+    } else if (orden === "price") {
+      const porPrecio = a.t.price_from - b.t.price_from;
+      if (porPrecio !== 0) return porPrecio;
     }
     const porRating = (b.t.rating_avg ?? -1) - (a.t.rating_avg ?? -1);
     if (porRating !== 0) return porRating;

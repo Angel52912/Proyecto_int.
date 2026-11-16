@@ -179,6 +179,24 @@ export async function listMyNotifications(opciones = {}) {
     .map(aNotificacion);
 }
 
+export async function countUnreadNotifications() {
+  exigirSesion();
+  return estado.notificaciones.filter((n) => n.user_id === uidActual() && n.read_at === null).length;
+}
+
+export async function markAllNotificationsRead() {
+  exigirSesion();
+  const ahora = new Date().toISOString();
+  let marcadas = 0;
+  for (const n of estado.notificaciones) {
+    if (n.user_id === uidActual() && n.read_at === null) {
+      n.read_at = ahora;
+      marcadas += 1;
+    }
+  }
+  return { updated: marcadas };
+}
+
 /** @param {string} notificationId */
 export async function markNotificationRead(notificationId) {
   exigirUuid(notificationId);
