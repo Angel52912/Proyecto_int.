@@ -1,0 +1,84 @@
+/* 15 · Califica tu experiencia */
+.calificar .barra__titulo {
+  order: -1;
+}
+
+.calificar__formulario,
+.calificar__gracias {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: calc(100dvh - 100px);
+  text-align: center;
+}
+
+.calificar__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-top: var(--espacio-3);
+  border-radius: 50%;
+  background: #e1f1e7;
+  color: var(--color-exito);
+}
+
+.calificar__titulo {
+  margin: var(--espacio-2) 0 0;
+}
+
+.calificar__formulario .texto-secundario {
+  margin: 0;
+}
+
+.calificar__estrellas {
+  display: flex;
+  gap: var(--espacio-1);
+  margin: var(--espacio-2) 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.calificar__estrellas label {
+  display: inline-flex;
+  padding: 2px;
+  color: var(--color-arena);
+  cursor: pointer;
+}
+
+.calificar__estrellas label.activa {
+  color: var(--color-miel);
+}
+
+.calificar__estrellas input:focus-visible + label {
+  outline: 3px solid var(--color-miel);
+  border-radius: 8px;
+}
+
+.calificar__texto {
+  margin: 0;
+  color: var(--color-cuero);
+  font-weight: 600;
+}
+
+.chips--envolver {
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow: visible;
+}
+
+.calificar__formulario textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1px solid var(--color-arena);
+  border-radius: var(--radio);
+  background: #fff;
+  font: inherit;
+}
+
+.calificar__formulario .acciones {
+  width: 100%;
+}

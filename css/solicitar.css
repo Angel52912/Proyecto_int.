@@ -1,0 +1,76 @@
+/* 10 · Solicitar cotización */
+.solicitar__formulario {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 100px);
+}
+
+.solicitar__para {
+  margin-bottom: var(--espacio-3);
+}
+
+.foto--chica {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.solicitar__fotos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--espacio-2);
+}
+
+.solicitar__foto {
+  position: relative;
+}
+
+.solicitar__foto .foto {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.solicitar__quitar {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(43 33 27 / 70%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.solicitar__agregar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-1);
+  aspect-ratio: 1;
+  border: 1.5px dashed var(--color-cuero);
+  border-radius: var(--radio);
+  color: var(--color-cuero);
+  font-size: var(--texto-secundario);
+  cursor: pointer;
+}
+
+.solicitar__agregar:focus-within,
+#fotos-calzado:focus-visible + .solicitar__fotos .solicitar__agregar {
+  outline: 3px solid var(--color-miel);
+}
+
+.contador {
+  align-self: flex-end;
+  color: var(--color-gris);
+}
+
+.solicitar .acciones {
+  padding-top: var(--espacio-3);
+}

@@ -12,6 +12,8 @@ const archivos = [
   { origen: "node_modules/leaflet/dist/leaflet.js", nombre: "leaflet.js" },
   { origen: "node_modules/leaflet/dist/leaflet.css", nombre: "leaflet.css" },
   { origen: "node_modules/leaflet/dist/images", nombre: "images" },
+  // QR del PIN de entrega (CU-06). MIT, sin dependencias.
+  { origen: "node_modules/qrcode-generator/qrcode.js", nombre: "qrcode.js" },
 ];
 
 mkdirSync(destino, { recursive: true });

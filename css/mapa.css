@@ -1,0 +1,63 @@
+/* 07 · Mapa de talleres */
+.mapa .pantalla__cuerpo {
+  position: relative;
+  padding: 0;
+}
+
+.mapa__lienzo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #e3ece2;
+}
+
+.mapa__superior {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: var(--espacio-3) var(--espacio-3) 0;
+}
+
+.mapa__superior .buscador input {
+  box-shadow: 0 2px 8px rgb(43 33 27 / 12%);
+  padding-right: 48px;
+}
+
+.mapa__ubicar {
+  position: fixed;
+  z-index: 5;
+  right: max(var(--espacio-3), calc((100% - 480px) / 2 + var(--espacio-3)));
+  bottom: calc(var(--alto-nav) + 190px + env(safe-area-inset-bottom));
+  box-shadow: 0 2px 8px rgb(43 33 27 / 15%);
+}
+
+.mapa__tarjeta {
+  position: fixed;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--alto-nav) + var(--espacio-3) + env(safe-area-inset-bottom));
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 var(--espacio-3);
+}
+
+.mapa__tarjeta > .tarjeta,
+.mapa__tarjeta > .estado-vacio,
+.mapa__tarjeta > .estado-error,
+.mapa__tarjeta > .estado-cargando {
+  background: #fff;
+  border-radius: var(--radio-tarjeta);
+  box-shadow: 0 4px 16px rgb(43 33 27 / 15%);
+}
+
+.mapa__conteo {
+  margin: var(--espacio-1) 0 0;
+  text-align: center;
+  color: var(--color-espresso);
+  text-shadow: 0 0 4px #fff;
+}

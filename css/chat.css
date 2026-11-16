@@ -1,0 +1,226 @@
+/* 11 · Chat y 24 · Chats (componente reutilizable) */
+.chat-pantalla .pantalla__cuerpo {
+  padding-bottom: 0;
+}
+
+.chat-pantalla__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  flex: 1;
+  min-height: 0;
+}
+
+.chat-contraparte {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.chat-contraparte__nombre {
+  margin: 0;
+  font-weight: 600;
+}
+
+.chat-solicitud {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) var(--espacio-3);
+  border-radius: var(--radio);
+  background: #fbefd8;
+}
+
+.chat-solicitud__descripcion {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-solicitud__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espacio-2);
+}
+
+.chat-solicitud__acciones:empty {
+  display: none;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 320px;
+  height: calc(100dvh - 240px);
+}
+
+.chat__zona {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.chat__anteriores {
+  display: block;
+  margin: 0 auto;
+}
+
+.chat__anteriores[hidden] {
+  display: none;
+}
+
+.chat__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin: 0;
+  padding: var(--espacio-2) 0;
+  list-style: none;
+}
+
+.chat__mensaje {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 78%;
+}
+
+.chat__mensaje--propio {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.chat__texto {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-arena);
+  border-radius: 16px 16px 16px 4px;
+  background: #fff;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat__mensaje--propio .chat__texto {
+  border-color: var(--color-cuero);
+  border-radius: 16px 16px 4px;
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+}
+
+.chat__hora {
+  margin-top: 2px;
+  color: var(--color-gris);
+  font-size: 11px;
+}
+
+.chat__sistema {
+  align-self: center;
+  max-width: 90%;
+  text-align: center;
+}
+
+.chat__sistema span {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--color-arena);
+  font-size: 12px;
+}
+
+.chat__vacio {
+  align-self: center;
+  padding: var(--espacio-4);
+}
+
+.chat__composer {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) 0 calc(var(--espacio-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-arena);
+  background: var(--color-hueso);
+}
+
+.chat__composer[hidden] {
+  display: none;
+}
+
+.chat__entrada {
+  flex: 1;
+  min-height: var(--tactil-min);
+  max-height: 120px;
+  padding: 10px 16px;
+  border: 1px solid var(--color-arena);
+  border-radius: 22px;
+  background: #fff;
+  color: var(--color-espresso);
+  font: inherit;
+  resize: none;
+}
+
+.chat__enviar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tactil-min);
+  height: var(--tactil-min);
+  flex: none;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+  cursor: pointer;
+}
+
+.chat__enviar:disabled {
+  opacity: 0.5;
+}
+
+.chat__aviso:empty {
+  display: none;
+}
+
+.chat__cerrado {
+  margin: 0;
+  padding: var(--espacio-3) 0;
+  text-align: center;
+  border-top: 1px solid var(--color-arena);
+}
+
+.chat__mensaje--tarjeta {
+  max-width: 85%;
+}
+
+.tarjeta-presupuesto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espacio-1);
+  min-width: 220px;
+  padding: var(--espacio-3);
+  border: 1.5px solid var(--color-cenote);
+  border-radius: var(--radio-tarjeta);
+  background: #fff;
+}
+
+.tarjeta-presupuesto p {
+  margin: 0;
+}
+
+.tarjeta-presupuesto--inactiva {
+  border-color: var(--color-arena);
+  opacity: 0.75;
+}
+
+.tarjeta-presupuesto__monto {
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-subtitulo);
+  font-weight: 700;
+}
+
+.boton--chico {
+  min-height: 40px;
+  margin-top: var(--espacio-1);
+  font-size: var(--texto-secundario);
+}

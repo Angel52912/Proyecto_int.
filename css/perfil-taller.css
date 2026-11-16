@@ -1,0 +1,95 @@
+/* 09 · Perfil del taller */
+.perfil-taller .barra {
+  position: absolute;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: none;
+}
+
+.perfil-taller .barra__volver {
+  margin: var(--espacio-2) 0 0;
+  background: #fff;
+}
+
+.perfil-taller .pantalla__cuerpo {
+  padding: 0 0 calc(var(--alto-nav) + 100px);
+}
+
+.perfil-taller__contenido {
+  display: flex;
+  flex-direction: column;
+}
+
+.perfil-taller__portada .foto {
+  width: 100%;
+  height: 220px;
+  border-radius: 0;
+}
+
+.perfil-taller__portada .foto--vacia .icono {
+  width: 48px;
+  height: 48px;
+}
+
+.perfil-taller__hoja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-top: -24px;
+  padding: var(--espacio-4) var(--espacio-3);
+  border-radius: 24px 24px 0 0;
+  background: var(--color-hueso);
+  position: relative;
+}
+
+.perfil-taller__nombre {
+  margin: 0;
+  font-size: var(--texto-subtitulo);
+}
+
+.perfil-taller__precio {
+  margin: 0;
+}
+
+.perfil-taller__horario summary {
+  cursor: pointer;
+  min-height: var(--tactil-min);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.perfil-taller__horario summary::after {
+  content: "▾";
+  color: var(--color-cuero);
+}
+
+.perfil-taller__horario[open] summary::after {
+  content: "▴";
+}
+
+.horario {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--espacio-1) var(--espacio-3);
+  margin: 0;
+  font-size: var(--texto-secundario);
+}
+
+.horario dd {
+  margin: 0;
+  text-align: right;
+}
+
+.perfil-taller__acciones {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom));
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--espacio-3);
+  background: linear-gradient(transparent, var(--color-hueso) 30%);
+}

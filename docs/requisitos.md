@@ -27,12 +27,12 @@ Leyenda: (A#) = flujo alternativo. Pantallas: ver `docs/diseno.md`.
 Nota: se eliminó A3 ("correo ya registrado"). Para no revelar qué correos existen, el registro muestra un mensaje genérico.
 
 ### CU-02. Búsqueda de artesanos en mapa (Cliente)
-- [ ] Seleccionar categoría de servicio (Reparación o Limpieza).
-- [ ] Visualizar el mapa de talleres cercanos (solo con sesión iniciada).
+- [x] Seleccionar categoría de servicio (Reparación o Limpieza).
+- [x] Visualizar el mapa de talleres cercanos (solo con sesión iniciada).
 - [x] Filtrar por distancia, colonia, calificación, horario (Abierto) o precio "desde".
 - [x] Consultar el perfil del artesano (calificación, servicios, horario, precio "desde", trabajos recientes).
 - [x] A1: ingresar colonia o C.P. manualmente (si no hay ubicación).
-- [ ] A2: mostrar aviso sin resultados.
+- [x] A2: mostrar aviso sin resultados.
 
 ### CU-03. Solicitud de cotización por foto y chat (Cliente, Artesano)
 - [x] Adjuntar fotografías del calzado (al menos una).
@@ -113,7 +113,7 @@ El rol de `profiles` es nulo hasta que el usuario lo elige con `set_my_role`.
 
 - [ ] Mobile-first y PWA instalable.
 - [ ] La PWA carga en menos de 2 s con 3G/4G.
-- [ ] Interfaz en español.
+- [x] Interfaz en español.
 - [ ] El service worker solo guarda en caché la interfaz; nunca respuestas de Supabase, tiles ni fotos.
 - [ ] (Pegar aquí RF01–RF08, RNF01–RNF05 y HU01–HU04 del documento del equipo.)
 

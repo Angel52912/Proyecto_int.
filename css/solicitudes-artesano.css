@@ -1,0 +1,50 @@
+/* 18 · Solicitudes (Artesano) */
+.resumenes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--espacio-2);
+}
+
+.resumen {
+  padding: var(--espacio-2) var(--espacio-3);
+  border-radius: var(--radio);
+  background: #f1e6dd;
+}
+
+.resumen--cenote {
+  background: #dcefef;
+}
+
+.resumen--miel {
+  background: #fbefd8;
+}
+
+.resumen p {
+  margin: 0;
+}
+
+.resumen__etiqueta {
+  color: var(--color-gris);
+  font-size: 11px;
+}
+
+.resumen__valor {
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-subtitulo);
+  font-weight: 700;
+  color: var(--color-cuero);
+}
+
+.resumen--cenote .resumen__valor {
+  color: var(--color-cenote);
+}
+
+.resumen--miel .resumen__valor {
+  color: #b27a12;
+}
+
+.solicitud-artesano__descripcion {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

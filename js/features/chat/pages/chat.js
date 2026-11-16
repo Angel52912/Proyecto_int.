@@ -1,0 +1,128 @@
+// 11 · Chat (CU-03) y 24 · Chat del artesano: conversación de una solicitud con la tarjeta de presupuesto.
+import { api as apiPedidos } from "../../orders/index.js";
+import { ESTADO_SOLICITUD } from "../../orders/fases.js";
+import { NOMBRE_SERVICIO } from "../../map/componentes.js";
+import { crearTarjetaPresupuesto } from "../../quotes/tarjeta.js";
+import { api as apiSolicitudes } from "../../requests/index.js";
+import { alSalir } from "../../../ui/ciclo.js";
+import { crear, enlace } from "../../../ui/dom.js";
+import { cargarEn } from "../../../ui/estados.js";
+import { crearFoto } from "../../../ui/foto.js";
+import { crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
+import { mensajeDeError } from "../../../ui/mensajes.js";
+import { crearChat } from "../componente.js";
+
+const ADMITE_MENSAJES = ["open", "quoted", "accepted"];
+
+/**
+ * Folio corto de una solicitud o pedido ("#1A2B").
+ * @param {string} id
+ * @returns {string}
+ */
+export function folio(id) {
+  return `#${id.replace(/-/g, "").slice(-4).toUpperCase()}`;
+}
+
+/**
+ * @param {"client" | "craftsman"} rol
+ * @param {any} solicitud SolicitudDetalle
+ */
+function pintarConversacion(rol, solicitud) {
+  const esCliente = rol === "client";
+  const nombre = solicitud.counterpart?.full_name ?? (esCliente ? "Taller no disponible" : "Cliente");
+  // Para el cliente una solicitud abierta está "Enviada"; para el artesano es "Nueva".
+  const estado = esCliente && solicitud.status === "open" ? { texto: "Enviada", tono: "miel" } : ESTADO_SOLICITUD[solicitud.status] ?? ESTADO_SOLICITUD.open;
+
+  const chat = crearChat({
+    requestId: solicitud.id,
+    // El cliente es el dueño de la solicitud; los demás mensajes con remitente son del artesano.
+    esPropio: (m) => (esCliente ? m.sender_id === solicitud.client_id : m.sender_id !== null && m.sender_id !== solicitud.client_id),
+    puedeEscribir: ADMITE_MENSAJES.includes(solicitud.status),
+    crearTarjeta: (m) =>
+      crearTarjetaPresupuesto(/** @type {string} */ (m.quote_id), {
+        ruta: (p) => (esCliente ? `/presupuesto/${p.id}` : p.status === "sent" ? `/artesano/solicitud/${solicitud.id}` : null),
+        textoBoton: esCliente ? "Ver presupuesto" : "Rectificar presupuesto",
+      }),
+  });
+  alSalir(chat.destruir);
+
+  const acciones = crear("div", { clase: "chat-solicitud__acciones" });
+  const avisoAccion = crear("p", { clase: "campo__error", attrs: { "aria-live": "polite" } });
+  if (esCliente && (solicitud.status === "open" || solicitud.status === "quoted")) {
+    // A2: cancelar solicitud (solo abierta o cotizada).
+    acciones.append(
+      crear("button", {
+        clase: "boton-texto",
+        texto: "Cancelar solicitud",
+        attrs: { type: "button" },
+        on: {
+          click: async (evento) => {
+            if (!window.confirm("¿Cancelar esta solicitud? El taller ya no podrá enviarte presupuesto.")) return;
+            const boton = /** @type {HTMLButtonElement} */ (evento.currentTarget);
+            boton.disabled = true;
+            try {
+              await apiSolicitudes.cancelRequest(solicitud.id);
+              chat.permitirEscritura(false, "Cancelaste esta solicitud.");
+              boton.remove();
+            } catch (error) {
+              avisoAccion.textContent = mensajeDeError(error, { invalid_state: "Esta solicitud ya no se puede cancelar." });
+              boton.disabled = false;
+            }
+          },
+        },
+      }),
+    );
+  }
+  if (!esCliente && (solicitud.status === "open" || solicitud.status === "quoted")) {
+    acciones.append(enlace(`/artesano/solicitud/${solicitud.id}`, { clase: "boton-texto", texto: solicitud.status === "quoted" ? "Rectificar presupuesto" : "Enviar presupuesto" }));
+  }
+  if (solicitud.status === "accepted") {
+    apiPedidos
+      .listMyOrders()
+      .then((pedidos) => {
+        const pedido = pedidos.find((p) => p.request_id === solicitud.id);
+        if (pedido) acciones.append(enlace(esCliente ? `/pedido/${pedido.id}` : `/artesano/pedido/${pedido.id}`, { clase: "boton-texto", texto: "Ver seguimiento" }));
+      })
+      .catch(() => {});
+  }
+  if (!ADMITE_MENSAJES.includes(solicitud.status)) chat.permitirEscritura(false, solicitud.status === "draft" ? "Esta solicitud aún no se envía." : "Esta solicitud está cerrada.");
+
+  const contraparte = crear("div", { clase: "chat-contraparte" }, [
+    crear("span", { clase: "avatar", texto: iniciales(nombre), attrs: { "aria-hidden": "true" } }),
+    crear("div", {}, [crear("p", { clase: "chat-contraparte__nombre", texto: nombre }), crearInsignia(estado.texto, estado.tono)]),
+  ]);
+
+  return [
+    contraparte,
+    crear("div", { clase: "chat-solicitud" }, [
+      crearFoto(solicitud.photos[0]?.url, "Foto del calzado", "foto--chica"),
+      crear("div", { clase: "tarjeta__cuerpo" }, [
+        crear("p", { clase: "tarjeta__detalle", texto: `Solicitud ${folio(solicitud.id)}` }),
+        crear("p", { clase: "tarjeta__titulo", texto: NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud.service_type)] }),
+        crear("p", { clase: "tarjeta__detalle chat-solicitud__descripcion", texto: solicitud.description }),
+      ]),
+    ]),
+    acciones,
+    avisoAccion,
+    chat.elemento,
+  ];
+}
+
+/**
+ * @param {"client" | "craftsman"} rol
+ * @returns {(contexto: import("../../../router.js").Contexto) => Promise<Node>}
+ */
+export function renderChat(rol) {
+  return async ({ params }) => {
+    const contenido = crear("div", { clase: "chat-pantalla__contenido" });
+    const pantalla = crearPantalla(
+      { titulo: "Chat", volver: rol === "client" ? "/pedidos" : "/artesano/chats", clase: "chat-pantalla" },
+      [contenido],
+    );
+    cargarEn(contenido, () => apiSolicitudes.getRequest(params.requestId), (s) => pintarConversacion(rol, s), {
+      not_found: "No encontramos esta conversación.",
+      invalid_input: "No encontramos esta conversación.",
+    });
+    return pantalla;
+  };
+}

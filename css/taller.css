@@ -1,0 +1,46 @@
+/* 17 · Datos del taller (Artesano) */
+.taller__formulario {
+  display: flex;
+  flex-direction: column;
+}
+
+.taller__estado {
+  margin-bottom: var(--espacio-3);
+}
+
+.taller__fotos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--espacio-2);
+}
+
+.taller__fotos .insignia {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+}
+
+.taller__mapa {
+  height: 160px;
+  border-radius: var(--radio-tarjeta);
+  background: #e3ece2;
+}
+
+.horario-fila {
+  display: grid;
+  grid-template-columns: 76px 1fr auto 1fr;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.horario-fila input[type="time"] {
+  min-height: 40px;
+  padding: 0 var(--espacio-2);
+  border: 1px solid var(--color-arena);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.horario-fila input:disabled {
+  opacity: 0.4;
+}

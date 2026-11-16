@@ -1,0 +1,67 @@
+/* 23 · Perfil y reputación (Artesano) */
+.mi-taller__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.reputacion {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+.reputacion__promedio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.reputacion__promedio strong {
+  font-family: var(--fuente-titulo);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.reputacion__barras {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+}
+
+.reputacion__barras li {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.reputacion__barra {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-arena);
+  overflow: hidden;
+}
+
+.reputacion__relleno {
+  display: block;
+  height: 100%;
+  background: var(--color-miel);
+}
+
+.estadistica {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-subtitulo);
+  font-weight: 700;
+}
+
+.estadistica--exito {
+  color: var(--color-exito);
+}

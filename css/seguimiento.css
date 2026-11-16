@@ -1,0 +1,73 @@
+/* 13 · Seguimiento del pedido */
+.seguimiento__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.seguimiento__fase {
+  margin: var(--espacio-3) 0 var(--espacio-1);
+}
+
+.seguimiento__porcentaje {
+  color: var(--color-cenote);
+}
+
+.linea-tiempo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  margin: 0;
+  list-style: none;
+}
+
+.linea-tiempo__paso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-3);
+}
+
+.linea-tiempo__paso p {
+  margin: 0;
+}
+
+.linea-tiempo__marca {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border: 2px solid var(--color-arena);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.linea-tiempo__paso--hecha .linea-tiempo__marca {
+  border-color: var(--color-cenote);
+  background: var(--color-cenote);
+  color: #fff;
+}
+
+.linea-tiempo__paso--actual .linea-tiempo__marca {
+  border-color: var(--color-miel);
+  background: var(--color-miel);
+  box-shadow: 0 0 0 4px #fbefd8;
+}
+
+.linea-tiempo__nombre {
+  font-weight: 600;
+}
+
+.linea-tiempo__paso--pendiente .linea-tiempo__nombre {
+  color: var(--color-gris);
+  font-weight: 400;
+}
+
+.linea-tiempo__nota {
+  font-style: italic;
+}
+
+.acciones--columna {
+  flex-direction: column;
+}
