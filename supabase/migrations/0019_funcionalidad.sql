@@ -123,6 +123,11 @@ begin
          and (not v_open or f.is_open)
        order by n
        limit p_limit offset p_offset
+    ) s;
+
+  return v_result;
+end;
+$$;
 
 revoke execute on function public.search_workshops(public.service_type, double precision, double precision, numeric, text, text, numeric, boolean, numeric, integer, integer, text, text) from public, anon;
 grant execute on function public.search_workshops(public.service_type, double precision, double precision, numeric, text, text, numeric, boolean, numeric, integer, integer, text, text) to authenticated;
