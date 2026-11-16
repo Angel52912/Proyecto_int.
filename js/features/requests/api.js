@@ -231,6 +231,32 @@ export async function listMyNotifications(opciones = {}) {
 }
 
 /**
+ * Cuántas notificaciones propias siguen sin leer (para el contador de la campana).
+ * @returns {Promise<number>}
+ */
+export async function countUnreadNotifications() {
+  await obtenerUid();
+  const { count, error } = await obtenerCliente().from("notifications").select("id", { count: "exact", head: true }).is("read_at", null);
+  if (error) throw traducirError(error);
+  return count ?? 0;
+}
+
+/**
+ * Marca como leídas todas las notificaciones propias pendientes.
+ * @returns {Promise<{ updated: number }>} cuántas se marcaron
+ */
+export async function markAllNotificationsRead() {
+  await obtenerUid();
+  const { data, error } = await obtenerCliente()
+    .from("notifications")
+    .update({ read_at: new Date().toISOString() })
+    .is("read_at", null)
+    .select("id");
+  if (error) throw traducirError(error);
+  return { updated: (data ?? []).length };
+}
+
+/**
  * @param {string} notificationId
  * @returns {Promise<Notificacion>}
  */

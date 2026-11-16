@@ -123,3 +123,19 @@ export function camposFaltantes(taller) {
   if (taller.price_from === null) faltan.push("price_from");
   return faltan;
 }
+
+export const LIMITE_RESENAS_POR_DEFECTO = 20;
+
+/**
+ * Paginación de las reseñas propias: `limit` de 1 a 100 (20 por defecto) y `offset` >= 0.
+ * @param {{ limit?: number, offset?: number } | undefined} filtros
+ * @returns {{ p_limit: number, p_offset: number }}
+ */
+export function validarPaginaResenas(filtros) {
+  if (filtros !== undefined && (typeof filtros !== "object" || filtros === null || Array.isArray(filtros))) throw new ApiError("invalid_input");
+  const limite = filtros?.limit ?? LIMITE_RESENAS_POR_DEFECTO;
+  const desfase = filtros?.offset ?? 0;
+  if (!Number.isInteger(limite) || limite < 1 || limite > 100) throw new ApiError("invalid_input");
+  if (!Number.isInteger(desfase) || desfase < 0) throw new ApiError("invalid_input");
+  return { p_limit: limite, p_offset: desfase };
+}

@@ -142,6 +142,15 @@ Tipos:
 - **Errores:** `not_authenticated`, `invalid_input` (tipo, tamaño o `kind`), `not_found` (sin taller), `forbidden`, `limit_reached`.
 - **Roles permitidos:** `craftsman` activo, solo en su taller.
 
+### `getMyWorkshopStats()` (RPC `get_my_workshop_stats`, pantalla "Mi taller")
+- **Respuesta:** `{ workshop_id, published, suspended, rating_avg: number | null, rating_count, orders: { total, in_progress, ready, delivered, on_time_pct: number | null }, requests: { open, quoted, accepted, cancelled } }`. `on_time_pct` (1 decimal) es el % de pedidos entregados en o antes de la fecha prometida, con la hora de Mérida; es `null` si aún no hay entregados. Las solicitudes no cuentan los borradores.
+- **Errores:** `not_authenticated`, `inactive_user`, `forbidden` (no es artesano), `not_found` (aún no crea su taller). **Roles permitidos:** `craftsman` activo. Simulado: `fijarDatosMiTallerSimulados({ resenas, pedidos, solicitudes })`.
+
+### `listMyWorkshopReviews({ limit?, offset? })` (RPC `list_my_workshop_reviews`)
+- **Parámetros:** `limit` 1 a 100 (20 por defecto), `offset` >= 0.
+- **Respuesta:** `{ total, items: { id, rating, tags: string[], comment: string | null, created_at }[] }`: solo las reseñas **no ocultas** de su taller, de la más reciente a la más antigua. **No incluye quién las escribió** (`client_id` ni `order_id`).
+- **Errores:** `not_authenticated`, `invalid_input`, `inactive_user`, `forbidden`, `not_found`. **Roles permitidos:** `craftsman` activo.
+
 ### `removeWorkshopPhoto(photoId)`
 - **Parámetros:** `photoId: string`. **Respuesta:** `void` (borra el registro y el archivo).
 - **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no es suya), `forbidden`. **Roles permitidos:** `craftsman` dueño.
@@ -210,6 +219,12 @@ Límites: descripción de 1 a 1000 caracteres, mensaje de 1 a 2000, máximo 5 fo
 
 ### `markNotificationRead(notificationId)`
 - **Respuesta:** `Notificacion` con `read_at`. **Errores:** `not_authenticated`, `invalid_input`, `not_found` (no existe o no es suya).
+
+### `countUnreadNotifications()`
+- **Respuesta:** `number`: las notificaciones propias sin leer (para el contador de la campana). **Errores:** `not_authenticated`. Con `subscribeToNotifications` se mantiene al día sin volver a consultar.
+
+### `markAllNotificationsRead()`
+- **Respuesta:** `{ updated: number }`: cuántas notificaciones propias pendientes se marcaron como leídas (0 si no había). **Errores:** `not_authenticated`.
 
 ### `subscribeToNotifications(alRecibir)`
 - **Parámetros:** `alRecibir: (notificacion: Notificacion) => void`. **Respuesta:** promesa de una función que cancela la suscripción.
