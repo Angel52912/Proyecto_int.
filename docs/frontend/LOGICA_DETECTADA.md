@@ -45,6 +45,13 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 | 09 | Seguimiento de pedido | Pasos y fotos de avance | 3 | `TODO(BACKEND)`; los pasos y las `progressPhotos` son de muestra y las fotos no se suben |
 | 09 | Seguimiento de pedido | Escribir al taller | 1 | Navega a `/chat/1042` (fase 07) |
 | 09 | Seguimiento de pedido | Volver | 1 | `window.history.back()` |
+| 10 | Recoger pedido | PIN, QR, taller y dirección de muestra | 2 | `js/mocks/pickup.js`; `QrPlaceholder` SVG determinista (no escaneable), `// TODO(BACKEND): QR real` |
+| 10 | Recoger pedido | Generar/validar PIN y QR reales | 3 | Se muestran valores del mock; sin lógica real |
+| 10 | Recoger pedido | Cómo llegar | 1 | Abre Google Maps en pestaña nueva con `mapsQuery` del mock |
+| 10 | Calificar experiencia | Estrellas, etiqueta dinámica y chips seleccionables | 1 | Estado local de `RatingScreen` (`stars`, `tags`) |
+| 10 | Calificar experiencia | Texto de reseña | 1 | Estado local controlado (`TextArea`) |
+| 10 | Calificar experiencia | Guardar calificación | 3 | `onSubmitRating` con `TODO(BACKEND)`; navega a `/pedidos` (`createReview` del backend exige sesión/UUID) |
+| 10 | Calificar experiencia | Cerrar / Enviar calificación | 1 | Navega a `/pedidos` |
 
 ## Contradicciones encontradas
 
@@ -59,3 +66,4 @@ STACK DETECTADO: JavaScript ES6+ sin framework / CSS plano (tokens.css y compone
 9. **Forma de los mensajes del chat:** el diseño usa `{ from, type, text, time, amount, delivery }`, mientras que el contrato define `Mensaje = { id, request_id, sender_id, body, kind, quote_id?, created_at }`. Se conservó la forma del diseño en `js/mocks/chat.js` (solo presentación) y se documentó en el propio mock. El servicio `js/features/chat/api.mock.js` existe (Nivel 1), pero exige sesión y un UUID de solicitud; el flujo de diseño usa el id `1042` y el modo simulado no tiene sesión, así que la pantalla no lo consume todavía.
 10. **Presupuesto:** los campos del diseño (`workshopName`, `rating`, `title`, `description`, `lines`, `total`, `delivery`, `time`, `notice`) son presentación; el contrato define `Presupuesto = { id, request_id, amount_mxn, delivery_date, detail, status, ... }`. El mock conserva ambos: `amount_mxn: 450` y `detail` con el desglose, además del `total` ya formateado. Aceptar/rechazar usa `TODO(BACKEND)` aunque `respondQuote` exista, porque exige sesión y un UUID y la fase indica que la respuesta real es Nivel 3.
 11. **Seguimiento de pedido:** el diseño usa `statusLabel`, `totalPhases`, `progress`, `steps` y `progressPhotos`, que no existen en `Orden` del contrato (`{ id, quote_id, request_id, client_id, workshop_id, phase, status, due_date, ready_at, delivered_at, created_at, updated_at }`). El mock `orderDetail` conserva los campos de contrato y añade los de presentación; `progress` se muestra tal cual, sin calcularlo. `js/features/orders/api.mock.js` existe (Nivel 1, solo lectura) pero exige sesión y un UUID de orden, mientras el flujo de diseño usa el id `1042`, así que la pantalla no lo consume todavía. El avance real de fases y las fotos son Nivel 3: quedan con `TODO(BACKEND)`.
+12. **Recoger y calificar (fase 10):** la fase pide `src/mocks/pickup.ts`; se creó `js/mocks/pickup.js` con los campos y textos exactos del diseño. No hay librería QR en el proyecto, así que se usa `QrPlaceholder` SVG determinista (Nivel 3, no escaneable) con `TODO(BACKEND)`. `createReview`/`revealDeliveryPin` existen en `js/features/orders/api(.mock).js` pero exigen sesión y UUID, mientras el flujo usa `pedidoId = "1042"` y la fase indica que guardar/validar es Nivel 3; se dejaron callbacks locales con `TODO(BACKEND)` y navegación según la fase.

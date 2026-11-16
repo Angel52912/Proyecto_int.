@@ -9,5 +9,5 @@
 - [x] Fase 07 — Chat
 - [x] Fase 08 — Presupuesto
 - [x] Fase 09 — Seguimiento de pedido
-- [ ] Fase 10 — Recoger pedido + Calificar
+- [x] Fase 10 — Recoger pedido + Calificar
 - [ ] Fase 11 — Mis pedidos + revisión final

@@ -2326,3 +2326,251 @@ a.ui-card {
     aspect-ratio: auto;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Recoger pedido (fase 10)
+   --------------------------------------------------------------------------- */
+
+.recoger {
+  padding-bottom: 80px;
+}
+
+.recoger__columna {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.recoger__listo {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--espacio-3);
+}
+
+.recoger__titulo {
+  margin: var(--espacio-12) 0 0;
+  color: var(--color-text);
+  font-family: var(--fuente-titulo);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  text-align: center;
+}
+
+.recoger__qr-tarjeta.ui-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 200px;
+  margin-top: var(--espacio-3);
+  border-radius: var(--radio-lg);
+}
+
+.recoger__texto-pin {
+  margin: var(--espacio-12) 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.recoger__pin {
+  display: flex;
+  justify-content: center;
+  gap: var(--espacio-12);
+  margin-top: var(--espacio-12);
+}
+
+.recoger__digito {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 52px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--fuente-titulo);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.recoger__taller.ui-card {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-12);
+  margin-top: var(--espacio-3);
+}
+
+.recoger__taller-icono {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-teal);
+}
+
+.recoger__taller-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.recoger__taller-nombre {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.recoger__taller-direccion {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+@media (min-width: 1024px) {
+  .recoger {
+    padding-bottom: 0;
+  }
+
+  .recoger__columna {
+    max-width: 480px;
+  }
+
+  .recoger__qr-tarjeta.ui-card {
+    width: 260px;
+  }
+
+  .recoger__qr-tarjeta svg {
+    width: 220px;
+    height: 220px;
+  }
+
+  .recoger .ui-barra-acciones .ui-boton--ancho {
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Calificar experiencia (fase 10)
+   --------------------------------------------------------------------------- */
+
+.calificar {
+  padding-bottom: 80px;
+}
+
+.calificar__tarjeta {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.calificar__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-12);
+}
+
+.calificar__titulo-cabecera {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--fuente-titulo);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: left;
+}
+
+.calificar__cerrar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-color: var(--color-border);
+  border-radius: var(--radio-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.calificar__exito {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  margin: var(--espacio-4) auto 0;
+  border-radius: var(--radio-full);
+  background: var(--color-teal-soft);
+  color: var(--color-teal);
+}
+
+.calificar__titulo {
+  margin: var(--espacio-3) 0 0;
+  color: var(--color-text);
+  font-family: var(--fuente-titulo);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  text-align: center;
+}
+
+.calificar__subtitulo {
+  margin: var(--espacio-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.calificar__estrellas {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--espacio-3);
+}
+
+.calificar__estrellas .ui-rating {
+  gap: var(--espacio-2);
+}
+
+.calificar__etiqueta-estrellas {
+  margin: var(--espacio-2) 0 0;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+}
+
+.calificar__etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-3);
+}
+
+.calificar__resena {
+  margin-top: var(--espacio-3);
+  margin-bottom: 0;
+}
+
+@media (min-width: 1024px) {
+  .calificar {
+    padding-bottom: 0;
+  }
+
+  .calificar__tarjeta {
+    max-width: 480px;
+    margin-top: 48px;
+    padding: var(--espacio-32);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radio-lg);
+  }
+}
