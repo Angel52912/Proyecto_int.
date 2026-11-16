@@ -7,10 +7,11 @@ export const ZONA_HORARIA = "America/Merida";
 export const LIMITE_POR_DEFECTO = 50;
 export const LIMITE_MAXIMO = 100;
 export const DISTANCIA_MAXIMA_KM = 500;
+export const ORDENES = /** @type {ReadonlyArray<string>} */ (["distance", "rating", "price"]);
 
 /**
- * @typedef {{ service: "repair" | "cleaning", lat?: number, lng?: number, max_distance_km?: number, colonia?: string, postal_code?: string, min_rating?: number, open_now?: boolean, max_price?: number, limit?: number, offset?: number }} FiltrosBusqueda
- * @typedef {{ p_service: string, p_lat: number | null, p_lng: number | null, p_max_distance_km: number | null, p_colonia: string | null, p_postal_code: string | null, p_min_rating: number | null, p_open_now: boolean, p_max_price: number | null, p_limit: number, p_offset: number }} ParametrosBusqueda
+ * @typedef {{ service?: "repair" | "cleaning", search?: string, order?: "distance" | "rating" | "price", lat?: number, lng?: number, max_distance_km?: number, colonia?: string, postal_code?: string, min_rating?: number, open_now?: boolean, max_price?: number, limit?: number, offset?: number }} FiltrosBusqueda
+ * @typedef {{ p_service: string | null, p_lat: number | null, p_lng: number | null, p_max_distance_km: number | null, p_colonia: string | null, p_postal_code: string | null, p_min_rating: number | null, p_open_now: boolean, p_max_price: number | null, p_limit: number, p_offset: number, p_search: string | null, p_order: string | null }} ParametrosBusqueda
  */
 
 /**
@@ -22,14 +23,14 @@ function esNumero(valor) {
 }
 
 /**
- * Valida los filtros (la categoría de servicio es obligatoria, paso 1 del CU) y los convierte en los parámetros de
+ * Valida los filtros (la categoría de servicio es opcional: sin ella se buscan todas) y los convierte en los parámetros de
  * `search_workshops`. Lanza invalid_input si algo no cumple.
  * @param {FiltrosBusqueda} filtros
  * @returns {ParametrosBusqueda}
  */
 export function validarFiltros(filtros) {
   if (typeof filtros !== "object" || filtros === null) throw new ApiError("invalid_input");
-  if (!SERVICIOS.includes(filtros.service)) throw new ApiError("invalid_input");
+  if (filtros.service !== undefined && !SERVICIOS.includes(filtros.service)) throw new ApiError("invalid_input");
   const hayLat = filtros.lat !== undefined;
   const hayLng = filtros.lng !== undefined;
   if (hayLat !== hayLng) throw new ApiError("invalid_input"); // la ubicación va completa o no va
@@ -49,13 +50,18 @@ export function validarFiltros(filtros) {
   }
   if (filtros.open_now !== undefined && typeof filtros.open_now !== "boolean") throw new ApiError("invalid_input");
   if (filtros.max_price !== undefined && (!esNumero(filtros.max_price) || filtros.max_price <= 0 || filtros.max_price >= 100000000)) throw new ApiError("invalid_input");
+  const busqueda = filtros.search === undefined ? "" : filtros.search;
+  if (typeof busqueda !== "string" || busqueda.trim().length > 100) throw new ApiError("invalid_input");
+  if (filtros.order !== undefined && (!ORDENES.includes(filtros.order) || (filtros.order === "distance" && !hayLat))) {
+    throw new ApiError("invalid_input"); // ordenar por cercanía exige ubicación
+  }
   const limite = filtros.limit ?? LIMITE_POR_DEFECTO;
   if (!Number.isInteger(limite) || limite < 1 || limite > LIMITE_MAXIMO) throw new ApiError("invalid_input");
   const desfase = filtros.offset ?? 0;
   if (!Number.isInteger(desfase) || desfase < 0) throw new ApiError("invalid_input");
 
   return {
-    p_service: filtros.service,
+    p_service: filtros.service ?? null,
     p_lat: hayLat ? /** @type {number} */ (filtros.lat) : null,
     p_lng: hayLng ? /** @type {number} */ (filtros.lng) : null,
     p_max_distance_km: filtros.max_distance_km ?? null,
@@ -66,6 +72,8 @@ export function validarFiltros(filtros) {
     p_max_price: filtros.max_price ?? null,
     p_limit: limite,
     p_offset: desfase,
+    p_search: busqueda.trim() === "" ? null : busqueda.trim(),
+    p_order: filtros.order ?? null,
   };
 }
 
