@@ -42,7 +42,7 @@ export async function crearSolicitud(c, cliente, taller, status = "draft") {
 }
 
 /**
- * Registra una foto de la solicitud (como superusuario).
+ * Registra una foto de la solicitud y su archivo en Storage (como superusuario).
  * @param {import("pg").Client} c
  * @param {string} solicitud
  * @param {string} [uuid]
@@ -52,5 +52,7 @@ export async function agregarFoto(c, solicitud, uuid = UUID_A) {
   await c.query("reset role");
   const path = `${solicitud}/${uuid}`;
   await c.query("insert into public.request_photos (request_id, path) values ($1, $2)", [solicitud, path]);
+  // Desde 0020 submit_request exige que el archivo exista de verdad en Storage.
+  await c.query("insert into storage.objects (bucket_id, name) values ('request-photos', $1)", [path]);
   return path;
 }

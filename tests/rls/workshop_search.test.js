@@ -351,7 +351,7 @@ describe("búsqueda de talleres (CU-02)", () => {
   test("grants: anon no ejecuta las funciones; authenticated sí", async () => {
     await c.query("reset role");
     const firmas = [
-      "public.search_workshops(public.service_type, double precision, double precision, numeric, text, text, numeric, boolean, numeric, integer, integer)",
+      "public.search_workshops(public.service_type, double precision, double precision, numeric, text, text, numeric, boolean, numeric, integer, integer, text, text)",
       "public.get_workshop_profile(uuid, double precision, double precision)",
     ];
     for (const f of firmas) {
