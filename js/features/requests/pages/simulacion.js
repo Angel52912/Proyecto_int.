@@ -1,6 +1,7 @@
 // Solo con la API simulada: cambia la sesión simulada entre cliente y artesano para recorrer ambos flujos
 // (por ejemplo: el cliente envía una solicitud y luego el artesano la cotiza). No existe con la API real.
 import { USAR_API_SIMULADA } from "../../../config.js";
+import { sincronizarSesionSimulada } from "../../auth/guardia.js";
 import { crear, ir } from "../../../ui/dom.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";
 
@@ -8,9 +9,7 @@ import { crearBoton, crearPantalla } from "../../../ui/layout.js";
  * @param {"client" | "craftsman"} rol
  */
 async function cambiarRol(rol) {
-  const [simulacion, taller] = await Promise.all([import("../simulacion.js"), import("../../workshop/api.mock.js")]);
-  simulacion.fijarSesionSimulada({ rol });
-  taller.fijarSesionSimulada({ rol });
+  await sincronizarSesionSimulada({ sesion: true, rol });
   ir(rol === "client" ? "/inicio" : "/artesano/solicitudes");
 }
 
