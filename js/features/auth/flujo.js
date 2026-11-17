@@ -1,6 +1,7 @@
 // Estado del flujo de acceso (CU-01) entre pantallas: correo pendiente de verificar y nombre capturado al crear la
 // cuenta. Vive en memoria y en sessionStorage (sobrevive a recargar), nunca en la URL.
 import { ir } from "../../ui/dom.js";
+import { olvidarAvatares } from "./avatar.js";
 import { destinoPorPerfil, olvidarPerfil, sincronizarSesionSimulada } from "./guardia.js";
 import { api } from "./index.js";
 
@@ -67,6 +68,7 @@ export async function cerrarSesion() {
     await api.signOut();
   } finally {
     olvidarPerfil();
+    olvidarAvatares();
     limpiarDatosAcceso();
     await sincronizarSesionSimulada({ sesion: false });
     ir("/acceso");
