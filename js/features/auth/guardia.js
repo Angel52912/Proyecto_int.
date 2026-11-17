@@ -59,13 +59,13 @@ async function perfilSimulado() {
 
 /**
  * Con la API simulada, alinea la sesión de los demás simulados con la de acceso (rol elegido o sesión cerrada).
- * @param {Rol | null} rol null = sin sesión
+ * @param {{ sesion: boolean, rol?: Rol | null }} cambios
  */
-export async function sincronizarSesionSimulada(rol) {
+export async function sincronizarSesionSimulada({ sesion, rol = null }) {
   if (!USAR_API_SIMULADA) return;
   const [simulacion, taller] = await Promise.all([import("../requests/simulacion.js"), import("../workshop/api.mock.js")]);
-  simulacion.fijarSesionSimulada(rol === null ? { sesion: false } : { sesion: true, rol });
-  if (rol !== null) taller.fijarSesionSimulada({ rol });
+  simulacion.fijarSesionSimulada(sesion ? { sesion: true, rol } : { sesion: false });
+  if (sesion && rol !== null) taller.fijarSesionSimulada({ rol });
 }
 
 /**
