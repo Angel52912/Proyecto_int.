@@ -1,4 +1,5 @@
 // 11 · Chat (CU-03) y 24 · Chat del artesano: conversación de una solicitud con la tarjeta de presupuesto.
+import { crearAvatar } from "../../auth/avatar.js";
 import { api as apiPedidos } from "../../orders/index.js";
 import { ESTADO_SOLICITUD } from "../../orders/fases.js";
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
@@ -8,7 +9,7 @@ import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
-import { crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
+import { crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { crearChat } from "../componente.js";
 
@@ -88,7 +89,7 @@ function pintarConversacion(rol, solicitud) {
   if (!ADMITE_MENSAJES.includes(solicitud.status)) chat.permitirEscritura(false, solicitud.status === "draft" ? "Esta solicitud aún no se envía." : "Esta solicitud está cerrada.");
 
   const contraparte = crear("div", { clase: "chat-contraparte" }, [
-    crear("span", { clase: "avatar", texto: iniciales(nombre), attrs: { "aria-hidden": "true" } }),
+    crearAvatar({ nombre, avatarPath: solicitud.counterpart?.avatar_path }),
     crear("div", {}, [crear("p", { clase: "chat-contraparte__nombre", texto: nombre }), crearInsignia(estado.texto, estado.tono)]),
   ]);
 
