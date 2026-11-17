@@ -1,26 +1,33 @@
-// Perfil del cliente (pestaña Perfil de la navegación inferior): nombre, datos privados y cerrar sesión.
-// La captura y edición del perfil es la pantalla 05 · Datos del cliente (CU-01, Acceso).
+// Perfil del cliente (pestaña Perfil de la navegación inferior): nombre, foto, datos privados y cerrar sesión.
+// La edición usa la pantalla 05 · Completar perfil (CU-01) con `?desde=perfil`.
 import { USAR_API_SIMULADA } from "../../../config.js";
-import { crear, enlace, ir } from "../../../ui/dom.js";
+import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearBoton, crearPantalla, iniciales } from "../../../ui/layout.js";
+import { cerrarSesion } from "../flujo.js";
 import { api } from "../index.js";
 
-/** @param {{ perfil: any, privados: any | null }} datos */
-function pintar({ perfil, privados }) {
-  const salir = crearBoton("Cerrar sesión", {
-    variante: "secundario",
-    alHacerClic: async () => {
-      try {
-        await api.signOut();
-      } finally {
-        ir("/");
-      }
-    },
-  });
+/**
+ * Avatar con la foto de perfil (URL firmada) o las iniciales si no hay o no carga.
+ * @param {string} nombre
+ * @param {string | null} url
+ */
+function crearAvatar(nombre, url) {
+  const avatar = crear("span", { clase: "avatar", texto: url ? undefined : iniciales(nombre), attrs: { "aria-hidden": "true" } });
+  if (url) {
+    const img = crear("img", { attrs: { src: url, alt: "" } });
+    img.addEventListener("error", () => avatar.replaceChildren(iniciales(nombre)));
+    avatar.append(img);
+  }
+  return avatar;
+}
+
+/** @param {{ perfil: any, privados: any | null, urlFoto: string | null }} datos */
+function pintar({ perfil, privados, urlFoto }) {
+  const salir = crearBoton("Cerrar sesión", { variante: "secundario", alHacerClic: () => cerrarSesion() });
   return [
     crear("div", { clase: "tarjeta tarjeta--enlace" }, [
-      crear("span", { clase: "avatar", texto: iniciales(perfil.full_name), attrs: { "aria-hidden": "true" } }),
+      crearAvatar(perfil.full_name, urlFoto),
       crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__titulo", texto: perfil.full_name || "Sin nombre" }), crear("p", { clase: "tarjeta__detalle", texto: "Cliente" })]),
     ]),
     crear("dl", { clase: "tarjeta horario" }, [
@@ -29,6 +36,7 @@ function pintar({ perfil, privados }) {
       crear("dt", { texto: "Dirección" }),
       crear("dd", { texto: privados?.address ?? "Sin capturar" }),
     ]),
+    enlace("/acceso/perfil?desde=perfil", { clase: "boton boton--bloque", texto: "Editar perfil" }),
     salir,
   ];
 }
@@ -45,13 +53,17 @@ export async function renderPerfilCliente() {
     contenido,
     async () => {
       const perfil = await api.getMyProfile();
-      return { perfil, privados: await api.getMyClientPrivate().catch(() => null) };
+      const [privados, urlFoto] = await Promise.all([
+        api.getMyClientPrivate().catch(() => null),
+        perfil.avatar_path ? api.getAvatarUrl(perfil.avatar_path).catch(() => null) : null,
+      ]);
+      return { perfil, privados, urlFoto };
     },
     pintar,
   ).then(() => {
-    // Sin sesión de Supabase (p. ej. en el simulado sin pasar por Acceso) se ofrece ir a iniciar sesión.
+    // Sin sesión (p. ej. en el simulado sin pasar por Acceso) se ofrece ir a iniciar sesión.
     if (contenido.querySelector(".estado-error")) {
-      contenido.append(enlace("/", { clase: "boton boton--bloque", texto: "Iniciar sesión" }));
+      contenido.append(enlace("/acceso", { clase: "boton boton--bloque", texto: "Iniciar sesión" }));
     }
   });
   return pantalla;
