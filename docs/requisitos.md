@@ -79,7 +79,7 @@ Nota: se eliminó A3 ("correo ya registrado"). Para no revelar qué correos exis
 - [x] A1: resaltar los campos obligatorios faltantes.
 
 ### CU-08. Administración de la plataforma (Admin) — propuesto
-- [ ] Iniciar sesión como administrador (cuenta creada por el equipo; no se puede elegir en el registro).
+- [x] Iniciar sesión como administrador (cuenta creada por el equipo; no se puede elegir en el registro).
 - [x] Panel con totales: usuarios, talleres, solicitudes, pedidos y calificación promedio.
 - [x] Usuarios: listar, buscar, desactivar y reactivar (no se eliminan).
 - [x] Talleres: listar, suspender o despublicar del mapa y reactivar.
