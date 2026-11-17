@@ -1,43 +1,93 @@
 // 23 · Perfil y reputación (Artesano): calificación, distribución de estrellas, pedidos entregados, % a tiempo y reseñas.
+// Las cifras y las reseñas vienen del servidor (`getMyWorkshopStats` y `listMyWorkshopReviews`); las reseñas son anónimas.
 import { cerrarSesion } from "../../auth/flujo.js";
-import { api as apiPedidos } from "../../orders/index.js";
-import { api as apiSolicitudes } from "../../requests/index.js";
 import { formatearFecha } from "../../../lib/fechas.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearBoton, crearEstrellas, crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
+import { crearBoton, crearEstrellas, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { api } from "../index.js";
 
+/** Reseñas que se piden al servidor para la distribución de estrellas y la lista. */
+const RESENAS_POR_PAGINA = 100;
+/** Reseñas visibles al abrir la pantalla; "Ver más" muestra las siguientes. */
+const RESENAS_VISIBLES = 10;
+
 /**
- * Estadísticas a partir de los pedidos y sus reseñas visibles.
- * @param {any[]} pedidos
- * @param {any[]} resenas
- * @returns {{ entregados: number, aTiempo: number | null, distribucion: Record<1|2|3|4|5, number> }}
+ * Cuántas reseñas hay de cada número de estrellas.
+ * @param {{ rating: number }[]} resenas
+ * @returns {Record<1|2|3|4|5, number>}
  */
-export function estadisticas(pedidos, resenas) {
-  const entregados = pedidos.filter((p) => p.status === "delivered");
-  const puntuales = entregados.filter((p) => p.delivered_at && p.due_date && p.delivered_at.slice(0, 10) <= p.due_date).length;
+export function distribucionDeResenas(resenas) {
   /** @type {Record<1|2|3|4|5, number>} */
   const distribucion = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  for (const r of resenas) distribucion[/** @type {1|2|3|4|5} */ (r.rating)] += 1;
-  return { entregados: entregados.length, aTiempo: entregados.length === 0 ? null : Math.round((puntuales / entregados.length) * 100), distribucion };
+  for (const r of resenas) {
+    if (r.rating >= 1 && r.rating <= 5) distribucion[/** @type {1|2|3|4|5} */ (r.rating)] += 1;
+  }
+  return distribucion;
 }
 
-/** @param {{ taller: any | null, pedidos: any[], resenas: { resena: any, cliente: string }[] }} datos */
-function pintar({ taller, pedidos, resenas }) {
-  if (taller === null) {
+/**
+ * Porcentaje a tiempo para mostrar ("92.5%", "100%" o "–" si aún no hay entregados).
+ * @param {number | null} porcentaje
+ * @returns {string}
+ */
+export function textoATiempo(porcentaje) {
+  if (porcentaje === null || !Number.isFinite(porcentaje)) return "–";
+  return `${Number.isInteger(porcentaje) ? porcentaje : porcentaje.toFixed(1)}%`;
+}
+
+/**
+ * @param {string} etiqueta
+ * @param {string} valor
+ * @param {string} [clase]
+ */
+const crearCifra = (etiqueta, valor, clase = "") =>
+  crear("div", { clase: "tarjeta" }, [crear("p", { clase: "tarjeta__detalle", texto: etiqueta }), crear("p", { clase: `estadistica ${clase}`.trim(), texto: valor })]);
+
+/** @param {{ id: string, rating: number, tags: string[], comment: string | null, created_at: string }} resena */
+const crearResena = (resena) =>
+  crear("li", { clase: "tarjeta" }, [
+    crear("div", { clase: "fila-entre" }, [crearEstrellas(resena.rating), crear("span", { clase: "texto-secundario", texto: formatearFecha(resena.created_at) })]),
+    resena.comment ? crear("p", { clase: "tarjeta__detalle", texto: resena.comment }) : null,
+    resena.tags.length > 0 ? crear("div", { clase: "chips chips--envolver-izq" }, resena.tags.map((t) => crearInsignia(t, "cuero"))) : null,
+  ]);
+
+/**
+ * Lista de reseñas con "Ver más" para mostrar las siguientes.
+ * @param {any[]} items
+ */
+function crearListaResenas(items) {
+  if (items.length === 0) return crear("p", { clase: "texto-secundario", texto: "Aún no tienes reseñas." });
+  const lista = crear("ul", { clase: "lista" }, items.slice(0, RESENAS_VISIBLES).map(crearResena));
+  if (items.length <= RESENAS_VISIBLES) return lista;
+  const verMas = crear("button", {
+    clase: "boton-texto",
+    texto: "Ver más reseñas",
+    attrs: { type: "button" },
+    on: {
+      click: () => {
+        lista.append(...items.slice(RESENAS_VISIBLES).map(crearResena));
+        verMas.remove();
+      },
+    },
+  });
+  return crear("div", {}, [lista, verMas]);
+}
+
+/** @param {{ taller: any | null, stats: any | null, resenas: { total: number, items: any[] } }} datos */
+function pintar({ taller, stats, resenas }) {
+  if (taller === null || stats === null) {
     return crearVacio("Aún no configuras tu taller.", enlace("/artesano/taller", { clase: "boton", texto: "Configurar mi taller" }));
   }
-  const { entregados, aTiempo, distribucion } = estadisticas(
-    pedidos,
-    resenas.map((r) => r.resena),
-  );
+  const distribucion = distribucionDeResenas(resenas.items);
+  const promedio = stats.rating_avg;
+  const total = stats.rating_count;
   const maximo = Math.max(1, ...Object.values(distribucion));
-  const estado = taller.suspended
+  const estado = stats.suspended
     ? crearInsignia("Suspendido", "error")
-    : taller.published
+    : stats.published
       ? crearInsignia("Visible en el mapa", "exito")
       : crearInsignia("Borrador: no visible", "neutra");
 
@@ -48,9 +98,9 @@ function pintar({ taller, pedidos, resenas }) {
     ]),
     crear("div", { clase: "tarjeta reputacion" }, [
       crear("div", { clase: "reputacion__promedio" }, [
-        crear("strong", { texto: taller.rating_avg === null ? "–" : taller.rating_avg.toFixed(1) }),
-        crearEstrellas(taller.rating_avg),
-        crear("span", { clase: "texto-secundario", texto: taller.rating_count === 1 ? "1 reseña" : `${taller.rating_count} reseñas` }),
+        crear("strong", { texto: promedio === null ? "–" : promedio.toFixed(1) }),
+        crearEstrellas(promedio),
+        crear("span", { clase: "texto-secundario", texto: total === 1 ? "1 reseña" : `${total} reseñas` }),
       ]),
       crear(
         "ul",
@@ -63,28 +113,14 @@ function pintar({ taller, pedidos, resenas }) {
       ),
     ]),
     crear("div", { clase: "presupuesto__datos" }, [
-      crear("div", { clase: "tarjeta" }, [crear("p", { clase: "tarjeta__detalle", texto: "Pedidos entregados" }), crear("p", { clase: "estadistica", texto: String(entregados) })]),
-      crear("div", { clase: "tarjeta" }, [crear("p", { clase: "tarjeta__detalle", texto: "A tiempo" }), crear("p", { clase: "estadistica estadistica--exito", texto: aTiempo === null ? "–" : `${aTiempo}%` })]),
+      crearCifra("Pedidos entregados", String(stats.orders.delivered)),
+      crearCifra("A tiempo", textoATiempo(stats.orders.on_time_pct), "estadistica--exito"),
+      crearCifra("En proceso", String(stats.orders.in_progress)),
+      crearCifra("Listos para entregar", String(stats.orders.ready)),
     ]),
     crear("section", { clase: "seccion" }, [
       crear("h2", { clase: "seccion__titulo", texto: "Reseñas recientes" }),
-      resenas.length === 0
-        ? crear("p", { clase: "texto-secundario", texto: "Aún no tienes reseñas." })
-        : crear(
-            "ul",
-            { clase: "lista" },
-            resenas.slice(0, 10).map(({ resena, cliente }) =>
-              crear("li", { clase: "tarjeta" }, [
-                crear("div", { clase: "fila-entre" }, [
-                  crear("div", { clase: "chat-contraparte" }, [crear("span", { clase: "avatar avatar--chico", texto: iniciales(cliente), attrs: { "aria-hidden": "true" } }), crear("strong", { texto: cliente })]),
-                  crearEstrellas(resena.rating),
-                ]),
-                resena.comment ? crear("p", { clase: "tarjeta__detalle", texto: resena.comment }) : null,
-                resena.tags.length > 0 ? crear("div", { clase: "chips chips--envolver-izq" }, resena.tags.map((/** @type {string} */ t) => crearInsignia(t, "cuero"))) : null,
-                crear("p", { clase: "tarjeta__detalle", texto: formatearFecha(resena.created_at) }),
-              ]),
-            ),
-          ),
+      crearListaResenas(resenas.items),
     ]),
   ];
 }
@@ -100,21 +136,10 @@ export async function renderMiTaller() {
     crearBoton("Cerrar sesión", { variante: "secundario", alHacerClic: () => cerrarSesion() }),
   ]);
   cargarEn(contenido, async () => {
-    const [taller, pedidos] = await Promise.all([api.getMyWorkshop(), apiPedidos.listMyOrders()]);
-    const entregados = pedidos.filter((p) => p.status === "delivered");
-    const resenas = (
-      await Promise.all(
-        entregados.map(async (p) => {
-          const resena = await apiPedidos.getOrderReview(p.id).catch(() => null);
-          if (!resena) return null;
-          const solicitud = await apiSolicitudes.getRequest(p.request_id).catch(() => null);
-          return { resena, cliente: solicitud?.counterpart?.full_name ?? "Cliente" };
-        }),
-      )
-    )
-      .filter((r) => r !== null)
-      .sort((a, b) => b.resena.created_at.localeCompare(a.resena.created_at));
-    return { taller, pedidos, resenas };
+    const taller = await api.getMyWorkshop();
+    if (taller === null) return { taller, stats: null, resenas: { total: 0, items: [] } };
+    const [stats, resenas] = await Promise.all([api.getMyWorkshopStats(), api.listMyWorkshopReviews({ limit: RESENAS_POR_PAGINA })]);
+    return { taller, stats, resenas };
   }, pintar);
   return pantalla;
 }

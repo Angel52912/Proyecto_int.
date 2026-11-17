@@ -13,7 +13,7 @@ import { textoHorarioHoy, urlComoLlegar } from "../../js/features/orders/pages/r
 import { lineaDeTiempo } from "../../js/features/orders/pages/seguimiento.js";
 import { columnasDelTablero } from "../../js/features/orders/pages/tablero.js";
 import { mensajeResultadoPin } from "../../js/features/orders/pages/verificar-entrega.js";
-import { estadisticas } from "../../js/features/workshop/pages/mi-taller.js";
+import { distribucionDeResenas, textoATiempo } from "../../js/features/workshop/pages/mi-taller.js";
 import { horarioDeFilas } from "../../js/features/workshop/pages/taller.js";
 
 describe("búsqueda de talleres (CU-02)", () => {
@@ -142,15 +142,11 @@ describe("artesano", () => {
     expect(ok).toEqual({ horario: { mon: [{ open: "09:00", close: "18:00" }], sun: [] }, error: null });
     expect(horarioDeFilas([{ dia: "mon", abierto: true, abre: "18:00", cierra: "09:00" }]).error).not.toBeNull();
   });
-  test("estadísticas de reputación", () => {
-    const pedidos = [
-      { status: "delivered", delivered_at: "2026-11-10T12:00:00Z", due_date: "2026-11-10" },
-      { status: "delivered", delivered_at: "2026-11-12T12:00:00Z", due_date: "2026-11-10" },
-      { status: "in_progress", delivered_at: null, due_date: "2026-11-20" },
-    ];
-    const r = estadisticas(pedidos, [{ rating: 5 }, { rating: 4 }]);
-    expect(r).toEqual({ entregados: 2, aTiempo: 50, distribucion: { 1: 0, 2: 0, 3: 0, 4: 1, 5: 1 } });
-    expect(estadisticas([], []).aTiempo).toBeNull();
+  test("reputación: estrellas por reseña y porcentaje a tiempo", () => {
+    expect(distribucionDeResenas([{ rating: 5 }, { rating: 4 }, { rating: 5 }, { rating: 9 }])).toEqual({ 1: 0, 2: 0, 3: 0, 4: 1, 5: 2 });
+    expect(textoATiempo(null)).toBe("–");
+    expect(textoATiempo(100)).toBe("100%");
+    expect(textoATiempo(92.5)).toBe("92.5%");
   });
   test("folio y búsqueda de conversaciones", () => {
     expect(folio("00000000-0000-4000-8000-00000000a1b2")).toBe("#A1B2");
