@@ -43,7 +43,11 @@ function campo(id, etiqueta, control, nombreIcono, error) {
   control.id = id;
   error.id = `${id}-error`;
   control.setAttribute("aria-describedby", error.id);
-  return crear("div", { clase: "campo campo--icono", attrs: { "data-campo": id } }, [crear("label", { texto: etiqueta, attrs: { for: id } }), icono(nombreIcono, { tam: 18 }), control, error]);
+  return crear("div", { clase: "campo", attrs: { "data-campo": id } }, [
+    crear("label", { texto: etiqueta, attrs: { for: id } }),
+    crear("div", { clase: "campo--icono" }, [icono(nombreIcono, { tam: 18 }), control]),
+    error,
+  ]);
 }
 
 /** Con `?desde=` la pantalla edita el perfil y regresa a la pestaña de origen. */

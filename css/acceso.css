@@ -105,7 +105,23 @@
   color: #4285f4;
 }
 
+.acceso .campo__error {
+  margin: 0;
+}
+
+.acceso .campo__error:empty {
+  display: none;
+}
+
 /* 02 · Correo */
+.acceso__terminos {
+  margin-bottom: var(--espacio-3);
+}
+
+.acceso__terminos.campo--error .casilla {
+  color: var(--color-error);
+}
+
 .casilla--terminos {
   align-items: flex-start;
   font-size: var(--texto-secundario);

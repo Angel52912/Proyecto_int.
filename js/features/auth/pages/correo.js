@@ -36,7 +36,11 @@ function campo(id, etiqueta, control, nombreIcono, error) {
   control.id = id;
   control.setAttribute("aria-describedby", `${id}-error`);
   error.id = `${id}-error`;
-  return crear("div", { clase: "campo campo--icono", attrs: { "data-campo": id } }, [crear("label", { texto: etiqueta, attrs: { for: id } }), icono(nombreIcono, { tam: 18 }), control, error]);
+  return crear("div", { clase: "campo", attrs: { "data-campo": id } }, [
+    crear("label", { texto: etiqueta, attrs: { for: id } }),
+    crear("div", { clase: "campo--icono" }, [icono(nombreIcono, { tam: 18 }), control]),
+    error,
+  ]);
 }
 
 /**
@@ -98,7 +102,7 @@ export function renderCorreo(modo) {
         crearCuenta ? campo("nombre", "Nombre completo", nombre, "perfil", errores.nombre) : null,
         campo("correo", "Correo electrónico", correo, "correo", errores.correo),
         crearCuenta
-          ? crear("div", { clase: "campo", attrs: { "data-campo": "acepta" } }, [
+          ? crear("div", { clase: "acceso__terminos", attrs: { "data-campo": "acepta" } }, [
               crear("label", { clase: "casilla casilla--terminos", attrs: { for: "acepta" } }, [acepta, crear("span", { texto: "Acepto los términos y el aviso de privacidad" })]),
               errores.acepta,
             ])
