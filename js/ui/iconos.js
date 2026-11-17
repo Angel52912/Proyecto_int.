@@ -36,6 +36,7 @@ const TRAZOS = {
   qr: ["M4 4h6v6H4z", "M14 4h6v6h-6z", "M4 14h6v6H4z", "M14 14h2v2h-2z", "M18 18h2v2h-2z", "M14 18h2", "M18 14h2"],
   subir: ["M12 16V4", "M7 9l5-5 5 5", "M4 20h16"],
   dinero: ["M3 6h18v12H3z", circulo(12, 12, 2.5), "M6 9v.01", "M18 15v.01"],
+  correo: ["M3 6h18v12H3z", "M3 7l9 6 9-6"],
 };
 
 /**
