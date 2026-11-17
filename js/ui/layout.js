@@ -2,7 +2,7 @@
 import { crear, enlace } from "./dom.js";
 import { icono } from "./iconos.js";
 
-/** @typedef {"client" | "craftsman"} RolNavegacion */
+/** @typedef {"client" | "craftsman" | "admin"} RolNavegacion */
 
 /** Navegación inferior según docs/diseno.md. */
 export const NAVEGACION = Object.freeze({
@@ -17,6 +17,13 @@ export const NAVEGACION = Object.freeze({
     { id: "tablero", ruta: "/artesano/tablero", texto: "Tablero", icono: "tablero" },
     { id: "chats", ruta: "/artesano/chats", texto: "Chats", icono: "chat" },
     { id: "perfil", ruta: "/artesano/perfil", texto: "Perfil", icono: "perfil" },
+  ],
+  // Panel de administración (CU-08): no viene en el Figma; sigue el mismo patrón de 4 pestañas.
+  admin: [
+    { id: "panel", ruta: "/admin", texto: "Panel", icono: "tablero" },
+    { id: "usuarios", ruta: "/admin/usuarios", texto: "Usuarios", icono: "perfil" },
+    { id: "talleres", ruta: "/admin/talleres", texto: "Talleres", icono: "reparacion" },
+    { id: "resenas", ruta: "/admin/resenas", texto: "Reseñas", icono: "estrella" },
   ],
 });
 
