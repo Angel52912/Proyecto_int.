@@ -96,7 +96,7 @@ export async function renderMiTaller() {
   const pantalla = crearPantalla({ rol: "craftsman", activa: "perfil", clase: "mi-taller" }, [
     crear("div", { clase: "fila-entre" }, [crear("h1", { clase: "pantalla__titulo", texto: "Mi taller" }), ajustes]),
     contenido,
-    enlace("/acceso/perfil?desde=perfil", { clase: "boton boton--bloque boton--secundario", texto: "Editar mi perfil" }),
+    enlace("/acceso/perfil?desde=taller", { clase: "boton boton--bloque boton--secundario", texto: "Editar mi perfil" }),
     crearBoton("Cerrar sesión", { variante: "secundario", alHacerClic: () => cerrarSesion() }),
   ]);
   cargarEn(contenido, async () => {

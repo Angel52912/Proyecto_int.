@@ -46,11 +46,15 @@ function campo(id, etiqueta, control, nombreIcono, error) {
   return crear("div", { clase: "campo campo--icono", attrs: { "data-campo": id } }, [crear("label", { texto: etiqueta, attrs: { for: id } }), icono(nombreIcono, { tam: 18 }), control, error]);
 }
 
+/** Con `?desde=` la pantalla edita el perfil y regresa a la pestaña de origen. */
+const REGRESO_AL_EDITAR = Object.freeze({ perfil: "/perfil", taller: "/artesano/perfil" });
+
 /**
  * @param {{ perfil: any, privados: any | null, urlFoto: string | null }} datos
- * @param {boolean} editando
+ * @param {string | null} regreso ruta a la que vuelve al editar; null en el alta
  */
-function pintar({ perfil, privados, urlFoto }, editando) {
+function pintar({ perfil, privados, urlFoto }, regreso) {
+  const editando = regreso !== null;
   const esCliente = perfil.role === "client";
   const error = () => crear("p", { clase: "campo__error", attrs: { "aria-live": "polite" } });
   const errores = { nombre: error(), edad: error(), direccion: error(), foto: error(), general: error() };
@@ -145,7 +149,7 @@ function pintar({ perfil, privados, urlFoto }, editando) {
             if (esCliente) await api.saveMyClientPrivate({ age: /** @type {number} */ (datos.age), address: datos.address });
             olvidarPerfil();
             limpiarDatosAcceso();
-            ir(editando ? "/perfil" : esCliente ? "/" : "/artesano/taller");
+            ir(regreso ?? (esCliente ? "/" : "/artesano/taller"));
           } catch (fallo) {
             errores.general.textContent = mensajeDeError(fallo, { invalid_input: "Revisa tus datos e intenta de nuevo." });
             guardar.disabled = false;
@@ -178,7 +182,8 @@ function pintar({ perfil, privados, urlFoto }, editando) {
  * @returns {Node}
  */
 export function renderCompletarPerfil({ consulta }) {
-  const editando = consulta.get("desde") === "perfil";
+  const regreso = REGRESO_AL_EDITAR[/** @type {keyof typeof REGRESO_AL_EDITAR} */ (consulta.get("desde") ?? "")];
+  const editando = regreso !== undefined;
   const contenido = crear("div", { clase: "acceso__formulario" });
   cargarEn(
     contenido,
@@ -194,10 +199,10 @@ export function renderCompletarPerfil({ consulta }) {
       ]);
       return { perfil, privados, urlFoto };
     },
-    (datos) => (datos === null ? [] : [pintar(datos, editando)]),
+    (datos) => (datos === null ? [] : [pintar(datos, regreso ?? null)]),
     { not_authenticated: "Tu sesión terminó. Inicia sesión para continuar." },
   ).then(() => {
     if (contenido.querySelector(".estado-error")) contenido.append(enlace("/acceso", { clase: "boton boton--bloque", texto: "Iniciar sesión" }));
   });
-  return crearPantalla({ titulo: editando ? "Editar perfil" : "Completa tu perfil", volver: editando ? "/perfil" : undefined, clase: "acceso" }, [contenido]);
+  return crearPantalla({ titulo: editando ? "Editar perfil" : "Completa tu perfil", volver: regreso, clase: "acceso" }, [contenido]);
 }
