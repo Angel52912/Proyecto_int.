@@ -1,4 +1,5 @@
 // 23 · Perfil y reputación (Artesano): calificación, distribución de estrellas, pedidos entregados, % a tiempo y reseñas.
+import { cerrarSesion } from "../../auth/flujo.js";
 import { api as apiPedidos } from "../../orders/index.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { formatearFecha } from "../../../lib/fechas.js";
@@ -6,7 +7,7 @@ import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearEstrellas, crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
+import { crearBoton, crearEstrellas, crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
 import { api } from "../index.js";
 
 /**
@@ -95,6 +96,8 @@ export async function renderMiTaller() {
   const pantalla = crearPantalla({ rol: "craftsman", activa: "perfil", clase: "mi-taller" }, [
     crear("div", { clase: "fila-entre" }, [crear("h1", { clase: "pantalla__titulo", texto: "Mi taller" }), ajustes]),
     contenido,
+    enlace("/acceso/perfil?desde=perfil", { clase: "boton boton--bloque boton--secundario", texto: "Editar mi perfil" }),
+    crearBoton("Cerrar sesión", { variante: "secundario", alHacerClic: () => cerrarSesion() }),
   ]);
   cargarEn(contenido, async () => {
     const [taller, pedidos] = await Promise.all([api.getMyWorkshop(), apiPedidos.listMyOrders()]);
