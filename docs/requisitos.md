@@ -21,7 +21,7 @@ Leyenda: (A#) = flujo alternativo. Pantallas: ver `docs/diseno.md`.
 - [x] Ingresar el código de verificación.
 - [x] Seleccionar rol: Cliente o Artesano (una sola vez; no se puede cambiar desde la app).
 - [x] Completar perfil (nombre, foto, edad, dirección para el cliente).
-- [ ] A1: mostrar error de credenciales.
+- [x] A1: mostrar error de credenciales.
 - [x] A2: reenviar código de verificación.
 
 Nota: se eliminó A3 ("correo ya registrado"). Para no revelar qué correos existen, el registro muestra un mensaje genérico.
@@ -79,7 +79,7 @@ Nota: se eliminó A3 ("correo ya registrado"). Para no revelar qué correos exis
 - [x] A1: resaltar los campos obligatorios faltantes.
 
 ### CU-08. Administración de la plataforma (Admin) — propuesto
-- [ ] Iniciar sesión como administrador (cuenta creada por el equipo; no se puede elegir en el registro).
+- [x] Iniciar sesión como administrador (cuenta creada por el equipo; no se puede elegir en el registro).
 - [x] Panel con totales: usuarios, talleres, solicitudes, pedidos y calificación promedio.
 - [x] Usuarios: listar, buscar, desactivar y reactivar (no se eliminan).
 - [x] Talleres: listar, suspender o despublicar del mapa y reactivar.

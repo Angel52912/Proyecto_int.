@@ -1,8 +1,8 @@
 // Lógica pura de las pantallas de cliente y artesano (sin DOM de la página completa).
-import { ordenarTalleres, textoServicios } from "../../js/features/map/componentes.js";
+import { buscarTalleres, parametrosDeBusqueda, textoServicios } from "../../js/features/map/componentes.js";
 import { filtroDeTexto } from "../../js/features/map/pages/mapa.js";
 import { filasHorario } from "../../js/features/map/pages/perfil-taller.js";
-import { filtrarPorTexto } from "../../js/features/map/pages/talleres.js";
+import { filtroDeLugar } from "../../js/features/map/pages/talleres.js";
 import { folio } from "../../js/features/chat/pages/chat.js";
 import { filtrarConversaciones } from "../../js/features/chat/pages/chats.js";
 import { conceptosDelDetalle, descripcionDelDetalle } from "../../js/features/quotes/pages/presupuesto.js";
@@ -13,32 +13,37 @@ import { textoHorarioHoy, urlComoLlegar } from "../../js/features/orders/pages/r
 import { lineaDeTiempo } from "../../js/features/orders/pages/seguimiento.js";
 import { columnasDelTablero } from "../../js/features/orders/pages/tablero.js";
 import { mensajeResultadoPin } from "../../js/features/orders/pages/verificar-entrega.js";
-import { estadisticas } from "../../js/features/workshop/pages/mi-taller.js";
+import { distribucionDeResenas, textoATiempo } from "../../js/features/workshop/pages/mi-taller.js";
 import { horarioDeFilas } from "../../js/features/workshop/pages/taller.js";
 
 describe("búsqueda de talleres (CU-02)", () => {
-  const talleres = [
-    { id: "1", name: "B", colonia: "Centro", postal_code: "97000", price_from: 200, rating_avg: 4.5, rating_count: 3, distance_km: 2 },
-    { id: "2", name: "A", colonia: "Itzimná", postal_code: "97100", price_from: 100, rating_avg: null, rating_count: 0, distance_km: 1 },
-    { id: "3", name: "C", colonia: "Centro", postal_code: "97000", price_from: 150, rating_avg: 4.9, rating_count: 10, distance_km: 3 },
-  ];
-  test("ordena por cercanía, calificación o precio", () => {
-    expect(ordenarTalleres(talleres, "cercanos").map((t) => t.id)).toEqual(["2", "1", "3"]);
-    expect(ordenarTalleres(talleres, "valorados").map((t) => t.id)).toEqual(["3", "1", "2"]);
-    expect(ordenarTalleres(talleres, "precio").map((t) => t.id)).toEqual(["2", "3", "1"]);
+  const ubicacion = { lat: 20.97, lng: -89.62 };
+  test("'Todos' no manda servicio y el orden se traduce al del servidor", () => {
+    expect(parametrosDeBusqueda({ service: "all", orden: "precio" })).toEqual({ order: "price" });
+    expect(parametrosDeBusqueda({ service: "repair", orden: "valorados", open_now: true })).toEqual({ service: "repair", order: "rating", open_now: true });
+    expect(parametrosDeBusqueda({ service: "cleaning", orden: "cercanos", ...ubicacion })).toEqual({ service: "cleaning", order: "distance", ...ubicacion });
+    expect(parametrosDeBusqueda({ service: "all" })).toEqual({});
   });
-  test("sin distancia, 'cercanos' cae a mejor valorados", () => {
-    const sinDistancia = talleres.map((t) => ({ ...t, distance_km: null }));
-    expect(ordenarTalleres(sinDistancia, "cercanos")[0].id).toBe("3");
+  test("sin ubicación, 'cercanos' pide mejor valorados", () => {
+    expect(parametrosDeBusqueda({ service: "all", orden: "cercanos" })).toEqual({ order: "rating" });
   });
-  test("texto del buscador: C.P. de 5 dígitos o colonia (A1)", () => {
+  test("texto del buscador: C.P. de 5 dígitos (A1) o nombre/colonia en el servidor", () => {
     expect(filtroDeTexto("97000")).toEqual({ postal_code: "97000" });
-    expect(filtroDeTexto(" Centro ")).toEqual({ colonia: "Centro" });
+    expect(filtroDeTexto(" Centro ")).toEqual({ search: "Centro" });
     expect(filtroDeTexto("")).toEqual({});
   });
-  test("filtra por nombre, colonia o C.P.", () => {
-    expect(filtrarPorTexto(talleres, "itz").map((t) => t.id)).toEqual(["2"]);
-    expect(filtrarPorTexto(talleres, "97000")).toHaveLength(2);
+  test("filtro de lugar del panel: C.P. o colonia", () => {
+    expect(filtroDeLugar("97100")).toEqual({ postal_code: "97100" });
+    expect(filtroDeLugar(" Itzimná ")).toEqual({ colonia: "Itzimná" });
+    expect(filtroDeLugar("")).toEqual({});
+  });
+  test("busca en el simulado: 'Todos' sin repetir y ordenado por precio", async () => {
+    const { reiniciarSimulacion } = await import("../../js/features/requests/simulacion.js");
+    reiniciarSimulacion();
+    const todos = await buscarTalleres({ service: "all", orden: "precio" });
+    expect(new Set(todos.map((t) => t.id)).size).toBe(todos.length);
+    const precios = todos.map((t) => t.price_from);
+    expect(precios).toEqual([...precios].sort((a, b) => a - b));
   });
   test("servicios y horario en texto", () => {
     expect(textoServicios(["repair", "cleaning"])).toBe("Reparación · Limpieza");
@@ -142,15 +147,11 @@ describe("artesano", () => {
     expect(ok).toEqual({ horario: { mon: [{ open: "09:00", close: "18:00" }], sun: [] }, error: null });
     expect(horarioDeFilas([{ dia: "mon", abierto: true, abre: "18:00", cierra: "09:00" }]).error).not.toBeNull();
   });
-  test("estadísticas de reputación", () => {
-    const pedidos = [
-      { status: "delivered", delivered_at: "2026-11-10T12:00:00Z", due_date: "2026-11-10" },
-      { status: "delivered", delivered_at: "2026-11-12T12:00:00Z", due_date: "2026-11-10" },
-      { status: "in_progress", delivered_at: null, due_date: "2026-11-20" },
-    ];
-    const r = estadisticas(pedidos, [{ rating: 5 }, { rating: 4 }]);
-    expect(r).toEqual({ entregados: 2, aTiempo: 50, distribucion: { 1: 0, 2: 0, 3: 0, 4: 1, 5: 1 } });
-    expect(estadisticas([], []).aTiempo).toBeNull();
+  test("reputación: estrellas por reseña y porcentaje a tiempo", () => {
+    expect(distribucionDeResenas([{ rating: 5 }, { rating: 4 }, { rating: 5 }, { rating: 9 }])).toEqual({ 1: 0, 2: 0, 3: 0, 4: 1, 5: 2 });
+    expect(textoATiempo(null)).toBe("–");
+    expect(textoATiempo(100)).toBe("100%");
+    expect(textoATiempo(92.5)).toBe("92.5%");
   });
   test("folio y búsqueda de conversaciones", () => {
     expect(folio("00000000-0000-4000-8000-00000000a1b2")).toBe("#A1B2");

@@ -1,5 +1,6 @@
 // 19 · Enviar presupuesto (Artesano, CU-04): fotos y descripción de la solicitud, costo, entrega y detalle.
 // Si ya hay un presupuesto vigente, el mismo formulario lo rectifica (A2).
+import { crearAvatar } from "../../auth/avatar.js";
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { folio } from "../../chat/pages/chat.js";
@@ -9,7 +10,7 @@ import { crear, enlace, ir } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearBoton, crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
+import { crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
 import { MAX_MONTO_MXN, fechaDeHoy } from "../validar.js";
@@ -62,7 +63,7 @@ function pintar({ solicitud, vigente }) {
     ),
     crear("div", { clase: "tarjeta" }, [
       crear("div", { clase: "fila-entre" }, [
-        crear("div", { clase: "chat-contraparte" }, [crear("span", { clase: "avatar avatar--chico", texto: iniciales(cliente), attrs: { "aria-hidden": "true" } }), crear("strong", { texto: cliente })]),
+        crear("div", { clase: "chat-contraparte" }, [crearAvatar({ nombre: cliente, avatarPath: solicitud.counterpart?.avatar_path, clase: "avatar--chico" }), crear("strong", { texto: cliente })]),
         crearInsignia(NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud.service_type)], "cuero"),
       ]),
       crear("p", { clase: "tarjeta__detalle enviar-presupuesto__descripcion", texto: solicitud.description }),

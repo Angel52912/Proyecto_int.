@@ -2,6 +2,7 @@
 import { api as apiAuth } from "../../auth/index.js";
 import { api as apiPedidos } from "../../orders/index.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
+import { crearCampana } from "../../requests/avisos.js";
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace, ir } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
@@ -82,13 +83,7 @@ export async function renderInicio() {
     if (nombre) saludo.textContent = `Hola, ${nombre}`;
   });
 
-  const campana = enlace("/pedidos", { clase: "boton-circular", attrs: { "aria-label": "Avisos de mis pedidos" } }, [icono("campana")]);
-  apiSolicitudes
-    .listMyNotifications({ unreadOnly: true })
-    .then((avisos) => {
-      if (avisos.length > 0) campana.append(crear("span", { clase: "punto-aviso", attrs: { "aria-hidden": "true" } }));
-    })
-    .catch(() => {});
+  const campana = crearCampana("client");
 
   const recordatorio = crear("div");
   apiPedidos
@@ -130,7 +125,7 @@ export async function renderInicio() {
     if (mapa) alSalir(() => mapa.remove());
     try {
       const ubicacion = await obtenerUbicacion();
-      const talleres = await buscarTalleres({ service: "all", ...(ubicacion ?? {}), limit: 10 });
+      const talleres = await buscarTalleres({ service: "all", orden: "cercanos", ...(ubicacion ?? {}), limit: 10 });
       if (talleres.length === 0) estadoMapa.replaceChildren(crearVacio("Aún no hay talleres publicados cerca."));
       if (mapa) pintarPines(mapa, talleres, { ubicacion });
     } catch {

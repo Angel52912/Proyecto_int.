@@ -1,0 +1,103 @@
+/* Avisos (notificaciones) de cliente y artesano, y contador de la campana. */
+.contador-avisos {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+}
+
+.contador-avisos[hidden] {
+  display: none;
+}
+
+.avisos__acciones {
+  display: flex;
+  justify-content: flex-end;
+  min-height: var(--tactil-min);
+}
+
+.avisos__acciones .boton-texto[hidden] {
+  display: none;
+}
+
+.avisos .campo__error:empty {
+  display: none;
+}
+
+.avisos__lista {
+  gap: var(--espacio-2);
+}
+
+.aviso-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-3);
+  width: 100%;
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-arena);
+  border-radius: var(--radio-tarjeta);
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.aviso-fila--nueva {
+  border-color: var(--color-cuero);
+  background: #fdf8f2;
+}
+
+.aviso-fila__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  background: #f1e6dd;
+  color: var(--color-cuero);
+}
+
+.aviso-fila__cuerpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.aviso-fila__titulo {
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+}
+
+.aviso-fila__detalle {
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+}
+
+.aviso-fila__fecha {
+  margin-top: 2px;
+  color: var(--color-gris);
+  font-size: 11px;
+}
+
+.aviso-fila__punto {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--color-cuero);
+}

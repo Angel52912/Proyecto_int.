@@ -1,0 +1,312 @@
+/* 01–05 · Acceso (CU-01): bienvenida, correo, código, rol y completar perfil. */
+.acceso .pantalla__cuerpo {
+  padding: var(--espacio-3) var(--espacio-4) var(--espacio-4);
+}
+
+.acceso__formulario {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.acceso__pie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  margin-top: auto;
+  padding-top: var(--espacio-4);
+}
+
+.acceso__titulo {
+  margin: 0;
+  font-size: var(--texto-titulo);
+  line-height: 1.3;
+}
+
+.acceso__texto {
+  margin: var(--espacio-1) 0 var(--espacio-4);
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+}
+
+/* 01 · Bienvenida */
+.acceso__marca {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin: var(--espacio-4) 0 var(--espacio-3);
+  font-family: var(--fuente-titulo);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-cuero);
+}
+
+.acceso__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radio);
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+}
+
+.acceso__ilustracion {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  margin-bottom: var(--espacio-4);
+  border-radius: 24px;
+  background: var(--color-arena);
+}
+
+.acceso__circulo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  background: #efe4d6;
+  color: var(--color-cuero);
+}
+
+.acceso__chip {
+  position: absolute;
+  top: var(--espacio-3);
+  left: var(--espacio-3);
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.acceso--bienvenida .acceso__titulo {
+  font-size: 30px;
+}
+
+.acceso--bienvenida .acceso__pie {
+  gap: var(--espacio-2);
+}
+
+.boton--blanco {
+  background: #fff;
+  border-color: var(--color-arena);
+  color: var(--color-espresso);
+}
+
+.google-g {
+  font-family: var(--fuente-titulo);
+  font-weight: 700;
+  color: #4285f4;
+}
+
+.acceso .campo__error {
+  margin: 0;
+}
+
+.acceso .campo__error:empty {
+  display: none;
+}
+
+/* 02 · Correo */
+.acceso__terminos {
+  margin-bottom: var(--espacio-3);
+}
+
+.acceso__terminos.campo--error .casilla {
+  color: var(--color-error);
+}
+
+.casilla--terminos {
+  align-items: flex-start;
+  font-size: var(--texto-secundario);
+}
+
+.casilla--terminos input {
+  margin-top: 2px;
+  flex: none;
+}
+
+/* 03 · Código */
+.acceso__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--espacio-4);
+  border-radius: 18px;
+  background: #dcefef;
+  color: var(--color-cenote);
+}
+
+.acceso__correo {
+  color: var(--color-espresso);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.codigo {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--espacio-2);
+  margin: 0 0 var(--espacio-3);
+  padding: 0;
+  border: 0;
+}
+
+.codigo input {
+  width: 100%;
+  min-width: 0;
+  height: 60px;
+  border: 1px solid var(--color-arena);
+  border-radius: var(--radio);
+  background: #fff;
+  color: var(--color-espresso);
+  font-family: var(--fuente-titulo);
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.codigo input:focus {
+  border: 2px solid var(--color-cuero);
+}
+
+.codigo--error input {
+  border-color: var(--color-error);
+}
+
+.acceso__reenviar {
+  margin: 0;
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+}
+
+.acceso__reenviar .boton-texto {
+  padding: 0;
+}
+
+/* 04 · Rol */
+.rol-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rol-opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3) 20px;
+  border: 1px solid var(--color-arena);
+  border-radius: var(--radio-tarjeta);
+  background: #fff;
+  cursor: pointer;
+}
+
+.rol-opcion:has(input:checked) {
+  border: 2px solid var(--color-cuero);
+}
+
+.rol-opcion:has(input:focus-visible) {
+  outline: 3px solid var(--color-miel);
+  outline-offset: 2px;
+}
+
+.rol-opcion__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 50%;
+  background: #f1e6dd;
+  color: var(--color-cuero);
+}
+
+.rol-opcion__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.rol-opcion__titulo {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+}
+
+.rol-opcion__detalle {
+  margin: 0;
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+}
+
+.rol-opcion input {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  accent-color: var(--color-cuero);
+}
+
+/* 05 · Completar perfil */
+.foto-perfil {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-1);
+  margin-bottom: var(--espacio-3);
+}
+
+.foto-perfil__marco {
+  position: relative;
+}
+
+.avatar--grande {
+  width: 96px;
+  height: 96px;
+  font-size: 28px;
+}
+
+.avatar:has(img) {
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-perfil__camara {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--color-hueso);
+  border-radius: 50%;
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+  cursor: pointer;
+}
+
+.foto-perfil .boton-texto {
+  padding: var(--espacio-1);
+}
+
+.aviso--simulado {
+  margin-bottom: var(--espacio-3);
+}

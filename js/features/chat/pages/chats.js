@@ -1,14 +1,15 @@
 // 24 · Chats (Artesano): lista de conversaciones con búsqueda y último mensaje.
+import { crearAvatar } from "../../auth/avatar.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { formatearHace } from "../../../lib/fechas.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearPantalla, iniciales } from "../../../ui/layout.js";
+import { crearPantalla } from "../../../ui/layout.js";
 import { api } from "../index.js";
 
 /**
- * @typedef {{ id: string, nombre: string, ultimo: string, fecha: string }} Conversacion
+ * @typedef {{ id: string, nombre: string, ultimo: string, fecha: string, avatarPath?: string | null }} Conversacion
  */
 
 /**
@@ -27,7 +28,7 @@ export function filtrarConversaciones(conversaciones, texto) {
 function crearFila(c) {
   return crear("li", {}, [
     enlace(`/artesano/chat/${c.id}`, { clase: "conversacion" }, [
-      crear("span", { clase: "avatar", texto: iniciales(c.nombre), attrs: { "aria-hidden": "true" } }),
+      crearAvatar({ nombre: c.nombre, avatarPath: c.avatarPath }),
       crear("div", { clase: "tarjeta__cuerpo" }, [
         crear("div", { clase: "fila-entre" }, [crear("p", { clase: "tarjeta__titulo", texto: c.nombre }), crear("span", { clase: "texto-secundario", texto: formatearHace(c.fecha) })]),
         crear("p", { clase: "tarjeta__detalle conversacion__ultimo", texto: c.ultimo }),
@@ -64,7 +65,7 @@ export async function renderChats() {
         solicitudes.map(async (s) => {
           const [detalle, mensajes] = await Promise.all([apiSolicitudes.getRequest(s.id).catch(() => null), api.listMessages(s.id, { limit: 1 }).catch(() => [])]);
           const ultimo = mensajes.at(-1);
-          return { id: s.id, nombre: detalle?.counterpart?.full_name ?? "Cliente", ultimo: ultimo?.kind === "quote_card" ? "Presupuesto enviado" : ultimo?.body ?? "", fecha: ultimo?.created_at ?? s.created_at };
+          return { id: s.id, nombre: detalle?.counterpart?.full_name ?? "Cliente", avatarPath: detalle?.counterpart?.avatar_path ?? null, ultimo: ultimo?.kind === "quote_card" ? "Presupuesto enviado" : ultimo?.body ?? "", fecha: ultimo?.created_at ?? s.created_at };
         }),
       );
       todas = conversaciones.sort((a, b) => b.fecha.localeCompare(a.fecha));

@@ -13,36 +13,34 @@ export const NOMBRE_SERVICIO = Object.freeze({ repair: "Reparación", cleaning: 
 export const CENTRO_MERIDA = Object.freeze({ lat: 20.9674, lng: -89.6237 });
 
 /** @typedef {"all" | "repair" | "cleaning"} FiltroServicio */
+/** @typedef {"cercanos" | "valorados" | "precio"} Orden */
+
+/** Orden de la pantalla → `order` de `searchWorkshops`. */
+export const ORDEN_SERVIDOR = Object.freeze({ cercanos: "distance", valorados: "rating", precio: "price" });
 
 /**
- * Busca talleres. El contrato exige un servicio; "Todos" hace las dos búsquedas y une los resultados sin repetir.
- * @param {Omit<import("./validar.js").FiltrosBusqueda, "service"> & { service: FiltroServicio }} filtros
- * @returns {Promise<any[]>}
+ * Filtros de la pantalla → parámetros de `searchWorkshops`. "Todos" no manda servicio (el servidor une ambos sin
+ * repetir) y "Más cercanos" sin ubicación cae a "Mejor valorados" (el servidor exige ubicación para ordenar por distancia).
+ * @param {Omit<import("./validar.js").FiltrosBusqueda, "service" | "order"> & { service: FiltroServicio, orden?: Orden }} filtros
+ * @returns {import("./validar.js").FiltrosBusqueda}
  */
-export async function buscarTalleres(filtros) {
-  if (filtros.service !== "all") return api.searchWorkshops(/** @type {any} */ (filtros));
-  const [reparacion, limpieza] = await Promise.all([
-    api.searchWorkshops({ ...filtros, service: "repair" }),
-    api.searchWorkshops({ ...filtros, service: "cleaning" }),
-  ]);
-  const porId = new Map([...reparacion, ...limpieza].map((t) => [t.id, t]));
-  return ordenarTalleres([...porId.values()], filtros.lat === undefined ? "valorados" : "cercanos");
+export function parametrosDeBusqueda({ service, orden, ...resto }) {
+  const conUbicacion = resto.lat !== undefined && resto.lng !== undefined;
+  const elegido = orden === "cercanos" && !conUbicacion ? "valorados" : orden;
+  return {
+    ...resto,
+    ...(service === "all" ? {} : { service }),
+    ...(elegido ? { order: /** @type {"distance" | "rating" | "price"} */ (ORDEN_SERVIDOR[elegido]) } : {}),
+  };
 }
 
 /**
- * @param {any[]} talleres
- * @param {"cercanos" | "valorados" | "precio"} orden
- * @returns {any[]}
+ * Busca talleres en el servidor: filtra, ordena y une los servicios ahí, así no se pierden resultados al pasar del límite.
+ * @param {Parameters<typeof parametrosDeBusqueda>[0]} filtros
+ * @returns {Promise<any[]>}
  */
-export function ordenarTalleres(talleres, orden) {
-  const copia = [...talleres];
-  const porCalificacion = (/** @type {any} */ a, /** @type {any} */ b) =>
-    (b.rating_avg ?? -1) - (a.rating_avg ?? -1) || b.rating_count - a.rating_count || a.name.localeCompare(b.name);
-  if (orden === "precio") return copia.sort((a, b) => a.price_from - b.price_from || porCalificacion(a, b));
-  if (orden === "cercanos" && copia.every((t) => t.distance_km !== null)) {
-    return copia.sort((a, b) => a.distance_km - b.distance_km || porCalificacion(a, b));
-  }
-  return copia.sort(porCalificacion);
+export async function buscarTalleres(filtros) {
+  return api.searchWorkshops(parametrosDeBusqueda(filtros));
 }
 
 /** @type {{ lat: number, lng: number } | null} */
