@@ -13,7 +13,7 @@ import { api } from "../index.js";
  * @param {string} etiqueta
  * @param {string | null} fecha
  */
-const fila = (etiqueta, fecha) => (fecha ? [crear("dt", { texto: etiqueta }), crear("dd", { texto: formatearFecha(fecha.slice(0, 10)) })] : []);
+const fila = (etiqueta, fecha) => (fecha ? [crear("dt", { texto: etiqueta }), crear("dd", { texto: formatearFecha(fecha) })] : []);
 
 /** @param {any} s SolicitudAdmin */
 function crearFilaSolicitud(s) {

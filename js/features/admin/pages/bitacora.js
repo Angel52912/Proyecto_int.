@@ -30,7 +30,7 @@ function crearFila(accion) {
   const { quien, que, objetivo, motivo } = textoDeAccion(accion);
   const fecha = new Date(accion.created_at);
   return crear("div", { clase: "tarjeta admin-fila" }, [
-    crear("div", { clase: "fila-entre" }, [crear("p", { clase: "tarjeta__titulo", texto: que }), crear("span", { clase: "texto-secundario", texto: `${formatearFecha(accion.created_at.slice(0, 10))} · ${formatearHora(fecha)}` })]),
+    crear("div", { clase: "fila-entre" }, [crear("p", { clase: "tarjeta__titulo", texto: que }), crear("span", { clase: "texto-secundario", texto: `${formatearFecha(fecha)} · ${formatearHora(fecha)}` })]),
     crear("p", { clase: "tarjeta__detalle", texto: `${quien} · ${objetivo}` }),
     motivo ? crear("p", { clase: "admin-fila__comentario", texto: `Motivo: ${motivo}` }) : null,
   ]);
