@@ -21,7 +21,7 @@ function crearSeccion(titulo, cifras, ruta) {
     crear(
       "dl",
       { clase: "admin-cifras" },
-      cifras.flatMap(([etiqueta, valor]) => [crear("dt", { texto: etiqueta }), crear("dd", { texto: String(valor) })]),
+      cifras.map(([etiqueta, valor]) => crear("div", { clase: "admin-cifra" }, [crear("dt", { texto: etiqueta }), crear("dd", { texto: String(valor) })])),
     ),
   ]);
 }
