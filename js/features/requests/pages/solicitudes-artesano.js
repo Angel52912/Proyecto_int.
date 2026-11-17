@@ -10,6 +10,7 @@ import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearInsignia, crearPantalla } from "../../../ui/layout.js";
+import { crearCampana } from "../avisos.js";
 import { api } from "../index.js";
 
 /**
@@ -43,7 +44,7 @@ function crearTarjetaSolicitud(detalle) {
 export async function renderSolicitudesArtesano() {
   const resumen = crear("div", { clase: "resumenes" }, [crearResumen("Nuevas", "–", "cuero"), crearResumen("En taller", "–", "cenote"), crearResumen("Calificación", "–", "miel")]);
   const lista = crear("div", { clase: "seccion" });
-  const campana = crear("span", { clase: "boton-circular", attrs: { role: "img", "aria-label": "Avisos" } }, [icono("campana")]);
+  const campana = crearCampana("craftsman");
 
   const pantalla = crearPantalla({ rol: "craftsman", activa: "solicitudes", clase: "solicitudes-artesano" }, [
     crear("div", { clase: "fila-entre" }, [crear("h1", { clase: "pantalla__titulo", texto: "Solicitudes" }), campana]),
@@ -92,7 +93,6 @@ export async function renderSolicitudesArtesano() {
   api
     .subscribeToNotifications((aviso) => {
       if (["request_received", "request_cancelled", "quote_accepted", "quote_rejected"].includes(aviso.type)) {
-        campana.append(crear("span", { clase: "punto-aviso", attrs: { "aria-hidden": "true" } }));
         cargar();
       }
     })
