@@ -7,6 +7,8 @@ Lo que ya hay: 26 rutas de cliente y artesano (inicio, mapa Leaflet, talleres, p
 ## 1. Bloqueantes (sin esto la app real no se puede usar)
 
 ### 1.1 Pantallas de acceso (CU-01)
+
+> **Hecho (rama `feat/cu-01-acceso`):** rutas `/acceso`, `/acceso/entrar`, `/acceso/crear`, `/acceso/codigo`, `/acceso/rol` y `/acceso/perfil` (`js/features/auth/pages/`). Sin campo de contraseña. El destino tras entrar lo decide `destinoPorPerfil` (`js/features/auth/guardia.js`); el artesano nuevo va a `/artesano/taller` para configurar su taller. Falta probarlo contra Supabase real (1.3) y la pantalla del admin (`/admin`).
 No existe ninguna. El router redirige a `RUTA_ACCESO = "/acceso"` (`js/router.js`) y esa ruta no está registrada. Según `docs/diseno.md` son 5 pantallas:
 
 1. **Bienvenida:** Iniciar sesión, Crear cuenta y Continuar con Google (`signInWithGoogle`).
@@ -22,6 +24,8 @@ Reglas a respetar:
 - Google vuelve a la app por PKCE: el callback se procesa antes del router (ver `js/supabaseClient.js`).
 
 ### 1.2 Guardia por rol en el router
+
+> **Hecho (rama `feat/cu-01-acceso`):** `soloPara(roles, render)` en `js/features/auth/guardia.js` envuelve el render de cada ruta (sin tocar `js/router.js`): sin sesión → `/acceso`, sin rol → `/acceso/rol`, otro rol → su inicio.
 `js/router.js` solo tiene `requiereSesion`. Falta una opción por rol (`client`, `craftsman`, `admin`): un cliente no debe abrir `/artesano/*` y un artesano no debe abrir las rutas de cliente. La base de datos ya lo impide (RLS), pero la pantalla debe redirigir y no mostrar un error de permisos.
 
 ### 1.3 Conectar al backend real
@@ -34,6 +38,8 @@ Reglas a respetar:
 ## 2. Funcionalidad que falta
 
 ### 2.1 Editar el perfil y mostrar fotos de perfil
+
+> **Hecho (rama `feat/cu-01-acceso`):** en parte. "Editar perfil" (Perfil del cliente y Mi taller) reutiliza `/acceso/perfil?desde=…` con nombre, edad, dirección y foto (`addAvatar`, `removeAvatar`, comprimida); la foto propia se muestra con `getAvatarUrl`. Falta mostrar la foto de la contraparte en chats y listas.
 - `perfil-cliente.js` solo muestra nombre, edad y dirección ("Sin capturar"); no hay pantalla para editarlos (`updateMyProfile`, `saveMyClientPrivate`).
 - Subir, cambiar y quitar la foto de perfil: `addAvatar`, `removeAvatar`. Comprimir antes de subir (`js/lib/imagen.js`).
 - Mostrar las fotos de perfil (hoy solo hay iniciales): las fotos son **privadas**, así que cada ruta (`Perfil.avatar_path`, `Contraparte.avatar_path`) se convierte con `getAvatarUrl(path)` en una URL firmada que **caduca en 1 hora**. Hay que pedirla al mostrar y de nuevo si vence. Solo la ve el propio usuario y la contraparte con una solicitud que no sea borrador.
@@ -42,6 +48,8 @@ Reglas a respetar:
 La campana de Inicio solo enlaza a `/pedidos`. Falta una pantalla de avisos con `listMyNotifications`, marcar una (`markNotificationRead`) o todas (`markAllNotificationsRead`) como leídas, el contador de la campana (`countUnreadNotifications`, que se mantiene al día con `subscribeToNotifications`) y la navegación según `type`. Tipos que existen: `request_received`, `quote_received`, `quote_accepted`, `quote_rejected`, `order_created`, `order_phase_changed`, `order_ready`, `order_delivered`, `review_received`, `request_cancelled`, `workshop_suspended`, `workshop_reactivated`.
 
 ### 2.3 Mensajes de error en español
+
+> **Hecho (rama `feat/cu-01-acceso`):** agregados en `js/ui/mensajes.js`.
 `js/ui/mensajes.js` no tiene mensaje para tres códigos del contrato: `invalid_code`, `auth_failed` y `role_already_set` (los usan las pantallas de acceso). Agregarlos con texto claro y corto en español, y mostrar siempre el texto con `textContent`, nunca como HTML.
 
 ### 2.4 Pantalla "Mi taller" del artesano
