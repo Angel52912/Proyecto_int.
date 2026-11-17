@@ -32,6 +32,9 @@ export function renderRol() {
       {
         clase: "acceso__formulario",
         on: {
+          change: () => {
+            if (!continuar.disabled) aviso.textContent = "";
+          },
           submit: async (evento) => {
             evento.preventDefault();
             const elegido = /** @type {HTMLInputElement | null} */ (formulario.querySelector('input[name="rol"]:checked'));
