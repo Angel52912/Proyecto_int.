@@ -1,0 +1,138 @@
+/* Panel de administración (CU-08): panel, usuarios, talleres, reseñas, consultas y bitácora. */
+.admin .campo__error:empty {
+  display: none;
+}
+
+.admin .chips {
+  margin-bottom: var(--espacio-1);
+}
+
+.admin-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.admin-panel__calificacion .estadistica {
+  margin: 0;
+}
+
+.admin-cifras {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-2) var(--espacio-3);
+  margin: var(--espacio-2) 0 0;
+}
+
+/* Cada cifra: número arriba y etiqueta abajo. */
+.admin-cifra {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.admin-cifra dt {
+  color: var(--color-gris);
+  font-size: 11px;
+}
+
+.admin-cifra dd {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.admin-conteo {
+  margin: 0 0 var(--espacio-2);
+}
+
+.admin-lista {
+  margin-bottom: var(--espacio-3);
+}
+
+.admin-fila {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.admin-fila p {
+  margin: 0;
+}
+
+.admin-fila__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+.admin-fila__correo {
+  overflow-wrap: anywhere;
+}
+
+.admin-fila__comentario {
+  padding: var(--espacio-2) var(--espacio-3);
+  border-radius: var(--radio);
+  background: var(--color-hueso);
+  font-size: var(--texto-secundario);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.admin-fila--oculta {
+  opacity: 0.75;
+}
+
+.admin-fechas {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px var(--espacio-3);
+  margin: 0;
+  font-size: var(--texto-secundario);
+}
+
+.admin-fechas dt {
+  color: var(--color-gris);
+}
+
+.admin-fechas dd {
+  margin: 0;
+}
+
+.admin-accion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.admin-accion .boton-texto {
+  padding-left: 0;
+}
+
+.boton-texto--peligro {
+  color: var(--color-error);
+}
+
+.admin-confirmacion {
+  width: 100%;
+  padding: var(--espacio-3);
+  border-radius: var(--radio);
+  background: var(--color-hueso);
+}
+
+.admin-confirmacion[hidden] {
+  display: none;
+}
+
+.admin-confirmacion__pregunta {
+  margin: 0 0 var(--espacio-2);
+  font-weight: 600;
+}
+
+.admin-confirmacion .campo {
+  margin-bottom: var(--espacio-2);
+}
+
+.admin-confirmacion textarea {
+  resize: vertical;
+}
