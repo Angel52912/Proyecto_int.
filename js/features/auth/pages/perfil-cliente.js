@@ -3,31 +3,17 @@
 import { USAR_API_SIMULADA } from "../../../config.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
-import { crearBoton, crearPantalla, iniciales } from "../../../ui/layout.js";
+import { crearBoton, crearPantalla } from "../../../ui/layout.js";
+import { crearAvatar } from "../avatar.js";
 import { cerrarSesion } from "../flujo.js";
 import { api } from "../index.js";
 
-/**
- * Avatar con la foto de perfil (URL firmada) o las iniciales si no hay o no carga.
- * @param {string} nombre
- * @param {string | null} url
- */
-function crearAvatar(nombre, url) {
-  const avatar = crear("span", { clase: "avatar", texto: url ? undefined : iniciales(nombre), attrs: { "aria-hidden": "true" } });
-  if (url) {
-    const img = crear("img", { attrs: { src: url, alt: "" } });
-    img.addEventListener("error", () => avatar.replaceChildren(iniciales(nombre)));
-    avatar.append(img);
-  }
-  return avatar;
-}
-
-/** @param {{ perfil: any, privados: any | null, urlFoto: string | null }} datos */
-function pintar({ perfil, privados, urlFoto }) {
+/** @param {{ perfil: any, privados: any | null }} datos */
+function pintar({ perfil, privados }) {
   const salir = crearBoton("Cerrar sesión", { variante: "secundario", alHacerClic: () => cerrarSesion() });
   return [
     crear("div", { clase: "tarjeta tarjeta--enlace" }, [
-      crearAvatar(perfil.full_name, urlFoto),
+      crearAvatar({ nombre: perfil.full_name, avatarPath: perfil.avatar_path }),
       crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__titulo", texto: perfil.full_name || "Sin nombre" }), crear("p", { clase: "tarjeta__detalle", texto: "Cliente" })]),
     ]),
     crear("dl", { clase: "tarjeta horario" }, [
@@ -53,11 +39,7 @@ export async function renderPerfilCliente() {
     contenido,
     async () => {
       const perfil = await api.getMyProfile();
-      const [privados, urlFoto] = await Promise.all([
-        api.getMyClientPrivate().catch(() => null),
-        perfil.avatar_path ? api.getAvatarUrl(perfil.avatar_path).catch(() => null) : null,
-      ]);
-      return { perfil, privados, urlFoto };
+      return { perfil, privados: await api.getMyClientPrivate().catch(() => null) };
     },
     pintar,
   ).then(() => {
