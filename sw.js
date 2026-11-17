@@ -1,6 +1,6 @@
 // Service worker: solo cachea la interfaz (HTML, CSS, JS, íconos).
 // Nunca cachea Supabase, tiles del mapa ni fotos. Ignora todo lo que no sea GET del mismo origen.
-const CACHE_VERSION = "mixanab-ui-v3";
+const CACHE_VERSION = "mixanab-ui-v4";
 
 // Toda la interfaz: los módulos ES se cargan por import, así que cada archivo debe estar aquí para funcionar sin red.
 const INTERFAZ = [
@@ -14,6 +14,8 @@ const INTERFAZ = [
   "./css/chat.css",
   "./css/chats.css",
   "./css/acceso.css",
+  "./css/admin.css",
+  "./css/avisos.css",
   "./css/components.css",
   "./css/enviar-presupuesto.css",
   "./css/inicio.css",
@@ -36,11 +38,19 @@ const INTERFAZ = [
   "./js/config.js",
   "./js/features/admin/api.js",
   "./js/features/admin/api.mock.js",
+  "./js/features/admin/componentes.js",
   "./js/features/admin/index.js",
+  "./js/features/admin/pages/bitacora.js",
+  "./js/features/admin/pages/consultas.js",
+  "./js/features/admin/pages/panel.js",
+  "./js/features/admin/pages/resenas.js",
+  "./js/features/admin/pages/talleres.js",
+  "./js/features/admin/pages/usuarios.js",
   "./js/features/admin/routes.js",
   "./js/features/admin/validar.js",
   "./js/features/auth/api.js",
   "./js/features/auth/api.mock.js",
+  "./js/features/auth/avatar.js",
   "./js/features/auth/flujo.js",
   "./js/features/auth/guardia.js",
   "./js/features/auth/index.js",
@@ -92,7 +102,9 @@ const INTERFAZ = [
   "./js/features/quotes/validar.js",
   "./js/features/requests/api.js",
   "./js/features/requests/api.mock.js",
+  "./js/features/requests/avisos.js",
   "./js/features/requests/index.js",
+  "./js/features/requests/pages/avisos.js",
   "./js/features/requests/pages/simulacion.js",
   "./js/features/requests/pages/solicitar.js",
   "./js/features/requests/pages/solicitudes-artesano.js",
