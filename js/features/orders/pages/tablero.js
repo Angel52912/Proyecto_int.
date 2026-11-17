@@ -1,6 +1,7 @@
 // 20 · Tablero Kanban (Artesano, CU-05): pedidos en 4 columnas por fase y una de listos para entrega.
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
+import { crearCampana } from "../../requests/avisos.js";
 import { folio } from "../../chat/pages/chat.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
@@ -80,7 +81,10 @@ function pintarTablero({ pedidos, solicitudes }) {
 /** @returns {Promise<Node>} */
 export async function renderTablero() {
   const contenido = crear("div", { clase: "tablero__contenido" });
-  const pantalla = crearPantalla({ rol: "craftsman", activa: "tablero", clase: "tablero" }, [crear("h1", { clase: "pantalla__titulo", texto: "Tablero" }), contenido]);
+  const pantalla = crearPantalla({ rol: "craftsman", activa: "tablero", clase: "tablero" }, [
+    crear("div", { clase: "fila-entre" }, [crear("h1", { clase: "pantalla__titulo", texto: "Tablero" }), crearCampana("craftsman")]),
+    contenido,
+  ]);
   cargarEn(
     contenido,
     async () => {
