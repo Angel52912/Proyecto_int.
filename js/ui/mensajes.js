@@ -12,6 +12,9 @@ export const MENSAJES_ERROR = Object.freeze({
   photo_required: "Agrega al menos una foto.",
   confirmation_required: "Confirma el cambio y escribe una nota para el cliente.",
   rate_limited: "Demasiados intentos. Espera un momento.",
+  invalid_code: "El código no es correcto o ya venció. Revisa tu correo.",
+  auth_failed: "No pudimos iniciar sesión. Intenta de nuevo.",
+  role_already_set: "Ya elegiste cómo usar MiXanab.",
   unexpected: "Algo salió mal. Intenta de nuevo.",
 });
 
