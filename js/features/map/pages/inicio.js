@@ -125,7 +125,7 @@ export async function renderInicio() {
     if (mapa) alSalir(() => mapa.remove());
     try {
       const ubicacion = await obtenerUbicacion();
-      const talleres = await buscarTalleres({ service: "all", ...(ubicacion ?? {}), limit: 10 });
+      const talleres = await buscarTalleres({ service: "all", orden: "cercanos", ...(ubicacion ?? {}), limit: 10 });
       if (talleres.length === 0) estadoMapa.replaceChildren(crearVacio("Aún no hay talleres publicados cerca."));
       if (mapa) pintarPines(mapa, talleres, { ubicacion });
     } catch {

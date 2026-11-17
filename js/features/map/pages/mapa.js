@@ -8,14 +8,15 @@ import { mensajeDeError } from "../../../ui/mensajes.js";
 import { NOMBRE_SERVICIO, buscarTalleres, crearMapaLeaflet, crearTarjetaTaller, obtenerUbicacion, pintarPines } from "../componentes.js";
 
 /**
- * Convierte el texto del buscador en filtro: 5 dígitos = C.P.; lo demás = colonia (A1).
+ * Convierte el texto del buscador "Buscar taller o colonia" en filtro: 5 dígitos = C.P. (A1); lo demás busca en el
+ * nombre o la colonia del taller (`search` del servidor).
  * @param {string} texto
- * @returns {{ colonia?: string, postal_code?: string }}
+ * @returns {{ search?: string, postal_code?: string }}
  */
 export function filtroDeTexto(texto) {
   const limpio = texto.trim();
   if (limpio === "") return {};
-  return /^\d{5}$/.test(limpio) ? { postal_code: limpio } : { colonia: limpio.slice(0, 100) };
+  return /^\d{5}$/.test(limpio) ? { postal_code: limpio } : { search: limpio.slice(0, 100) };
 }
 
 /** @param {import("../../../router.js").Contexto} contexto */
@@ -136,6 +137,7 @@ export async function renderMapa({ consulta }) {
     try {
       resultados = await buscarTalleres({
         service: estado.servicio,
+        orden: "cercanos",
         ...(estado.ubicacion ?? {}),
         ...filtroDeTexto(estado.texto),
         ...(estado.abierto ? { open_now: true } : {}),

@@ -3,21 +3,20 @@ import { crear } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearPantalla } from "../../../ui/layout.js";
-import { NOMBRE_SERVICIO, buscarTalleres, crearTarjetaTaller, obtenerUbicacion, ordenarTalleres } from "../componentes.js";
+import { NOMBRE_SERVICIO, buscarTalleres, crearTarjetaTaller, obtenerUbicacion } from "../componentes.js";
 import { filtroDeTexto } from "./mapa.js";
 
-/** @typedef {"cercanos" | "valorados" | "precio"} Orden */
+/** @typedef {import("../componentes.js").Orden} Orden */
 
 /**
- * Filtra por nombre del taller o colonia (texto libre del buscador de Inicio).
- * @param {any[]} talleres
+ * Filtro "Colonia o C.P." del panel: 5 dígitos = C.P.; lo demás = colonia.
  * @param {string} texto
- * @returns {any[]}
+ * @returns {{ colonia?: string, postal_code?: string }}
  */
-export function filtrarPorTexto(talleres, texto) {
-  const buscado = texto.trim().toLowerCase();
-  if (buscado === "") return talleres;
-  return talleres.filter((t) => t.name.toLowerCase().includes(buscado) || t.colonia.toLowerCase().includes(buscado) || t.postal_code === buscado);
+export function filtroDeLugar(texto) {
+  const limpio = texto.trim();
+  if (limpio === "") return {};
+  return /^\d{5}$/.test(limpio) ? { postal_code: limpio } : { colonia: limpio.slice(0, 100) };
 }
 
 /**
@@ -136,8 +135,10 @@ export async function renderTalleres({ consulta }) {
     const precio = Number(entradaPrecio.value);
     const filtros = {
       service: /** @type {import("../componentes.js").FiltroServicio} */ (selectServicio.value),
+      orden: estado.orden,
       ...(estado.ubicacion ?? {}),
-      ...filtroDeTexto(entradaLugar.value),
+      ...filtroDeTexto(textoInicial),
+      ...filtroDeLugar(entradaLugar.value),
       ...(selectCalificacion.value ? { min_rating: Number(selectCalificacion.value) } : {}),
       ...(Number.isFinite(precio) && precio > 0 ? { max_price: precio } : {}),
       ...(distancia ? { max_distance_km: distancia } : {}),
@@ -145,7 +146,7 @@ export async function renderTalleres({ consulta }) {
     };
     return cargarEn(
       lista,
-      async () => ordenarTalleres(filtrarPorTexto(await buscarTalleres(filtros), textoInicial), estado.orden),
+      () => buscarTalleres(filtros),
       (talleres) =>
         talleres.length === 0
           ? crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros.")
