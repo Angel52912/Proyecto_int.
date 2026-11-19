@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage, sinAcceso } from "../helpers/db.js";
 import { PERMISO_DENEGADO, UUID_A, UUID_B, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-01: bucket privado avatars y la restricción de profiles.avatar_path (migración 0017). */
@@ -27,7 +27,7 @@ describe("fotos de perfil (bucket avatars)", () => {
 
   const subir = (/** @type {string} */ ruta) => intentar(c, "insert into storage.objects (bucket_id, name) values ('avatars', $1) returning id", [ruta]);
   const leer = (/** @type {string} */ ruta) => intentar(c, "select id from storage.objects where bucket_id = 'avatars' and name = $1", [ruta]);
-  const borrar = (/** @type {string} */ ruta) => intentar(c, "delete from storage.objects where bucket_id = 'avatars' and name = $1", [ruta]);
+  const borrar = (/** @type {string} */ ruta) => intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'avatars' and name = $1", [ruta]);
   /** Inserta un archivo como superusuario. */
   async function existente(/** @type {string} */ ruta) {
     await c.query("reset role");
@@ -47,7 +47,7 @@ describe("fotos de perfil (bucket avatars)", () => {
     test("bucket privado, 5 MB y solo jpeg, png o webp", async () => {
       await c.query("reset role");
       const { rows } = await c.query("select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'avatars'");
-      expect(rows).toEqual([{ public: false, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
+      expect(rows.map((r) => ({ ...r, file_size_limit: Number(r.file_size_limit) }))).toEqual([{ public: false, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
     });
   });
 
@@ -139,7 +139,7 @@ describe("fotos de perfil (bucket avatars)", () => {
         expect((await leer(`${cliente}/${UUID_A}`)).rows).toEqual([]);
       }
       await actuarComo(c, null);
-      expect((await leer(`${cliente}/${UUID_A}`)).error?.code).toBe(PERMISO_DENEGADO);
+      expect(sinAcceso(await leer(`${cliente}/${UUID_A}`))).toBe(true);
     });
 
     test("una carpeta que no es un uid válido no rompe la política (no se ve y no hay error)", async () => {
@@ -175,7 +175,9 @@ describe("fotos de perfil (bucket avatars)", () => {
       await actuarComo(c, inactivo);
       expect((await borrar(`${inactivo}/${UUID_A}`)).rowCount).toBe(0);
       await actuarComo(c, null);
-      expect((await borrar(`${inactivo}/${UUID_A}`)).error?.code).toBe(PERMISO_DENEGADO);
+      // En Supabase real anon conserva el privilegio sobre la tabla y las políticas dejan 0 filas; en local falla con 42501.
+      const anonimo = await borrar(`${inactivo}/${UUID_A}`);
+      expect(anonimo.error?.code === PERMISO_DENEGADO || (anonimo.error === null && anonimo.rowCount === 0)).toBe(true);
     });
   });
 

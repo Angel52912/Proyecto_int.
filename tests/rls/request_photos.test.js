@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage, sinAcceso } from "../helpers/db.js";
 import { PERMISO_DENEGADO, UUID_A, UUID_B, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-03: fotos de la solicitud (tabla request_photos y bucket privado request-photos). */
@@ -153,14 +153,14 @@ describe("request_photos y Storage", () => {
     test("configuración: privado, 5 MB y solo jpeg, png o webp", async () => {
       await c.query("reset role");
       const { rows } = await c.query("select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'request-photos'");
-      expect(rows).toEqual([{ public: false, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
+      expect(rows.map((r) => ({ ...r, file_size_limit: Number(r.file_size_limit) }))).toEqual([{ public: false, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
     });
 
     test("el cliente sube y borra archivos de su borrador", async () => {
       const { cliente, solicitud } = await escenario("draft");
       await actuarComo(c, cliente);
       expect((await subir(`${solicitud}/${UUID_A}`)).error).toBeNull();
-      const del = await intentar(c, "delete from storage.objects where bucket_id = 'request-photos' and name = $1", [`${solicitud}/${UUID_A}`]);
+      const del = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'request-photos' and name = $1", [`${solicitud}/${UUID_A}`]);
       expect(del.rowCount).toBe(1);
     });
 
@@ -169,7 +169,7 @@ describe("request_photos y Storage", () => {
       await c.query("insert into storage.objects (bucket_id, name) values ('request-photos', $1)", [`${solicitud}/${UUID_A}`]);
       await actuarComo(c, cliente);
       expect((await subir(`${solicitud}/${UUID_B}`)).error?.code).toBe(PERMISO_DENEGADO);
-      const del = await intentar(c, "delete from storage.objects where bucket_id = 'request-photos'");
+      const del = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'request-photos'");
       expect(del.rowCount).toBe(0);
     });
 
@@ -197,7 +197,7 @@ describe("request_photos y Storage", () => {
         expect((await leer(ruta)).rows).toEqual([]);
       }
       await actuarComo(c, null);
-      expect((await leer(ruta)).error?.code).toBe(PERMISO_DENEGADO);
+      expect(sinAcceso(await leer(ruta))).toBe(true);
     });
 
     test("el artesano no ve los archivos de un borrador", async () => {

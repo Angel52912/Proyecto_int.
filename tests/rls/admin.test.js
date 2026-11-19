@@ -204,7 +204,10 @@ describe("administración (CU-08)", () => {
       const pagina = await llamar("admin_list_users", [e.token, null, null, 1, 1]);
       expect(pagina.rows[0].r.total).toBe(2);
       expect(pagina.rows[0].r.items).toHaveLength(1);
-      const porCorreo = await llamar("admin_list_users", [(await c.query("select email from auth.users where id = $1", [e.cliente])).rows[0].email.toUpperCase()]);
+      await c.query("reset role"); // auth.users solo la lee el superusuario
+      const correo = (await c.query("select email from auth.users where id = $1", [e.cliente])).rows[0].email.toUpperCase();
+      await actuarComo(c, admin);
+      const porCorreo = await llamar("admin_list_users", [correo]);
       expect(porCorreo.rows[0].r.items.map((/** @type {{ id: string }} */ u) => u.id)).toEqual([e.cliente]);
     });
 

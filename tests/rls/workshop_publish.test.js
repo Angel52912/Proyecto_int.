@@ -71,12 +71,14 @@ describe("publicar taller", () => {
   test("el artesano puede retirar su taller del mapa", async () => {
     const uid = await artesanoConTallerCompleto();
     const cliente = await usuarioConRol("client");
+    const taller = (await c.query("select id from public.workshops where owner_id = $1", [uid])).rows[0].id;
     await actuarComo(c, uid);
     await intentar(c, "select public.publish_my_workshop()");
     const r = await intentar(c, "select public.unpublish_my_workshop() as r");
     expect(r.rows[0].r).toEqual({ published: false, missing: [] });
     await actuarComo(c, cliente);
-    expect((await intentar(c, "select id from public.workshops")).rows).toEqual([]);
+    // Solo este taller: las demás pruebas comparten la transacción y dejan talleres publicados.
+    expect((await intentar(c, "select id from public.workshops where id = $1", [taller])).rows).toEqual([]);
   });
 
   test("un taller suspendido no se puede publicar", async () => {

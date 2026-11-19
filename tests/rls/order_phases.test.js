@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage, sinAcceso } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, UUID_A, UUID_B, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -334,7 +334,7 @@ describe("fases del pedido (CU-05)", () => {
     test("configuración: privado, 5 MB y solo jpeg, png o webp", async () => {
       await c.query("reset role");
       const { rows } = await c.query("select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'progress-photos'");
-      expect(rows).toEqual([{ public: false, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
+      expect(rows.map((r) => ({ ...r, file_size_limit: Number(r.file_size_limit) }))).toEqual([{ public: false, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
     });
 
     test("el artesano dueño sube con el pedido en curso", async () => {
@@ -388,7 +388,7 @@ describe("fases del pedido (CU-05)", () => {
         expect((await leer(ruta)).rows).toEqual([]);
       }
       await actuarComo(c, null);
-      expect((await leer(ruta)).error?.code).toBe(PERMISO_DENEGADO);
+      expect(sinAcceso(await leer(ruta))).toBe(true);
     });
 
     test("el artesano borra un archivo huérfano pero no uno ya registrado en un avance", async () => {
@@ -398,13 +398,13 @@ describe("fases del pedido (CU-05)", () => {
       await actuarComo(c, artesano);
       expect((await avanzar(orden, 2, usado)).error).toBeNull();
 
-      const borrarUsado = await intentar(c, "delete from storage.objects where bucket_id = 'progress-photos' and name = $1", [usado]);
+      const borrarUsado = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'progress-photos' and name = $1", [usado]);
       expect(borrarUsado.rowCount).toBe(0);
-      const borrarHuerfano = await intentar(c, "delete from storage.objects where bucket_id = 'progress-photos' and name = $1", [huerfano]);
+      const borrarHuerfano = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'progress-photos' and name = $1", [huerfano]);
       expect(borrarHuerfano.rowCount).toBe(1);
 
       await actuarComo(c, cliente);
-      const borrarComoCliente = await intentar(c, "delete from storage.objects where bucket_id = 'progress-photos'");
+      const borrarComoCliente = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'progress-photos'");
       expect(borrarComoCliente.rowCount).toBe(0);
     });
   });

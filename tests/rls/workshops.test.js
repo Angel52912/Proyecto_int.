@@ -44,7 +44,7 @@ describe("workshops", () => {
   test("el artesano crea su taller en borrador y lo lee", async () => {
     const uid = await usuarioConRol("craftsman");
     await actuarComo(c, uid);
-    const ins = await intentar(c, "insert into public.workshops (owner_id, name) values ($1, 'Mi taller') returning published, services", [uid]);
+    const ins = await intentar(c, "insert into public.workshops (owner_id, name) values ($1, 'Mi taller') returning published, services::text[] as services", [uid]);
     expect(ins.rows).toEqual([{ published: false, services: [] }]);
     const sel = await intentar(c, "select name from public.workshops");
     expect(sel.rows).toEqual([{ name: "Mi taller" }]);
@@ -108,10 +108,11 @@ describe("workshops", () => {
   test("el cliente ve solo talleres publicados y no suspendidos", async () => {
     const cliente = await usuarioConRol("client");
     const visible = await crearTaller(await usuarioConRol("craftsman"), { published: true });
-    await crearTaller(await usuarioConRol("craftsman")); // borrador
-    await crearTaller(await usuarioConRol("craftsman"), { published: true, suspended: true });
+    const borrador = await crearTaller(await usuarioConRol("craftsman"));
+    const suspendido = await crearTaller(await usuarioConRol("craftsman"), { published: true, suspended: true });
     await actuarComo(c, cliente);
-    const sel = await intentar(c, "select id from public.workshops");
+    // Solo entre los talleres de esta prueba: las demás pruebas comparten la transacción y dejan talleres publicados.
+    const sel = await intentar(c, "select id from public.workshops where id = any($1::uuid[])", [[visible, borrador, suspendido]]);
     expect(sel.rows).toEqual([{ id: visible }]);
   });
 

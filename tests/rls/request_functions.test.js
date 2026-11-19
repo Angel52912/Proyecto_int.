@@ -248,7 +248,7 @@ describe("submit_request y cancel_request", () => {
     expect(rows).toHaveLength(2);
     for (const fila of rows) {
       expect(fila.prosecdef).toBe(true);
-      expect(fila.proconfig).toContain("search_path=");
+      expect(fila.proconfig.some((/** @type {string} */ x) => /^search_path=(""|)$/.test(x))).toBe(true); // vacío, con o sin comillas
       expect({ auth: fila.auth, anon: fila.anon }).toEqual({ auth: true, anon: false });
     }
   });
