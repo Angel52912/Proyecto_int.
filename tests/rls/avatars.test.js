@@ -175,7 +175,9 @@ describe("fotos de perfil (bucket avatars)", () => {
       await actuarComo(c, inactivo);
       expect((await borrar(`${inactivo}/${UUID_A}`)).rowCount).toBe(0);
       await actuarComo(c, null);
-      expect((await borrar(`${inactivo}/${UUID_A}`)).error?.code).toBe(PERMISO_DENEGADO);
+      // En Supabase real anon conserva el privilegio sobre la tabla y las políticas dejan 0 filas; en local falla con 42501.
+      const anonimo = await borrar(`${inactivo}/${UUID_A}`);
+      expect(anonimo.error?.code === PERMISO_DENEGADO || (anonimo.error === null && anonimo.rowCount === 0)).toBe(true);
     });
   });
 
