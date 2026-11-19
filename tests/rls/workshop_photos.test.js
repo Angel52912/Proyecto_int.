@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 const UUID_A = "11111111-1111-4111-8111-111111111111";
@@ -160,12 +160,12 @@ describe("workshop_photos y Storage", () => {
 
   describe("bucket workshop-photos", () => {
     /** @param {string} ruta */
-    const subir = (ruta) => intentar(c, "insert into storage.objects (bucket_id, name) values ('workshop-photos', $1) returning id", [ruta]);
+    const subir = (ruta) => intentar(c, "insert into storage.objects (bucket_id, name) values ('workshop-photos', $1)", [ruta]);
 
     test("configuración: público, 5 MB y solo jpeg, png o webp", async () => {
       await c.query("reset role");
       const { rows } = await c.query("select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'workshop-photos'");
-      expect(rows).toEqual([{ public: true, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
+      expect(rows.map((r) => ({ ...r, file_size_limit: Number(r.file_size_limit) }))).toEqual([{ public: true, file_size_limit: 5242880, allowed_mime_types: ["image/jpeg", "image/png", "image/webp"] }]);
     });
 
     test("el dueño sube y borra archivos en la carpeta de su taller", async () => {
@@ -173,7 +173,7 @@ describe("workshop_photos y Storage", () => {
       const taller = await crearTaller(uid);
       await actuarComo(c, uid);
       expect((await subir(`${taller}/${UUID_A}`)).error).toBeNull();
-      const del = await intentar(c, "delete from storage.objects where bucket_id = 'workshop-photos' and name = $1", [`${taller}/${UUID_A}`]);
+      const del = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'workshop-photos' and name = $1", [`${taller}/${UUID_A}`]);
       expect(del.rowCount).toBe(1);
     });
 
@@ -184,7 +184,7 @@ describe("workshop_photos y Storage", () => {
       await c.query("insert into storage.objects (bucket_id, name) values ('workshop-photos', $1)", [`${taller}/${UUID_A}`]);
       await actuarComo(c, otro);
       expect((await subir(`${taller}/${UUID_B}`)).error?.code).toBe(PERMISO_DENEGADO);
-      const del = await intentar(c, "delete from storage.objects where bucket_id = 'workshop-photos'");
+      const del = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'workshop-photos'");
       expect(del.rowCount).toBe(0);
     });
 

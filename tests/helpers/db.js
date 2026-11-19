@@ -116,3 +116,27 @@ export async function intentar(cliente, sql, parametros = []) {
     return { rows: [], rowCount: 0, error: /** @type {Error & { code?: string }} */ (error) };
   }
 }
+
+/**
+ * Ejecuta un DELETE directo sobre storage.objects. En Supabase real está bloqueado ("Direct deletion from storage
+ * tables is not allowed") salvo que la transacción lo permita con este ajuste local; así se prueban las políticas
+ * de DELETE sin pasar por la API de Storage.
+ * @param {pg.Client} cliente
+ * @param {string} sql
+ * @param {unknown[]} [parametros]
+ * @returns {Promise<{ rows: any[], rowCount: number, error: (Error & { code?: string }) | null }>}
+ */
+export async function intentarBorradoStorage(cliente, sql, parametros = []) {
+  await cliente.query("select set_config('storage.allow_delete_query', 'true', true)");
+  return intentar(cliente, sql, parametros);
+}
+
+/**
+ * ¿El resultado equivale a "sin acceso"? En Supabase real `anon` conserva SELECT sobre las tablas de Storage y las
+ * políticas devuelven cero filas; con Supabase local falla con permission denied (42501). Ambas cuentan como denegado.
+ * @param {{ rows: any[], error: (Error & { code?: string }) | null }} resultado
+ * @returns {boolean}
+ */
+export function sinAcceso(resultado) {
+  return resultado.error?.code === "42501" || (resultado.error === null && resultado.rows.length === 0);
+}

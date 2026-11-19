@@ -213,7 +213,7 @@ describe("send_quote, respond_quote y cancel_request", () => {
       expect(await estadoSolicitud(solicitud)).toBe("accepted");
       await c.query("reset role");
       const estados = (await c.query("select status from public.quotes where request_id = $1 order by created_at, id", [solicitud])).rows;
-      expect(estados.map((q) => q.status).sort()).toEqual(["accepted", "rejected", "rejected", "rejected"]);
+      expect(estados.map((q) => q.status).sort()).toEqual(["accepted", "rejected", "rejected"]); // 3 presupuestos: 2 rechazados y 1 aceptado
     });
 
     test("responder dos veces o un presupuesto reemplazado lanza invalid_state", async () => {

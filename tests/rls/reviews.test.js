@@ -154,10 +154,10 @@ describe("reseñas y calificación (CU-06)", () => {
     }
 
     test("ven las reseñas no ocultas los clientes y artesanos activos", async () => {
-      const { cliente, artesano } = await conResena();
+      const { cliente, artesano, resena } = await conResena();
       for (const uid of [cliente, artesano, await usuarioConRol("client"), await usuarioConRol("craftsman")]) {
         await actuarComo(c, uid);
-        expect((await intentar(c, "select id from public.reviews")).rows).toHaveLength(1);
+        expect((await intentar(c, "select id from public.reviews where id = $1", [resena])).rows).toHaveLength(1);
       }
     });
 
@@ -182,10 +182,10 @@ describe("reseñas y calificación (CU-06)", () => {
       expect(await taller(tallerId)).toEqual({ rating_avg: null, rating_count: 0 });
 
       await actuarComo(c, cliente);
-      expect((await intentar(c, "select id from public.reviews")).rows).toHaveLength(1);
+      expect((await intentar(c, "select id from public.reviews where id = $1", [resena])).rows).toHaveLength(1);
       for (const uid of [artesano, await usuarioConRol("client")]) {
         await actuarComo(c, uid);
-        expect((await intentar(c, "select id from public.reviews")).rows).toEqual([]);
+        expect((await intentar(c, "select id from public.reviews where id = $1", [resena])).rows).toEqual([]);
       }
 
       await c.query("reset role");

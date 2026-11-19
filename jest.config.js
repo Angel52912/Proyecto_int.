@@ -9,9 +9,11 @@ export default {
       testMatch: ["<rootDir>/tests/unit/**/*.test.js"],
     },
     {
-      // Requiere Docker y Supabase local (`npm run db:start`).
+      // Requiere un proyecto de Supabase de pruebas (TEST_DATABASE_URL en .env.test) o Supabase local (`npm run db:start`).
+      // 60 s por prueba: con una base remota cada consulta tarda decenas de milisegundos y varias pruebas hacen decenas.
       displayName: "rls",
       testEnvironment: "node",
+      testTimeout: 60000,
       transform: {},
       testMatch: ["<rootDir>/tests/rls/**/*.test.js"],
     },

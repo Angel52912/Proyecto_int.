@@ -168,7 +168,7 @@ describe("quotes y orders: RLS", () => {
       expect((await intentar(c, "select id from public.orders")).error?.code).toBe(PERMISO_DENEGADO);
     });
 
-    test("orders no tiene columnas de PIN (viven en private.order_pins) y select * no filtra nada", async () => {
+    test("orders no tiene columnas de PIN (viven en private.order_pins) y select * no devuelve nada de PIN", async () => {
       const e = await escenario();
       await c.query("reset role");
       const { rows } = await c.query(
@@ -178,7 +178,8 @@ describe("quotes y orders: RLS", () => {
       for (const uid of [e.cliente, e.artesano]) {
         await actuarComo(c, uid);
         const todo = await intentar(c, "select * from public.orders");
-        expect(todo.error?.code).toBe(PERMISO_DENEGADO); // el grant sigue siendo por columna
+        expect(todo.error).toBeNull(); // desde 0013 todas las columnas de orders están concedidas
+        for (const fila of todo.rows) expect(Object.keys(fila).filter((k) => /pin/.test(k))).toEqual([]);
         expect((await intentar(c, "select delivery_pin_hash from public.orders")).error?.code).toBe("42703");
       }
     });

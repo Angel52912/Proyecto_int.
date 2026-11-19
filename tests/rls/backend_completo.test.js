@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, UUID_A, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -212,7 +212,7 @@ describe("backend completo (0019 y 0020)", () => {
 
   describe("0020: cuotas y rutas de Storage", () => {
     const subir = (/** @type {string} */ bucket, /** @type {string} */ ruta) =>
-      intentar(c, "insert into storage.objects (bucket_id, name) values ($1, $2) returning id", [bucket, ruta]);
+      intentar(c, "insert into storage.objects (bucket_id, name) values ($1, $2)", [bucket, ruta]);
     async function rellenar(/** @type {string} */ bucket, /** @type {string} */ carpeta, /** @type {number} */ cuantos) {
       await c.query("reset role");
       await c.query("insert into storage.objects (bucket_id, name) select $1, $2::text || '/' || gen_random_uuid()::text from generate_series(1, $3)", [bucket, carpeta, cuantos]);
@@ -285,7 +285,7 @@ describe("backend completo (0019 y 0020)", () => {
       expect((await subir("workshop-photos", `${id}/${uuid()}`)).error?.code).toBe(PERMISO_DENEGADO);
       const fila = await intentar(c, "insert into public.workshop_photos (workshop_id, path, kind) values ($1, $2, 'work')", [id, `${id}/${uuid()}`]);
       expect(fila.error?.code).toBe(PERMISO_DENEGADO);
-      expect((await intentar(c, "delete from storage.objects where bucket_id = 'workshop-photos' and name = $1", [archivo])).rowCount).toBe(1);
+      expect((await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'workshop-photos' and name = $1", [archivo])).rowCount).toBe(1);
     });
 
     test("el artesano activo con el taller disponible sigue pudiendo subir y registrar fotos", async () => {
@@ -332,7 +332,7 @@ describe("backend completo (0019 y 0020)", () => {
       const solicitud = await crearSolicitud(c, cliente, tallerId, "open");
       await c.query("insert into public.messages (request_id, sender_id, body, kind) select $1, null, 'sistema', 'system' from generate_series(1, 40)", [solicitud]);
       await actuarComo(c, cliente);
-      const enviar = () => intentar(c, "insert into public.messages (request_id, sender_id, body, kind) values ($1, $2, 'hola', 'text')", [solicitud, cliente]);
+      const enviar = () => intentar(c, "insert into public.messages (request_id, body) values ($1, 'hola')", [solicitud]);
       for (let i = 0; i < 30; i += 1) expect((await enviar()).error).toBeNull();
       expect((await enviar()).error?.message).toContain("rate_limited");
     });
