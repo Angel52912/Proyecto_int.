@@ -225,14 +225,18 @@ describe("workshop_photos y Storage", () => {
       expect((await subir(`${taller}/${UUID_A}`)).error?.code).toBe(PERMISO_DENEGADO);
     });
 
-    test("el bucket no tiene política de listado para authenticated ni anon", async () => {
+    test("el bucket solo tiene una política de lectura: la del dueño del taller en su carpeta (0022); no hay listado general", async () => {
       await c.query("reset role");
       const { rows } = await c.query(
-        `select policyname from pg_policies
+        `select policyname, roles::text as roles, qual from pg_policies
           where schemaname = 'storage' and tablename = 'objects' and cmd in ('SELECT', 'ALL')
             and qual ilike '%workshop-photos%'`,
       );
-      expect(rows).toEqual([]);
+      // La lectura pública sigue siendo por URL (bucket público). La política exige ser el dueño del taller de esa carpeta.
+      expect(rows.map((r) => r.policyname)).toEqual(["workshop_photos_storage_select_owner"]);
+      expect(rows[0].roles).toContain("authenticated");
+      expect(rows[0].roles).not.toContain("anon");
+      expect(rows[0].qual).toContain("owns_workshop");
     });
   });
 });
