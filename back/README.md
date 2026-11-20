@@ -9,7 +9,7 @@ estaba en `supabase/` y las pruebas de permisos en `tests/rls/` y `tests/helpers
 | --- | --- |
 | [`supabase/`](supabase/README.md) | `migrations/` (SQL versionado, una migración por CU) y `seed.sql` (solo desarrollo/pruebas). |
 | `tests/rls/` | Pruebas Jest de permisos por rol (cliente, artesano, admin, sin rol, anónimo). |
-| `tests/helpers/` | Utilidades para abrir transacciones, crear usuarios y datos de prueba. |
+| `tests/helpers/` | `db.js` (transacciones, roles y Storage), `escenarios.js` (solicitudes y pedidos) y datos de `presupuestos.js`/`solicitudes.js`. |
 
 ## Qué NO hay aquí
 
