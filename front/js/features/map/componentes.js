@@ -21,8 +21,8 @@ export const ORDEN_SERVIDOR = Object.freeze({ cercanos: "distance", valorados: "
 /**
  * Filtros de la pantalla → parámetros de `searchWorkshops`. "Todos" no manda servicio (el servidor une ambos sin
  * repetir) y "Más cercanos" sin ubicación cae a "Mejor valorados" (el servidor exige ubicación para ordenar por distancia).
- * @param {Omit<import("./validar.js").FiltrosBusqueda, "service" | "order"> & { service: FiltroServicio, orden?: Orden }} filtros
- * @returns {import("./validar.js").FiltrosBusqueda}
+ * @param {Omit<import("../../../../apis/api-mixanab/map/validar.js").FiltrosBusqueda, "service" | "order"> & { service: FiltroServicio, orden?: Orden }} filtros
+ * @returns {import("../../../../apis/api-mixanab/map/validar.js").FiltrosBusqueda}
  */
 export function parametrosDeBusqueda({ service, orden, ...resto }) {
   const conUbicacion = resto.lat !== undefined && resto.lng !== undefined;
