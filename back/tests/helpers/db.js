@@ -14,7 +14,7 @@ function leerUrlDePruebas() {
       if (coincidencia) return coincidencia[1].replace(/^["']|["']$/g, "");
     }
   }
-  throw new Error("Falta TEST_DATABASE_URL (ver tests/rls/ejemplo-env-pruebas.txt). Debe apuntar al proyecto de PRUEBAS.");
+  throw new Error("Falta TEST_DATABASE_URL (ver back/tests/rls/ejemplo-env-pruebas.txt). Debe apuntar al proyecto de PRUEBAS.");
 }
 
 /**

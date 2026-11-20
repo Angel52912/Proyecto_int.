@@ -2,10 +2,10 @@ import js from "@eslint/js";
 import globals from "globals";
 
 export default [
-  { ignores: ["node_modules/**", "js/vendor/**", "supabase/**", "coverage/**"] },
+  { ignores: ["node_modules/**", "front/js/vendor/**", "back/supabase/**", "coverage/**"] },
   js.configs.recommended,
   {
-    files: ["js/**/*.js", "sw.js"],
+    files: ["front/js/**/*.js", "front/sw.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
@@ -24,7 +24,13 @@ export default [
     },
   },
   {
-    files: ["tests/**/*.js", "jest.config.js", "eslint.config.js", "scripts/**/*.mjs"],
+    files: [
+      "front/tests/**/*.js",
+      "back/tests/**/*.js",
+      "jest.config.js",
+      "eslint.config.js",
+      "scripts/**/*.mjs",
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",

@@ -6,7 +6,7 @@ Estado: aprobada el 2026-11-12. Alcance: CU-01 a CU-08. Sin servidor propio: tod
 
 | # | Decisión |
 |---|---|
-| D1 | Docker solo para quien escribe migraciones y pruebas RLS (Supabase local). El resto del equipo trabaja con `api.js` simulado (`js/features/<modulo>/api.mock.js`) y `USAR_API_SIMULADA = true` en `js/config.js`. |
+| D1 | Docker solo para quien escribe migraciones y pruebas RLS (Supabase local). El resto del equipo trabaja con `api.js` simulado (`front/js/features/<modulo>/api.mock.js`) y `USAR_API_SIMULADA = true` en `front/js/config.js`. |
 | D2 | Los grants del esquema `private` se verifican con una prueba RLS (ver sección 5). |
 | D3 | Sin `pg_cron`, sin CI y sin typecheck por ahora. Los borradores de solicitud huérfanos se limpian a mano. |
 | D4 | El service worker solo cachea la interfaz (HTML, CSS, JS, íconos). Nunca cachea Supabase, tiles del mapa ni fotos (privadas o públicas). |
@@ -123,7 +123,7 @@ Las políticas RLS llaman a funciones de `private`. Si `authenticated` no tiene 
 3. `revoke execute on all functions in schema private from public, anon;` y `grant execute on all functions in schema private to authenticated;` para las ya creadas.
 4. `anon` no recibe nada en `private`.
 
-Verificación obligatoria (prueba en `tests/rls/grants.test.js`, escrita junto con `0001_base`):
+Verificación obligatoria (prueba en `back/tests/rls/grants.test.js`, escrita junto con `0001_base`):
 - `has_schema_privilege('authenticated', 'private', 'usage')` es verdadero y el de `anon` es falso.
 - `has_function_privilege('authenticated', f, 'execute')` es verdadero para cada función de `private`, y falso para `anon` y `public`.
 - Un usuario `authenticated` puede hacer SELECT de su propio perfil (la política evalúa el helper sin error).
@@ -131,7 +131,7 @@ Verificación obligatoria (prueba en `tests/rls/grants.test.js`, escrita junto c
 Estado actual: aún no existen migraciones, así que los grants no se pueden verificar. Quedan como requisito de `0001_base`.
 
 ## 6. Service worker (D4)
-- Precachea solo la interfaz: `index.html`, `manifest.webmanifest`, `css/`, `js/` (incluye `js/vendor/`) e `icons/`.
+- Precachea solo la interfaz: `front/index.html`, `front/manifest.webmanifest`, `front/css/`, `front/js/` (incluye `front/js/vendor/`) e `front/icons/`.
 - Ignora toda petición de otro origen (Supabase, tiles de OSM) y toda petición que no sea GET. No llama a `respondWith` en esos casos.
 - Las rutas same-origin que no están en la lista van a red sin guardarse en caché.
 - Las fotos nunca se guardan: ni las privadas (firmadas, de Supabase) ni las públicas.
@@ -139,11 +139,11 @@ Estado actual: aún no existen migraciones, así que los grants no se pueden ver
 
 ## 7. Estructura y scripts
 Ver `CLAUDE.md` para la estructura y comandos vigentes. Reglas:
-- Cada módulo tiene `routes.js` (lista de rutas), `api.js` (único que toca Supabase), `api.mock.js` (simulado) y `view.js`. `js/router.js` solo importa los `routes.js`.
+- Cada módulo tiene `routes.js` (lista de rutas), `api.js` (único que toca Supabase), `api.mock.js` (simulado) y `view.js`. `front/js/router.js` solo importa los `routes.js`.
 - Una hoja CSS por pantalla.
-- `@supabase/supabase-js` y `leaflet` se copian a `js/vendor/` con `npm run vendor` (se ejecuta en `postinstall`). `js/vendor/` está en `.gitignore`.
+- `@supabase/supabase-js` y `leaflet` se copian a `front/js/vendor/` con `npm run vendor` (se ejecuta en `postinstall`). `front/js/vendor/` está en `.gitignore`.
 - Router por hash (`#/ruta`); el callback PKCE de OAuth se procesa antes del router.
-- CSP por `<meta>` en `index.html`.
+- CSP por `<meta>` en `front/index.html`.
 - La CLI de Supabase no es dependencia: se invoca con `npx supabase` solo en los scripts `db:*`. No existe script de `db push`.
 
 ## 8. Etapas y reparto

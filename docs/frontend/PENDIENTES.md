@@ -1,6 +1,6 @@
 # Pendientes del frontend
 
-Estado a 16 nov 2026. El backend (CU-01 a CU-08 y las migraciones `0001` a `0020`) está implementado; `0019` y `0020` se aplican con confirmación de Angel (ver `docs/operacion/`). El contrato de cada función está en `docs/contrato-api.md`. Hoy el frontend corre **solo con el simulado** (`USAR_API_SIMULADA = true` en `js/config.js`) y nunca se ha probado contra Supabase.
+Estado a 16 nov 2026. El backend (CU-01 a CU-08 y las migraciones `0001` a `0020`) está implementado; `0019` y `0020` se aplican con confirmación de Angel (ver `docs/operacion/`). El contrato de cada función está en `docs/contrato-api.md`. Hoy el frontend corre **solo con el simulado** (`USAR_API_SIMULADA = true` en `front/js/config.js`) y nunca se ha probado contra Supabase.
 
 Lo que ya hay: 26 rutas de cliente y artesano (inicio, mapa Leaflet, talleres, perfil del taller, solicitar cotización, chat, presupuesto, seguimiento, recoger con QR y PIN, calificar, mis pedidos; y del artesano: su taller, solicitudes, enviar presupuesto, chats, tablero, actualizar fase, verificar entrega), con estados de carga, error y vacío, y pruebas.
 
@@ -8,8 +8,8 @@ Lo que ya hay: 26 rutas de cliente y artesano (inicio, mapa Leaflet, talleres, p
 
 ### 1.1 Pantallas de acceso (CU-01)
 
-> **Hecho (rama `feat/cu-01-acceso`):** rutas `/acceso`, `/acceso/entrar`, `/acceso/crear`, `/acceso/codigo`, `/acceso/rol` y `/acceso/perfil` (`js/features/auth/pages/`). Sin campo de contraseña. El destino tras entrar lo decide `destinoPorPerfil` (`js/features/auth/guardia.js`); el artesano nuevo va a `/artesano/taller` para configurar su taller. Falta probarlo contra Supabase real (1.3) y la pantalla del admin (`/admin`).
-No existe ninguna. El router redirige a `RUTA_ACCESO = "/acceso"` (`js/router.js`) y esa ruta no está registrada. Según `docs/diseno.md` son 5 pantallas:
+> **Hecho (rama `feat/cu-01-acceso`):** rutas `/acceso`, `/acceso/entrar`, `/acceso/crear`, `/acceso/codigo`, `/acceso/rol` y `/acceso/perfil` (`front/js/features/auth/pages/`). Sin campo de contraseña. El destino tras entrar lo decide `destinoPorPerfil` (`front/js/features/auth/guardia.js`); el artesano nuevo va a `/artesano/taller` para configurar su taller. Falta probarlo contra Supabase real (1.3) y la pantalla del admin (`/admin`).
+No existe ninguna. El router redirige a `RUTA_ACCESO = "/acceso"` (`front/js/router.js`) y esa ruta no está registrada. Según `docs/diseno.md` son 5 pantallas:
 
 1. **Bienvenida:** Iniciar sesión, Crear cuenta y Continuar con Google (`signInWithGoogle`).
 2. **Crear cuenta / entrar con correo** (`signInWithEmail`).
@@ -21,15 +21,15 @@ Reglas a respetar:
 - **No hay contraseña.** El diseño dice "nombre, correo, contraseña", pero el backend solo usa Google y el código de 6 dígitos por correo. Hay que quitar el campo de contraseña del diseño.
 - A1 (credenciales): mostrar el error según `error.code` (`invalid_code`, `auth_failed`, `rate_limited`, `invalid_input`).
 - Después de entrar, decidir el destino con `getMyProfile()`: sin rol → pantalla 4; con rol pero sin nombre → pantalla 5; cliente → `/`; artesano → `/artesano/tablero`; admin → panel del admin.
-- Google vuelve a la app por PKCE: el callback se procesa antes del router (ver `js/supabaseClient.js`).
+- Google vuelve a la app por PKCE: el callback se procesa antes del router (ver `front/js/supabaseClient.js`).
 
 ### 1.2 Guardia por rol en el router
 
-> **Hecho (rama `feat/cu-01-acceso`):** `soloPara(roles, render)` en `js/features/auth/guardia.js` envuelve el render de cada ruta (sin tocar `js/router.js`): sin sesión → `/acceso`, sin rol → `/acceso/rol`, otro rol → su inicio.
-`js/router.js` solo tiene `requiereSesion`. Falta una opción por rol (`client`, `craftsman`, `admin`): un cliente no debe abrir `/artesano/*` y un artesano no debe abrir las rutas de cliente. La base de datos ya lo impide (RLS), pero la pantalla debe redirigir y no mostrar un error de permisos.
+> **Hecho (rama `feat/cu-01-acceso`):** `soloPara(roles, render)` en `front/js/features/auth/guardia.js` envuelve el render de cada ruta (sin tocar `front/js/router.js`): sin sesión → `/acceso`, sin rol → `/acceso/rol`, otro rol → su inicio.
+`front/js/router.js` solo tiene `requiereSesion`. Falta una opción por rol (`client`, `craftsman`, `admin`): un cliente no debe abrir `/artesano/*` y un artesano no debe abrir las rutas de cliente. La base de datos ya lo impide (RLS), pero la pantalla debe redirigir y no mostrar un error de permisos.
 
 ### 1.3 Conectar al backend real
-1. Poner `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `js/config.js` (clave `anon`; la `service_role` nunca va en el frontend).
+1. Poner `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `front/js/config.js` (clave `anon`; la `service_role` nunca va en el frontend).
 2. Cambiar `USAR_API_SIMULADA` a `false`.
 3. Recorrer cada flujo con datos reales y reportar los errores de integración al backend con el nombre de la función y el `error.code`.
 4. Ocultar o quitar la ruta `/simulacion` (selector de rol de pruebas) cuando el modo no sea simulado.
@@ -39,20 +39,20 @@ Reglas a respetar:
 
 ### 2.1 Editar el perfil y mostrar fotos de perfil
 
-> **Hecho (rama `feat/cu-01-acceso`):** en parte. "Editar perfil" (Perfil del cliente y Mi taller) reutiliza `/acceso/perfil?desde=…` con nombre, edad, dirección y foto (`addAvatar`, `removeAvatar`, comprimida); la foto propia se muestra con `getAvatarUrl`. La foto de la contraparte (chat, lista de chats y Enviar presupuesto) se hizo en `feat/front-pendientes` con `crearAvatar` (`js/features/auth/avatar.js`), que guarda la URL firmada 50 min.
+> **Hecho (rama `feat/cu-01-acceso`):** en parte. "Editar perfil" (Perfil del cliente y Mi taller) reutiliza `/acceso/perfil?desde=…` con nombre, edad, dirección y foto (`addAvatar`, `removeAvatar`, comprimida); la foto propia se muestra con `getAvatarUrl`. La foto de la contraparte (chat, lista de chats y Enviar presupuesto) se hizo en `feat/front-pendientes` con `crearAvatar` (`front/js/features/auth/avatar.js`), que guarda la URL firmada 50 min.
 - `perfil-cliente.js` solo muestra nombre, edad y dirección ("Sin capturar"); no hay pantalla para editarlos (`updateMyProfile`, `saveMyClientPrivate`).
-- Subir, cambiar y quitar la foto de perfil: `addAvatar`, `removeAvatar`. Comprimir antes de subir (`js/lib/imagen.js`).
+- Subir, cambiar y quitar la foto de perfil: `addAvatar`, `removeAvatar`. Comprimir antes de subir (`front/js/lib/imagen.js`).
 - Mostrar las fotos de perfil (hoy solo hay iniciales): las fotos son **privadas**, así que cada ruta (`Perfil.avatar_path`, `Contraparte.avatar_path`) se convierte con `getAvatarUrl(path)` en una URL firmada que **caduca en 1 hora**. Hay que pedirla al mostrar y de nuevo si vence. Solo la ve el propio usuario y la contraparte con una solicitud que no sea borrador.
 
 ### 2.2 Notificaciones
 
-> **Hecho (rama `feat/front-pendientes`):** pantallas `/avisos` y `/artesano/avisos` (`js/features/requests/pages/avisos.js`) y campana con contador en vivo (`crearCampana` en `js/features/requests/avisos.js`) en Inicio, Solicitudes y Tablero. Cada tipo tiene texto y pantalla de destino; marcar uno o todos como leídos.
+> **Hecho (rama `feat/front-pendientes`):** pantallas `/avisos` y `/artesano/avisos` (`front/js/features/requests/pages/avisos.js`) y campana con contador en vivo (`crearCampana` en `front/js/features/requests/avisos.js`) en Inicio, Solicitudes y Tablero. Cada tipo tiene texto y pantalla de destino; marcar uno o todos como leídos.
 La campana de Inicio solo enlaza a `/pedidos`. Falta una pantalla de avisos con `listMyNotifications`, marcar una (`markNotificationRead`) o todas (`markAllNotificationsRead`) como leídas, el contador de la campana (`countUnreadNotifications`, que se mantiene al día con `subscribeToNotifications`) y la navegación según `type`. Tipos que existen: `request_received`, `quote_received`, `quote_accepted`, `quote_rejected`, `order_created`, `order_phase_changed`, `order_ready`, `order_delivered`, `review_received`, `request_cancelled`, `workshop_suspended`, `workshop_reactivated`.
 
 ### 2.3 Mensajes de error en español
 
-> **Hecho (rama `feat/cu-01-acceso`):** agregados en `js/ui/mensajes.js`.
-`js/ui/mensajes.js` no tiene mensaje para tres códigos del contrato: `invalid_code`, `auth_failed` y `role_already_set` (los usan las pantallas de acceso). Agregarlos con texto claro y corto en español, y mostrar siempre el texto con `textContent`, nunca como HTML.
+> **Hecho (rama `feat/cu-01-acceso`):** agregados en `front/js/ui/mensajes.js`.
+`front/js/ui/mensajes.js` no tiene mensaje para tres códigos del contrato: `invalid_code`, `auth_failed` y `role_already_set` (los usan las pantallas de acceso). Agregarlos con texto claro y corto en español, y mostrar siempre el texto con `textContent`, nunca como HTML.
 
 ### 2.4 Pantalla "Mi taller" del artesano
 
@@ -61,13 +61,13 @@ La campana de Inicio solo enlaza a `/pedidos`. Falta una pantalla de avisos con 
 
 ### 2.5 Búsqueda: usar los filtros del servidor
 
-> **Hecho (rama `feat/front-pendientes`):** `buscarTalleres` hace una sola consulta con `search`, `order` y servicio opcional (`parametrosDeBusqueda` en `js/features/map/componentes.js`); se quitaron el orden y el filtro por texto del navegador.
-Desde `0019`, `searchWorkshops` acepta `search` (texto en nombre o colonia), `order` (`distance`, `rating` o `price`) y un `service` opcional (sin él trae los de todos los servicios, sin repetirlos). El buscador "Buscar taller o colonia", el orden de la lista y la opción "Todos" pueden pasar a usar el servidor en lugar de ordenar, filtrar y unir dos consultas en el cliente (`buscarTalleres`, `ordenarTalleres` y `filtrarPorTexto` en `js/features/map/`). Así no se pierden resultados cuando hay más de 50 talleres.
+> **Hecho (rama `feat/front-pendientes`):** `buscarTalleres` hace una sola consulta con `search`, `order` y servicio opcional (`parametrosDeBusqueda` en `front/js/features/map/componentes.js`); se quitaron el orden y el filtro por texto del navegador.
+Desde `0019`, `searchWorkshops` acepta `search` (texto en nombre o colonia), `order` (`distance`, `rating` o `price`) y un `service` opcional (sin él trae los de todos los servicios, sin repetirlos). El buscador "Buscar taller o colonia", el orden de la lista y la opción "Todos" pueden pasar a usar el servidor en lugar de ordenar, filtrar y unir dos consultas en el cliente (`buscarTalleres`, `ordenarTalleres` y `filtrarPorTexto` en `front/js/features/map/`). Así no se pierden resultados cuando hay más de 50 talleres.
 
 ### 2.6 Panel de administración (CU-08)
 
-> **Hecho (rama `feat/front-pendientes`):** rutas `/admin`, `/admin/usuarios`, `/admin/talleres`, `/admin/resenas`, `/admin/solicitudes`, `/admin/pedidos` y `/admin/bitacora` (`js/features/admin/pages/`), solo para el rol `admin`. Acciones con confirmación y motivo opcional. En modo simulado se entra desde `/simulacion` → "Entrar como admin".
-Sin pantallas. El módulo `js/features/admin/` ya tiene `api.js` y `api.mock.js` listos y documentados en `docs/contrato-api.md` (sección CU-08): panel con totales, usuarios (listar, buscar, desactivar, reactivar), talleres (suspender, reactivar), reseñas (ocultar, restaurar), solicitudes y pedidos en solo lectura, y bitácora. Está pendiente que el equipo decida quién y cómo.
+> **Hecho (rama `feat/front-pendientes`):** rutas `/admin`, `/admin/usuarios`, `/admin/talleres`, `/admin/resenas`, `/admin/solicitudes`, `/admin/pedidos` y `/admin/bitacora` (`front/js/features/admin/pages/`), solo para el rol `admin`. Acciones con confirmación y motivo opcional. En modo simulado se entra desde `/simulacion` → "Entrar como admin".
+Sin pantallas. El módulo `front/js/features/admin/` ya tiene `api.js` y `api.mock.js` listos y documentados en `docs/contrato-api.md` (sección CU-08): panel con totales, usuarios (listar, buscar, desactivar, reactivar), talleres (suspender, reactivar), reseñas (ocultar, restaurar), solicitudes y pedidos en solo lectura, y bitácora. Está pendiente que el equipo decida quién y cómo.
 
 ## 3. Cosas que el backend NO soporta (no construirlas)
 - **Adjuntar fotos en el chat:** los mensajes son solo texto (máximo 2000 caracteres).
@@ -77,7 +77,7 @@ Sin pantallas. El módulo `js/features/admin/` ya tiene `api.js` y `api.mock.js`
 - **Contraseñas:** ver 1.1.
 
 ## 4. Calidad y entrega
-- **PWA:** hay íconos de 192 y 512 px (`purpose: any`); falta un ícono `maskable`. Subir `CACHE_VERSION` de `sw.js` cada vez que se agreguen archivos y añadir las pantallas nuevas a su lista. El service worker solo guarda la interfaz: nunca Supabase, mapas ni fotos.
+- **PWA:** hay íconos de 192 y 512 px (`purpose: any`); falta un ícono `maskable`. Subir `CACHE_VERSION` de `front/sw.js` cada vez que se agreguen archivos y añadir las pantallas nuevas a su lista. El service worker solo guarda la interfaz: nunca Supabase, mapas ni fotos.
 - **Rendimiento:** cargar en menos de 2 s con 3G/4G (medir con Chrome DevTools y Lighthouse).
 - **Diseño adaptable:** probar en móvil, tableta y escritorio (hay barra lateral en escritorio).
 - **Tipografías:** decidir si Poppins e Inter van como archivos locales o solo fuentes del sistema (duda abierta en `CLAUDE.md`).

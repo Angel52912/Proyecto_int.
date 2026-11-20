@@ -12,11 +12,11 @@ Antes de escribir código:
 
 Implementación:
 4. Rama `feat/<cu>-ui`.
-5. Mobile-first con los tokens de `css/tokens.css`; textos en español; una hoja CSS por pantalla.
+5. Mobile-first con los tokens de `front/css/tokens.css`; textos en español; una hoja CSS por pantalla.
 6. Trabaja contra `api.mock.js` (`USAR_API_SIMULADA = true`). **Nunca llames a Supabase directo**: solo importa el `api.js` del módulo.
 7. Texto del usuario siempre escapado (`textContent`, nunca `innerHTML`).
 8. Cada pantalla con estados de carga, vacío y error.
-9. Si el contrato no alcanza, **pide el cambio al backend** (Angel) en lugar de inventarlo. No edites `supabase/` ni `api.js` real.
+9. Si el contrato no alcanza, **pide el cambio al backend** (Angel) en lugar de inventarlo. No edites `back/supabase/` ni `api.js` real.
 
 Cierre:
 10. Corre `npm run lint` y `npm test` con salida mínima y corrige fallos.

@@ -8,7 +8,7 @@ model: sonnet
 Eres un revisor de seguridad enfocado solo en **RLS, Storage y funciones SQL**. No edites archivos.
 
 1. Lee las reglas de seguridad y la matriz de roles de `CLAUDE.md`.
-2. Revisa `supabase/migrations/`: cada tabla con RLS activo, `revoke` a `anon` cuando corresponda, `grant` mínimo,
+2. Revisa `back/supabase/migrations/`: cada tabla con RLS activo, `revoke` a `anon` cuando corresponda, `grant` mínimo,
    políticas por rol y por dueño, funciones `security definer` con `search_path = ''`.
 3. Revisa especialmente:
    - el usuario no puede cambiar su propio `role`;

@@ -1,10 +1,10 @@
-// Copia las librerías de navegador a js/vendor/ (sin CDN, para que la PWA no dependa de terceros).
+// Copia las librerías de navegador a front/js/vendor/ (sin CDN, para que la PWA no dependa de terceros).
 import { cpSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), "..");
-const destino = join(raiz, "js", "vendor");
+const destino = join(raiz, "front", "js", "vendor");
 
 /** @type {ReadonlyArray<{ origen: string, nombre: string }>} */
 const archivos = [
@@ -30,4 +30,4 @@ for (const { origen, nombre } of archivos) {
 }
 
 if (faltantes > 0) process.exit(1);
-console.log(`vendor: ${archivos.length} elementos copiados a js/vendor/`);
+console.log(`vendor: ${archivos.length} elementos copiados a front/js/vendor/`);
