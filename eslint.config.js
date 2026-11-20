@@ -5,7 +5,7 @@ export default [
   { ignores: ["node_modules/**", "front/js/vendor/**", "back/supabase/**", "coverage/**"] },
   js.configs.recommended,
   {
-    files: ["front/js/**/*.js", "apis/**/*.js", "front/sw.js"],
+    files: ["front/js/**/*.js", "apis/**/*.js", "sw.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
@@ -29,7 +29,7 @@ export default [
       "back/tests/**/*.js",
       "jest.config.js",
       "eslint.config.js",
-      "scripts/**/*.mjs",
+      "back/scripts/**/*.mjs",
     ],
     languageOptions: {
       ecmaVersion: 2022,

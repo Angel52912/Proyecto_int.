@@ -3,7 +3,7 @@ import { cpSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const raiz = join(dirname(fileURLToPath(import.meta.url)), "..");
+const raiz = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const destino = join(raiz, "front", "js", "vendor");
 
 /** @type {ReadonlyArray<{ origen: string, nombre: string }>} */
