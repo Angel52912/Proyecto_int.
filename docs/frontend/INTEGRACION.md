@@ -22,7 +22,7 @@ De Milton se conserva:
 - Esta carpeta `docs/frontend/` completa (las fases y la lógica detectada).
 - Todo su historial: `feature/frontend` está fusionada como padre del commit de integración, así que su código (`front/js/components/`, `front/js/mocks/` y los `view.js` por módulo) sigue en la historia de Git. Para verlo: `git show origin/feature/frontend:js/features/map/view.js`.
 
-No se llevó al árbol de trabajo (Abraham ya lo cubre con el contrato): `front/js/components/`, `front/js/mocks/`, los `view.js` de Milton, sus tokens y estilos de pantalla, y el cambio de `<main id="app">` a `<div>` en `front/index.html` (el diseño de Abraham necesita el `<main>`).
+No se llevó al árbol de trabajo (Abraham ya lo cubre con el contrato): `front/js/components/`, `front/js/mocks/`, los `view.js` de Milton, sus tokens y estilos de pantalla, y el cambio de `<main id="app">` a `<div>` en `index.html` (el diseño de Abraham necesita el `<main>`).
 
 La rama `revert-9-feature/frontend` (un `Revert` del PR #9) **no se fusiona**: deshacería el trabajo de Milton que se conserva en el historial.
 

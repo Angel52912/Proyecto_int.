@@ -1,31 +1,35 @@
-# `front/` — interfaz de la PWA
+# `front/` — diseño e interfaz de la PWA
 
-Aquí vive **todo lo que se ve y ejecuta en el navegador**. Antes de esta reorganización,
-estos archivos estaban en la raíz del repositorio (`index.html`, `css/`, `js/`, `icons/`,
-`manifest.webmanifest` y `sw.js`).
+Todo lo que se ve y ejecuta en el navegador. El punto de entrada (`index.html`), el
+`manifest.webmanifest` y el `sw.js` están en la [raíz](../README.md) para que el sitio se
+sirva desde ahí; las librerías y los datos viven en `apis/`.
 
 ## Qué hay aquí
 
 | Ruta | Contenido |
 | --- | --- |
-| `index.html` | Entrada de la PWA; carga `css/` y `js/` con rutas **relativas**. |
-| `manifest.webmanifest` | Configuración de instalación; íconos en `icons/`. |
-| `sw.js` | Service worker: solo cachea la interfaz (nunca Supabase, tiles ni fotos). |
 | `css/` | Tokens, componentes y una hoja por pantalla. |
 | `icons/` | Íconos 192 y 512 px de la PWA. |
-| `js/` | Router, configuración, `lib/`, `ui/` y `features/<modulo>/`. |
-| `js/vendor/` | Generado por `npm run vendor` (no se versiona). |
+| `js/app.js` | Arranque de la app y carga del cliente de Supabase. |
+| `js/router.js` | Router por hash. |
+| `js/ui/` | Componentes compartidos de interfaz (mensajes, sesión, etc.). |
+| `js/features/<modulo>/` | `routes.js`, `index.js` (elige API real/simulada), `pages/`, `componentes.js` y lógica de presentación. |
+| `js/lib/` | Utilidades de la interfaz (escape, fechas, imágenes, formato MXN). |
+| `js/vendor/` | Generado por `npm run vendor`; no se versiona. |
 | `tests/unit/` | Pruebas Jest/jsdom de la interfaz. |
 
 ## Qué NO hay aquí
 
-- Migraciones SQL, `seed.sql` ni pruebas RLS: están en [`../back/`](../back/README.md).
-- Configuración compartida (`package.json`, `jest.config.js`, `eslint.config.js`): está en la raíz.
+- Los `api.js`, `api.mock.js`, `config.js`, `supabaseClient.js` ni las validaciones del
+  contrato: están en [`../apis/`](../apis/README.md). Las pantallas los consumen mediante
+  `front/js/features/<modulo>/index.js`.
+- SQL, migraciones, RLS ni pruebas de permisos: están en [`../back/`](../back/README.md).
+- Configuración de npm y de lint: está en la raíz.
 
 ## Cómo servirlo
 
-Desde la raíz del repositorio: `npm run dev` → http://localhost:5500
-(el script sirve esta carpeta, así que `index.html` queda en la raíz del sitio).
+Desde la raíz: `npm run dev` → http://localhost:5500 (el servidor sirve la raíz, donde
+está `index.html`).
 
-> `index.html`, `manifest.webmanifest` y `sw.js` usan rutas relativas: muévelos siempre
-> juntos o habría que corregir sus rutas.
+> Al mover o renombrar un módulo hay que actualizar a la vez la lista `INTERFAZ` de
+> `../sw.js`: si un archivo falta ahí, la PWA no funciona sin red.

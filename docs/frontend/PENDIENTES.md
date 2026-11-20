@@ -1,6 +1,6 @@
 # Pendientes del frontend
 
-Estado a 16 nov 2026. El backend (CU-01 a CU-08 y las migraciones `0001` a `0020`) está implementado; `0019` y `0020` se aplican con confirmación de Angel (ver `docs/operacion/`). El contrato de cada función está en `docs/contrato-api.md`. Hoy el frontend corre **solo con el simulado** (`USAR_API_SIMULADA = true` en `front/js/config.js`) y nunca se ha probado contra Supabase.
+Estado a 16 nov 2026. El backend (CU-01 a CU-08 y las migraciones `0001` a `0020`) está implementado; `0019` y `0020` se aplican con confirmación de Angel (ver `docs/operacion/`). El contrato de cada función está en `docs/contrato-api.md`. Hoy el frontend corre **solo con el simulado** (`USAR_API_SIMULADA = true` en `apis/config.js`) y nunca se ha probado contra Supabase.
 
 Lo que ya hay: 26 rutas de cliente y artesano (inicio, mapa Leaflet, talleres, perfil del taller, solicitar cotización, chat, presupuesto, seguimiento, recoger con QR y PIN, calificar, mis pedidos; y del artesano: su taller, solicitudes, enviar presupuesto, chats, tablero, actualizar fase, verificar entrega), con estados de carga, error y vacío, y pruebas.
 
@@ -21,7 +21,7 @@ Reglas a respetar:
 - **No hay contraseña.** El diseño dice "nombre, correo, contraseña", pero el backend solo usa Google y el código de 6 dígitos por correo. Hay que quitar el campo de contraseña del diseño.
 - A1 (credenciales): mostrar el error según `error.code` (`invalid_code`, `auth_failed`, `rate_limited`, `invalid_input`).
 - Después de entrar, decidir el destino con `getMyProfile()`: sin rol → pantalla 4; con rol pero sin nombre → pantalla 5; cliente → `/`; artesano → `/artesano/tablero`; admin → panel del admin.
-- Google vuelve a la app por PKCE: el callback se procesa antes del router (ver `front/js/supabaseClient.js`).
+- Google vuelve a la app por PKCE: el callback se procesa antes del router (ver `apis/supabaseClient.js`).
 
 ### 1.2 Guardia por rol en el router
 
@@ -29,7 +29,7 @@ Reglas a respetar:
 `front/js/router.js` solo tiene `requiereSesion`. Falta una opción por rol (`client`, `craftsman`, `admin`): un cliente no debe abrir `/artesano/*` y un artesano no debe abrir las rutas de cliente. La base de datos ya lo impide (RLS), pero la pantalla debe redirigir y no mostrar un error de permisos.
 
 ### 1.3 Conectar al backend real
-1. Poner `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `front/js/config.js` (clave `anon`; la `service_role` nunca va en el frontend).
+1. Poner `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `apis/config.js` (clave `anon`; la `service_role` nunca va en el frontend).
 2. Cambiar `USAR_API_SIMULADA` a `false`.
 3. Recorrer cada flujo con datos reales y reportar los errores de integración al backend con el nombre de la función y el `error.code`.
 4. Ocultar o quitar la ruta `/simulacion` (selector de rol de pruebas) cuando el modo no sea simulado.
@@ -77,7 +77,7 @@ Sin pantallas. El módulo `front/js/features/admin/` ya tiene `api.js` y `api.mo
 - **Contraseñas:** ver 1.1.
 
 ## 4. Calidad y entrega
-- **PWA:** hay íconos de 192 y 512 px (`purpose: any`); falta un ícono `maskable`. Subir `CACHE_VERSION` de `front/sw.js` cada vez que se agreguen archivos y añadir las pantallas nuevas a su lista. El service worker solo guarda la interfaz: nunca Supabase, mapas ni fotos.
+- **PWA:** hay íconos de 192 y 512 px (`purpose: any`); falta un ícono `maskable`. Subir `CACHE_VERSION` de `sw.js` cada vez que se agreguen archivos y añadir las pantallas nuevas a su lista. El service worker solo guarda la interfaz: nunca Supabase, mapas ni fotos.
 - **Rendimiento:** cargar en menos de 2 s con 3G/4G (medir con Chrome DevTools y Lighthouse).
 - **Diseño adaptable:** probar en móvil, tableta y escritorio (hay barra lateral en escritorio).
 - **Tipografías:** decidir si Poppins e Inter van como archivos locales o solo fuentes del sistema (duda abierta en `CLAUDE.md`).

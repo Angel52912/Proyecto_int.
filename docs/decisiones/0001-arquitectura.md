@@ -6,7 +6,7 @@ Estado: aprobada el 2026-11-12. Alcance: CU-01 a CU-08. Sin servidor propio: tod
 
 | # | Decisión |
 |---|---|
-| D1 | Docker solo para quien escribe migraciones y pruebas RLS (Supabase local). El resto del equipo trabaja con `api.js` simulado (`front/js/features/<modulo>/api.mock.js`) y `USAR_API_SIMULADA = true` en `front/js/config.js`. |
+| D1 | Docker solo para quien escribe migraciones y pruebas RLS (Supabase local). El resto del equipo trabaja con `api.js` simulado (`apis/api-mixanab/<modulo>/api.mock.js`) y `USAR_API_SIMULADA = true` en `apis/config.js`. |
 | D2 | Los grants del esquema `private` se verifican con una prueba RLS (ver sección 5). |
 | D3 | Sin `pg_cron`, sin CI y sin typecheck por ahora. Los borradores de solicitud huérfanos se limpian a mano. |
 | D4 | El service worker solo cachea la interfaz (HTML, CSS, JS, íconos). Nunca cachea Supabase, tiles del mapa ni fotos (privadas o públicas). |
@@ -131,7 +131,7 @@ Verificación obligatoria (prueba en `back/tests/rls/grants.test.js`, escrita ju
 Estado actual: aún no existen migraciones, así que los grants no se pueden verificar. Quedan como requisito de `0001_base`.
 
 ## 6. Service worker (D4)
-- Precachea solo la interfaz: `front/index.html`, `front/manifest.webmanifest`, `front/css/`, `front/js/` (incluye `front/js/vendor/`) e `front/icons/`.
+- Precachea solo la interfaz: `index.html`, `manifest.webmanifest`, `front/css/`, `front/js/` (incluye `front/js/vendor/`), `apis/` e `front/icons/`.
 - Ignora toda petición de otro origen (Supabase, tiles de OSM) y toda petición que no sea GET. No llama a `respondWith` en esos casos.
 - Las rutas same-origin que no están en la lista van a red sin guardarse en caché.
 - Las fotos nunca se guardan: ni las privadas (firmadas, de Supabase) ni las públicas.
@@ -143,7 +143,7 @@ Ver `CLAUDE.md` para la estructura y comandos vigentes. Reglas:
 - Una hoja CSS por pantalla.
 - `@supabase/supabase-js` y `leaflet` se copian a `front/js/vendor/` con `npm run vendor` (se ejecuta en `postinstall`). `front/js/vendor/` está en `.gitignore`.
 - Router por hash (`#/ruta`); el callback PKCE de OAuth se procesa antes del router.
-- CSP por `<meta>` en `front/index.html`.
+- CSP por `<meta>` en `index.html`.
 - La CLI de Supabase no es dependencia: se invoca con `npx supabase` solo en los scripts `db:*`. No existe script de `db push`.
 
 ## 8. Etapas y reparto

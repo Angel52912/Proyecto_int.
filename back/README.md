@@ -10,12 +10,14 @@ estaba en `supabase/` y las pruebas de permisos en `tests/rls/` y `tests/helpers
 | [`supabase/`](supabase/README.md) | `migrations/` (SQL versionado, una migración por CU) y `seed.sql` (solo desarrollo/pruebas). |
 | `tests/rls/` | Pruebas Jest de permisos por rol (cliente, artesano, admin, sin rol, anónimo). |
 | `tests/helpers/` | `db.js` (transacciones, roles y Storage), `escenarios.js` (solicitudes y pedidos) y datos de `presupuestos.js`/`solicitudes.js`. |
+| [`scripts/`](scripts/README.md) | `vendor.mjs`, usado por `npm run vendor` y por `postinstall`. |
 
 ## Qué NO hay aquí
 
 - Pantallas, CSS ni módulos de interfaz: están en [`../front/`](../front/README.md).
-- Los `api.js`/`api.mock.js` siguen en `front/js/features/<modulo>/` porque son el contrato
-  que consume el navegador (la lógica sensible vive en funciones SQL de `supabase/`).
+- Los `api.js`/`api.mock.js` están en [`../apis/`](../apis/README.md): son el contrato que
+  consume el navegador (la lógica sensible vive en funciones SQL de `supabase/`).
+  `front/` nunca importa de `back/`.
 - La `service_role`: nunca se guarda aquí ni en el frontend.
 
 ## Comandos

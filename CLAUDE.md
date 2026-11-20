@@ -12,7 +12,7 @@ seguimiento en 4 fases, entrega con PIN/QR y calificación.
 
 ## Equipo y responsabilidades
 
-- **Angel Rosado:** todo el backend. Dueño de `back/supabase/` (migraciones, RLS, funciones SQL, Storage), `front/js/features/*/api.js` y `front/js/supabaseClient.js`.
+- **Angel Rosado:** todo el backend. Dueño de `back/supabase/` (migraciones, RLS, funciones SQL, Storage), `apis/api-inicio-sesion/` y `apis/api-mixanab/` (los `api.js`) y `apis/supabaseClient.js`.
 - **Milton:** frontend (pantallas, `front/css/` y `front/js/features/*/pages` de su parte).
 - **Abraham:** frontend (igual, de su parte).
 - **José Cárdenas:** pruebas del backend. Dueño de `back/tests/rls/` y de la colección de Postman.
@@ -21,7 +21,8 @@ Reparto de pantallas propuesto: Milton = Acceso + Artesano + Admin; Abraham = Cl
 El chat lo construye Abraham como componente reutilizable y Milton lo reutiliza.
 
 Reglas de convivencia:
-- El frontend trabaja contra el `api.js` simulado (modo `USAR_API_SIMULADA` de `front/js/config.js`), siguiendo `docs/contrato-api.md`. Cuando el backend de un CU se fusiona, se cambia a la versión real.
+- El frontend trabaja contra el `api.js` simulado (modo `USAR_API_SIMULADA` de `apis/config.js`), siguiendo `docs/contrato-api.md`. Cuando el backend de un CU se fusiona, se cambia a la versión real.
+- La interfaz (`front/`) importa `apis/`, nunca `back/`: el back responde vía Supabase y la capa `apis/`.
 - Nadie del frontend edita `back/supabase/`; nadie del backend edita `front/css/` ni pantallas, salvo acuerdo.
 - Todo cambio al contrato (nombres, parámetros, errores) se actualiza en `docs/contrato-api.md` en el mismo commit.
 - Solo Angel aplica migraciones al proyecto de desarrollo de Supabase. José prueba en un proyecto de pruebas aparte.
@@ -51,22 +52,30 @@ Reglas de convivencia:
 ## Estructura
 
 ```
-/front/      # PWA: README.md, index.html, manifest.webmanifest, sw.js, icons/
+index.html  manifest.webmanifest  sw.js   # entrada y PWA (raíz del sitio)
+README.md   CLAUDE.md                      # guía del proyecto y reglas del equipo
+/front/      # diseño e interfaz: README.md, css/, icons/, js/, tests/unit/
   css/       # tokens.css (colores y tipografía), components.css, una hoja por pantalla
   js/
-    app.js  router.js  supabaseClient.js  config.js
-    features/<modulo>/   # auth, map, requests, chat, quotes, orders, workshop, admin
-                         # routes.js (rutas), api.js (único que toca Supabase), api.mock.js, view.js
-    lib/                 # escape de texto, validaciones, formato MXN
+    app.js  router.js
+    ui/                  # componentes compartidos de interfaz
+    features/<modulo>/   # routes.js, index.js (elige real/simulado), pages/, componentes.js
+    lib/                 # escape de texto, fechas, imágenes, formato MXN
     vendor/              # generado por `npm run vendor`; no se versiona
   tests/unit/            # pruebas Jest de la interfaz
-/back/       # Base de datos y permisos: README.md
+/apis/       # capa de datos del navegador: README.md
+  config.js  supabaseClient.js
+  lib/                   # ApiError y validaciones del contrato
+  api-inicio-sesion/     # auth: api.js, api.mock.js, validar.js
+  api-mixanab/<modulo>/  # map, requests, chat, quotes, orders, workshop, admin
+                         # api.js, api.mock.js, validar.js y simulacion.js
+/back/       # base de datos y permisos: README.md
   supabase/
     migrations/          # SQL versionado (una migración por CU)
     seed.sql             # solo desarrollo y pruebas
   tests/rls/             # pruebas de permisos RLS
   tests/helpers/         # utilidades para pruebas de base de datos
-/scripts/    # utilidades de npm (vendor)
+  scripts/vendor.mjs     # copia librerías a front/js/vendor/
 /docs/       # requisitos.md, diseno.md, decisiones/
 ```
 
@@ -106,7 +115,7 @@ La PWA debe cargar en menos de 2 s con 3G/4G.
 1. Leer el CU en `docs/requisitos.md` y las pantallas en `docs/diseno.md`.
 2. Plan breve (modo plan) antes de escribir código.
 3. Migración SQL con RLS (solo quien tiene Docker), lógica, pantallas y pruebas Jest (incluye pruebas de permisos por rol).
-   Quien no tiene Docker trabaja con `api.mock.js` y `USAR_API_SIMULADA = true` en `front/js/config.js`.
+   Quien no tiene Docker trabaja con `api.mock.js` y `USAR_API_SIMULADA = true` en `apis/config.js`.
 4. Correr lint y pruebas, y marcar el checklist del CU.
 5. Una rama por CU (`feat/cu-03-cotizacion`) con varios commits pequeños (ver "Commits").
 
