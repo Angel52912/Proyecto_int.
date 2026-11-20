@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, crearUsuarioFactory } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 const UUID_A = "11111111-1111-4111-8111-111111111111";
@@ -8,8 +8,6 @@ const UUID_B = "22222222-2222-4222-8222-222222222222";
 describe("workshop_photos y Storage", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `fotos-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -20,11 +18,7 @@ describe("workshop_photos y Storage", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /**
    * @param {string} owner

@@ -1,12 +1,10 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { PERMISO_DENEGADO, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-03: submit_request y cancel_request (flujo principal y alternos). Los errores viajan en el mensaje. */
 describe("submit_request y cancel_request", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `funciones-sol-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -17,11 +15,7 @@ describe("submit_request y cancel_request", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** @param {"draft" | "open" | "quoted" | "accepted" | "declined" | "cancelled"} [status] */
   async function escenario(status = "draft") {

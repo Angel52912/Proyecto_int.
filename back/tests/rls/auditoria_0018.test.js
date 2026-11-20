@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -18,11 +18,7 @@ describe("auditoría 0018", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, `${marca()}@prueba.test`);
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** Taller publicado con colonia única, y un cliente. */
   async function escenario() {

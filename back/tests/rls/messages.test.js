@@ -1,12 +1,10 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-03: chat (messages), notificaciones y publicación Realtime. */
 describe("messages, notifications y Realtime", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `chat-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -17,11 +15,7 @@ describe("messages, notifications y Realtime", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** @param {"draft" | "open" | "quoted" | "accepted" | "declined" | "cancelled"} [status] */
   async function escenario(status = "open") {

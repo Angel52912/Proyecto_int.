@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -6,8 +6,6 @@ import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpe
 describe("quotes y orders: RLS", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `quotes-orders-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -18,11 +16,7 @@ describe("quotes y orders: RLS", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** Solicitud aceptada con su presupuesto y su orden, más usuarios ajenos de cada rol. */
   async function escenario() {

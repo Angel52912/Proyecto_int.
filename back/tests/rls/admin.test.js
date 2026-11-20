@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -10,7 +10,6 @@ describe("administración (CU-08)", () => {
   const AJENA = "99999999-9999-4999-8999-999999999999";
   // Ancho fijo: una marca nunca es prefijo de otra (las búsquedas son por subcadena).
   const marca = () => `adm${Date.now()}x${String(n++).padStart(5, "0")}`;
-  const correo = () => `${marca()}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -21,12 +20,7 @@ describe("administración (CU-08)", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol @param {string} [nombre] */
-  async function usuarioConRol(rol, nombre) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    if (nombre) await c.query("update public.profiles set full_name = $2 where id = $1", [uid, nombre]);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** Llama a una función de public como el usuario actual. */
   const llamar = (/** @type {string} */ funcion, /** @type {unknown[]} */ args = []) =>

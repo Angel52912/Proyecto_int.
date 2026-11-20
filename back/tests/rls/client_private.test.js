@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 
@@ -6,8 +6,6 @@ const PERMISO_DENEGADO = "42501";
 describe("client_private", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `privado-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -18,11 +16,7 @@ describe("client_private", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   test("el cliente hace CRUD de sus propios datos", async () => {
     const uid = await usuarioConRol("client");

@@ -1,12 +1,10 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage, sinAcceso } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
 import { PERMISO_DENEGADO, UUID_A, UUID_B, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-01: bucket privado avatars y la restricción de profiles.avatar_path (migración 0017). */
 describe("fotos de perfil (bucket avatars)", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `avatar-${Date.now()}-${n++}@prueba.test`;
   const UUID_C = "33333333-3333-4333-8333-333333333333";
   const UUID_D = "44444444-4444-4444-8444-444444444444";
 
@@ -19,11 +17,7 @@ describe("fotos de perfil (bucket avatars)", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   const subir = (/** @type {string} */ ruta) => intentar(c, "insert into storage.objects (bucket_id, name) values ('avatars', $1) returning id", [ruta]);
   const leer = (/** @type {string} */ ruta) => intentar(c, "select id from storage.objects where bucket_id = 'avatars' and name = $1", [ruta]);

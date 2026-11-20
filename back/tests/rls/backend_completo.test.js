@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, crearUsuarioFactory } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, UUID_A, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -20,11 +20,7 @@ describe("backend completo (0019 y 0020)", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, `${marca()}@prueba.test`);
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** Taller publicado con colonia única (y nombre indicado). */
   async function taller(/** @type {string} */ colonia, /** @type {Record<string, unknown>} */ extra = {}) {

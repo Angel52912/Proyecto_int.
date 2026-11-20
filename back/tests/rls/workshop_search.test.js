@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { PERMISO_DENEGADO } from "../helpers/solicitudes.js";
 
 /** CU-02: search_workshops, get_workshop_profile y los helpers de horario y distancia. */
@@ -6,7 +6,6 @@ describe("búsqueda de talleres (CU-02)", () => {
   /** @type {import("pg").Client} */
   let c;
   let n = 0;
-  const correo = () => `busqueda-${Date.now()}-${n++}@prueba.test`;
   const AJENA = "99999999-9999-4999-8999-999999999999";
   const TODO_EL_DIA = { mon: [{ open: "00:00", close: "23:59" }], tue: [{ open: "00:00", close: "23:59" }], wed: [{ open: "00:00", close: "23:59" }], thu: [{ open: "00:00", close: "23:59" }], fri: [{ open: "00:00", close: "23:59" }], sat: [{ open: "00:00", close: "23:59" }], sun: [{ open: "00:00", close: "23:59" }] };
   const CENTRO = { lat: 20.9674, lng: -89.5926 };
@@ -20,11 +19,7 @@ describe("búsqueda de talleres (CU-02)", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /**
    * Inserta un taller como superusuario. `colonia` único por prueba para aislar los resultados de otros datos.

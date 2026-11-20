@@ -1,11 +1,10 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentarBorradoStorage, intentar, sinAcceso } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentarBorradoStorage, intentar, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
 import { UUID_A, UUID_B, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** Migración 0022: el artesano dueño lee y por tanto puede borrar los archivos de su carpeta en workshop-photos. */
 describe("workshop-photos: lectura del dueño (0022)", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -16,11 +15,7 @@ describe("workshop-photos: lectura del dueño (0022)", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, `wps-${Date.now()}-${n++}@prueba.test`);
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   async function conArchivo() {
     const artesano = await usuarioConRol("craftsman");

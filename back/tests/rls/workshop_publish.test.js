@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 const HORARIO = JSON.stringify({ mon: [{ open: "09:00", close: "18:00" }] });
@@ -7,8 +7,6 @@ const HORARIO = JSON.stringify({ mon: [{ open: "09:00", close: "18:00" }] });
 describe("publicar taller", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `publicar-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -19,11 +17,7 @@ describe("publicar taller", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** Artesano con taller completo (borrador). */
   async function artesanoConTallerCompleto() {

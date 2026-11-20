@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -6,8 +6,6 @@ import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpe
 describe("PIN de entrega (CU-06)", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `pin-${Date.now()}-${n++}@prueba.test`;
   const AJENA = "99999999-9999-4999-8999-999999999999";
 
   beforeAll(async () => {
@@ -19,11 +17,7 @@ describe("PIN de entrega (CU-06)", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** Cliente, artesano, taller y una orden con el estado indicado (fase 4). */
   async function escenario(status = "ready") {

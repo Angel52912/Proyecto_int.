@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { crearPresupuesto, fechaFutura } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -6,8 +6,6 @@ import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpe
 describe("send_quote, respond_quote y cancel_request", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `funciones-quote-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -18,11 +16,7 @@ describe("send_quote, respond_quote y cancel_request", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /** @param {"draft" | "open" | "quoted" | "accepted" | "declined" | "cancelled"} [status] */
   async function escenario(status = "open") {

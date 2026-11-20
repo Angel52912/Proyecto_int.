@@ -1,12 +1,10 @@
-import { abrirTransaccion, actuarComo, asignarRol, cerrarTransaccion, crearUsuario, intentar, intentarBorradoStorage, sinAcceso } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
 import { PERMISO_DENEGADO, UUID_A, UUID_B, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-03: fotos de la solicitud (tabla request_photos y bucket privado request-photos). */
 describe("request_photos y Storage", () => {
   /** @type {import("pg").Client} */
   let c;
-  let n = 0;
-  const correo = () => `fotos-sol-${Date.now()}-${n++}@prueba.test`;
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -17,11 +15,7 @@ describe("request_photos y Storage", () => {
   });
 
   /** @param {"client" | "craftsman" | "admin" | null} rol */
-  async function usuarioConRol(rol) {
-    const uid = await crearUsuario(c, correo());
-    if (rol) await asignarRol(c, uid, rol);
-    return uid;
-  }
+  const usuarioConRol = crearUsuarioFactory(c);
 
   /**
    * Escenario base: cliente, artesano dueño y una solicitud con el estado indicado.

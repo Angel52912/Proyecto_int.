@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import pg from "pg";
 
@@ -55,6 +56,31 @@ export async function crearUsuario(cliente, correo, metadata = {}) {
     [correo, JSON.stringify(metadata)],
   );
   return rows[0].id;
+}
+
+/**
+ * Crea un usuario con el rol indicado (o sin rol) y, si se da, le asigna nombre.
+ * @param {pg.Client} cliente
+ * @param {"client" | "craftsman" | "admin" | null} rol
+ * @param {{ correo?: string, nombre?: string }} [opciones]
+ * @returns {Promise<string>}
+ */
+export async function crearUsuarioConRol(cliente, rol, opciones = {}) {
+  const uid = await crearUsuario(cliente, opciones.correo ?? `${randomUUID()}@prueba.test`);
+  if (rol) await asignarRol(cliente, uid, rol);
+  if (opciones.nombre) {
+    await cliente.query("update public.profiles set full_name = $2 where id = $1", [uid, opciones.nombre]);
+  }
+  return uid;
+}
+
+/**
+ * Devuelve `usuarioConRol(rol, nombre)` ligado a una conexión para no repetirlo en cada archivo de pruebas.
+ * @param {pg.Client} cliente
+ * @returns {(rol: "client" | "craftsman" | "admin" | null, nombre?: string) => Promise<string>}
+ */
+export function crearUsuarioFactory(cliente) {
+  return (rol, nombre) => crearUsuarioConRol(cliente, rol, { nombre });
 }
 
 /**
