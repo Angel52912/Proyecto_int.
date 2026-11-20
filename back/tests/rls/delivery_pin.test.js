@@ -1,6 +1,6 @@
 import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
-import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
-import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { PERMISO_DENEGADO } from "../helpers/solicitudes.js";
+import { crearEscenarioPedido } from "../helpers/escenarios.js";
 
 /** CU-06: private.order_pins, reveal_delivery_pin y verify_delivery_pin (flujo principal y alternos). */
 describe("PIN de entrega (CU-06)", () => {
@@ -20,16 +20,7 @@ describe("PIN de entrega (CU-06)", () => {
   const usuarioConRol = crearUsuarioFactory(c);
 
   /** Cliente, artesano, taller y una orden con el estado indicado (fase 4). */
-  async function escenario(status = "ready") {
-    const cliente = await usuarioConRol("client");
-    const artesano = await usuarioConRol("craftsman");
-    const taller = await crearTallerPublicado(c, artesano);
-    const solicitud = await crearSolicitud(c, cliente, taller, "accepted");
-    const quote = await crearPresupuesto(c, solicitud, "accepted");
-    const orden = await crearOrden(c, { quote, request: solicitud, cliente, taller });
-    await c.query("update public.orders set phase = 4, status = $2::public.order_status where id = $1", [orden, status]);
-    return { cliente, artesano, taller, solicitud, orden };
-  }
+  const escenario = (status = "ready") => crearEscenarioPedido(c, { fase: 4, statusOrden: status });
 
   /** El cliente genera el PIN. @returns {Promise<string>} */
   async function revelar(/** @type {string} */ cliente, /** @type {string} */ orden) {

@@ -1,6 +1,6 @@
 import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
-import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
-import { PERMISO_DENEGADO, UUID_A, UUID_B, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { PERMISO_DENEGADO, UUID_A, UUID_B } from "../helpers/solicitudes.js";
+import { crearEscenarioPedido } from "../helpers/escenarios.js";
 
 /** CU-05: order_updates, advance_phase, mark_ready y bucket progress-photos (flujo principal y alternos). */
 describe("fases del pedido (CU-05)", () => {
@@ -20,16 +20,7 @@ describe("fases del pedido (CU-05)", () => {
   const usuarioConRol = crearUsuarioFactory(c);
 
   /** Cliente, artesano, taller y una orden `in_progress` en la fase indicada. */
-  async function escenario(fase = 1) {
-    const cliente = await usuarioConRol("client");
-    const artesano = await usuarioConRol("craftsman");
-    const taller = await crearTallerPublicado(c, artesano);
-    const solicitud = await crearSolicitud(c, cliente, taller, "accepted");
-    const quote = await crearPresupuesto(c, solicitud, "accepted");
-    const orden = await crearOrden(c, { quote, request: solicitud, cliente, taller });
-    if (fase !== 1) await c.query("update public.orders set phase = $2 where id = $1", [orden, fase]);
-    return { cliente, artesano, taller, solicitud, orden };
-  }
+  const escenario = (fase = 1) => crearEscenarioPedido(c, { fase });
 
   /** Simula un archivo ya subido a Storage (como superusuario) y devuelve su ruta. */
   async function subirArchivo(/** @type {string} */ orden, uuid = UUID_A) {

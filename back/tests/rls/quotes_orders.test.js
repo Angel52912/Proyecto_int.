@@ -1,6 +1,7 @@
 import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
-import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { PERMISO_DENEGADO, crearSolicitud } from "../helpers/solicitudes.js";
+import { crearEscenarioPedido } from "../helpers/escenarios.js";
 
 /** CU-04: permisos de las tablas quotes y orders (solo lectura para participantes). */
 describe("quotes y orders: RLS", () => {
@@ -20,19 +21,10 @@ describe("quotes y orders: RLS", () => {
 
   /** Solicitud aceptada con su presupuesto y su orden, más usuarios ajenos de cada rol. */
   async function escenario() {
-    const cliente = await usuarioConRol("client");
-    const artesano = await usuarioConRol("craftsman");
-    const taller = await crearTallerPublicado(c, artesano);
-    const request = await crearSolicitud(c, cliente, taller, "accepted");
-    const quote = await crearPresupuesto(c, request, "accepted");
-    const orden = await crearOrden(c, { quote, request, cliente, taller });
+    const e = await crearEscenarioPedido(c);
     return {
-      cliente,
-      artesano,
-      taller,
-      request,
-      quote,
-      orden,
+      ...e,
+      request: e.solicitud,
       otroCliente: await usuarioConRol("client"),
       otroArtesano: await usuarioConRol("craftsman"),
       admin: await usuarioConRol("admin"),

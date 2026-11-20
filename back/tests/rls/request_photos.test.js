@@ -1,5 +1,6 @@
 import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
-import { PERMISO_DENEGADO, UUID_A, UUID_B, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { PERMISO_DENEGADO, UUID_A, UUID_B, agregarFoto, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { crearEscenarioSolicitud } from "../helpers/escenarios.js";
 
 /** CU-03: fotos de la solicitud (tabla request_photos y bucket privado request-photos). */
 describe("request_photos y Storage", () => {
@@ -21,13 +22,7 @@ describe("request_photos y Storage", () => {
    * Escenario base: cliente, artesano dueño y una solicitud con el estado indicado.
    * @param {"draft" | "open" | "quoted" | "accepted" | "declined" | "cancelled"} [status]
    */
-  async function escenario(status = "draft") {
-    const cliente = await usuarioConRol("client");
-    const artesano = await usuarioConRol("craftsman");
-    const taller = await crearTallerPublicado(c, artesano);
-    const solicitud = await crearSolicitud(c, cliente, taller, status);
-    return { cliente, artesano, solicitud };
-  }
+  const escenario = (status = "draft") => crearEscenarioSolicitud(c, status);
 
   /**
    * @param {string} solicitud

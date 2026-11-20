@@ -1,5 +1,6 @@
 import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
 import { PERMISO_DENEGADO, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { crearEscenarioSolicitud } from "../helpers/escenarios.js";
 
 /** CU-03: submit_request y cancel_request (flujo principal y alternos). Los errores viajan en el mensaje. */
 describe("submit_request y cancel_request", () => {
@@ -18,13 +19,7 @@ describe("submit_request y cancel_request", () => {
   const usuarioConRol = crearUsuarioFactory(c);
 
   /** @param {"draft" | "open" | "quoted" | "accepted" | "declined" | "cancelled"} [status] */
-  async function escenario(status = "draft") {
-    const cliente = await usuarioConRol("client");
-    const artesano = await usuarioConRol("craftsman");
-    const taller = await crearTallerPublicado(c, artesano);
-    const solicitud = await crearSolicitud(c, cliente, taller, status);
-    return { cliente, artesano, taller, solicitud };
-  }
+  const escenario = (status = "draft") => crearEscenarioSolicitud(c, status);
 
   /** @param {string} solicitud */
   const enviar = (solicitud) => intentar(c, "select public.submit_request($1) as r", [solicitud]);

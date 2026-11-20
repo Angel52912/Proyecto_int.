@@ -1,5 +1,6 @@
 import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
-import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { PERMISO_DENEGADO, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { crearEscenarioSolicitud } from "../helpers/escenarios.js";
 
 /** CU-03: chat (messages), notificaciones y publicación Realtime. */
 describe("messages, notifications y Realtime", () => {
@@ -18,13 +19,7 @@ describe("messages, notifications y Realtime", () => {
   const usuarioConRol = crearUsuarioFactory(c);
 
   /** @param {"draft" | "open" | "quoted" | "accepted" | "declined" | "cancelled"} [status] */
-  async function escenario(status = "open") {
-    const cliente = await usuarioConRol("client");
-    const artesano = await usuarioConRol("craftsman");
-    const taller = await crearTallerPublicado(c, artesano);
-    const solicitud = await crearSolicitud(c, cliente, taller, status);
-    return { cliente, artesano, solicitud };
-  }
+  const escenario = (status = "open") => crearEscenarioSolicitud(c, status);
 
   /**
    * @param {string} solicitud

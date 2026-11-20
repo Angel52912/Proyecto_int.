@@ -1,6 +1,6 @@
 import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
-import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
-import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { PERMISO_DENEGADO } from "../helpers/solicitudes.js";
+import { crearEscenarioPedido } from "../helpers/escenarios.js";
 
 /** CU-06: reviews, create_review y el promedio del taller (flujo principal y alternos). */
 describe("reseñas y calificación (CU-06)", () => {
@@ -24,16 +24,7 @@ describe("reseñas y calificación (CU-06)", () => {
    * @param {string} [status]
    * @param {{ artesano: string, taller: string }} [base]
    */
-  async function escenario(status = "delivered", base) {
-    const cliente = await usuarioConRol("client");
-    const artesano = base?.artesano ?? (await usuarioConRol("craftsman"));
-    const taller = base?.taller ?? (await crearTallerPublicado(c, artesano));
-    const solicitud = await crearSolicitud(c, cliente, taller, "accepted");
-    const quote = await crearPresupuesto(c, solicitud, "accepted");
-    const orden = await crearOrden(c, { quote, request: solicitud, cliente, taller });
-    await c.query("update public.orders set phase = 4, status = $2::public.order_status where id = $1", [orden, status]);
-    return { cliente, artesano, taller, solicitud, orden };
-  }
+  const escenario = (status = "delivered", base) => crearEscenarioPedido(c, { fase: 4, statusOrden: status, base });
 
   const calificar = (
     /** @type {string} */ orden,
