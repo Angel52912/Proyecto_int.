@@ -1,12 +1,11 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
-import { PERMISO_DENEGADO, UUID_A, UUID_B } from "../helpers/solicitudes.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory, desactivarUsuario, crearArchivoStorage } from "../helpers/db.js";
+import { PERMISO_DENEGADO, UUID_A, UUID_B, UUID_AJENO as AJENA } from "../helpers/solicitudes.js";
 import { crearEscenarioPedido } from "../helpers/escenarios.js";
 
 /** CU-05: order_updates, advance_phase, mark_ready y bucket progress-photos (flujo principal y alternos). */
 describe("fases del pedido (CU-05)", () => {
   /** @type {import("pg").Client} */
   let c;
-  const AJENA = "99999999-9999-4999-8999-999999999999";
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -26,7 +25,7 @@ describe("fases del pedido (CU-05)", () => {
   async function subirArchivo(/** @type {string} */ orden, uuid = UUID_A) {
     await c.query("reset role");
     const ruta = `${orden}/${uuid}`;
-    await c.query("insert into storage.objects (bucket_id, name) values ('progress-photos', $1)", [ruta]);
+    await crearArchivoStorage(c, "progress-photos", ruta);
     return ruta;
   }
 
@@ -168,8 +167,7 @@ describe("fases del pedido (CU-05)", () => {
       expect((await avanzar(orden, 2, ruta)).error?.code).toBe(PERMISO_DENEGADO);
       await actuarSinUsuario(c);
       expect((await avanzar(orden, 2, ruta)).error?.message).toContain("not_authenticated");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [artesano]);
+      await desactivarUsuario(c, artesano);
       await actuarComo(c, artesano);
       expect((await avanzar(orden, 2, ruta)).error?.message).toContain("inactive_user");
     });

@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, crearUsuarioFactory, desactivarUsuario, crearArchivoStorage } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 const UUID_A = "11111111-1111-4111-8111-111111111111";
@@ -141,7 +141,7 @@ describe("workshop_photos y Storage", () => {
     test("un artesano desactivado no registra fotos", async () => {
       const uid = await usuarioConRol("craftsman");
       const taller = await crearTaller(uid);
-      await c.query("update public.profiles set active = false where id = $1", [uid]);
+      await desactivarUsuario(c, uid);
       await actuarComo(c, uid);
       expect((await insertarFoto(taller)).error?.code).toBe(PERMISO_DENEGADO);
     });
@@ -175,7 +175,7 @@ describe("workshop_photos y Storage", () => {
       const dueno = await usuarioConRol("craftsman");
       const otro = await usuarioConRol("craftsman");
       const taller = await crearTaller(dueno);
-      await c.query("insert into storage.objects (bucket_id, name) values ('workshop-photos', $1)", [`${taller}/${UUID_A}`]);
+      await crearArchivoStorage(c, "workshop-photos", `${taller}/${UUID_A}`);
       await actuarComo(c, otro);
       expect((await subir(`${taller}/${UUID_B}`)).error?.code).toBe(PERMISO_DENEGADO);
       const del = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'workshop-photos'");
@@ -207,7 +207,7 @@ describe("workshop_photos y Storage", () => {
     test("un artesano desactivado no sube archivos", async () => {
       const uid = await usuarioConRol("craftsman");
       const taller = await crearTaller(uid);
-      await c.query("update public.profiles set active = false where id = $1", [uid]);
+      await desactivarUsuario(c, uid);
       await actuarComo(c, uid);
       expect((await subir(`${taller}/${UUID_A}`)).error?.code).toBe(PERMISO_DENEGADO);
     });

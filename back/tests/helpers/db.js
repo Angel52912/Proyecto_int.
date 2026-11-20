@@ -96,6 +96,17 @@ export async function asignarRol(cliente, uid, rol) {
 }
 
 /**
+ * Desactiva un perfil como superusuario (las pruebas lo usan para simular cuentas inactivas).
+ * @param {pg.Client} cliente
+ * @param {string} uid
+ * @returns {Promise<void>}
+ */
+export async function desactivarUsuario(cliente, uid) {
+  await cliente.query("reset role");
+  await cliente.query("update public.profiles set active = false where id = $1", [uid]);
+}
+
+/**
  * Actúa como un usuario autenticado (uid) o como anónimo (uid nulo) hasta el siguiente cambio.
  * @param {pg.Client} cliente
  * @param {string | null} uid
@@ -155,6 +166,18 @@ export async function intentar(cliente, sql, parametros = []) {
 export async function intentarBorradoStorage(cliente, sql, parametros = []) {
   await cliente.query("select set_config('storage.allow_delete_query', 'true', true)");
   return intentar(cliente, sql, parametros);
+}
+
+/**
+ * Inserta un archivo en Storage como superusuario (simula una subida ya realizada).
+ * @param {pg.Client} cliente
+ * @param {string} bucket
+ * @param {string} ruta
+ * @returns {Promise<void>}
+ */
+export async function crearArchivoStorage(cliente, bucket, ruta) {
+  await cliente.query("reset role");
+  await cliente.query("insert into storage.objects (bucket_id, name) values ($1, $2)", [bucket, ruta]);
 }
 
 /**

@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory, desactivarUsuario, crearArchivoStorage } from "../helpers/db.js";
 import { PERMISO_DENEGADO, UUID_A, UUID_B, agregarFoto, crearTallerPublicado } from "../helpers/solicitudes.js";
 import { crearEscenarioSolicitud } from "../helpers/escenarios.js";
 
@@ -122,7 +122,7 @@ describe("request_photos y Storage", () => {
 
     test("un cliente desactivado no registra fotos", async () => {
       const { cliente, solicitud } = await escenario("draft");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await insertarFoto(solicitud)).error?.code).toBe(PERMISO_DENEGADO);
     });
@@ -155,7 +155,7 @@ describe("request_photos y Storage", () => {
 
     test("con la solicitud ya enviada el cliente no sube ni borra", async () => {
       const { cliente, solicitud } = await escenario("open");
-      await c.query("insert into storage.objects (bucket_id, name) values ('request-photos', $1)", [`${solicitud}/${UUID_A}`]);
+      await crearArchivoStorage(c, "request-photos", `${solicitud}/${UUID_A}`);
       await actuarComo(c, cliente);
       expect((await subir(`${solicitud}/${UUID_B}`)).error?.code).toBe(PERMISO_DENEGADO);
       const del = await intentarBorradoStorage(c, "delete from storage.objects where bucket_id = 'request-photos'");
@@ -172,7 +172,7 @@ describe("request_photos y Storage", () => {
     test("cliente y artesano dueño leen los archivos; los demás no", async () => {
       const { cliente, artesano, solicitud } = await escenario("open");
       const ruta = `${solicitud}/${UUID_A}`;
-      await c.query("insert into storage.objects (bucket_id, name) values ('request-photos', $1)", [ruta]);
+      await crearArchivoStorage(c, "request-photos", ruta);
       const otroCliente = await usuarioConRol("client");
       const otroArtesano = await usuarioConRol("craftsman");
       const admin = await usuarioConRol("admin");
@@ -192,7 +192,7 @@ describe("request_photos y Storage", () => {
     test("el artesano no ve los archivos de un borrador", async () => {
       const { artesano, solicitud } = await escenario("draft");
       const ruta = `${solicitud}/${UUID_A}`;
-      await c.query("insert into storage.objects (bucket_id, name) values ('request-photos', $1)", [ruta]);
+      await crearArchivoStorage(c, "request-photos", ruta);
       await actuarComo(c, artesano);
       expect((await leer(ruta)).rows).toEqual([]);
     });
@@ -225,7 +225,7 @@ describe("request_photos y Storage", () => {
 
     test("un cliente desactivado no sube archivos y anónimo tampoco", async () => {
       const { cliente, solicitud } = await escenario("draft");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await subir(`${solicitud}/${UUID_A}`)).error?.code).toBe(PERMISO_DENEGADO);
       await actuarComo(c, null);

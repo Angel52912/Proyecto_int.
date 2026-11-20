@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -33,8 +33,7 @@ describe("auditoría 0018", () => {
   const buscar = (/** @type {string} */ colonia) =>
     intentar(c, "select public.search_workshops(null, null, null, null, $1) as r", [colonia]);
   const desactivar = async (/** @type {string} */ uid) => {
-    await c.query("reset role");
-    await c.query("update public.profiles set active = false where id = $1", [uid]);
+    await desactivarUsuario(c, uid);
   };
 
   describe("1. un artesano desactivado sale del mapa y de las solicitudes", () => {

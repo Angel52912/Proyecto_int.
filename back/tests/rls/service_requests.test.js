@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-03: permisos de service_requests por rol y visibilidad de la contraparte en profiles. */
@@ -99,7 +99,7 @@ describe("service_requests", () => {
     test("un cliente desactivado no crea solicitudes", async () => {
       const cliente = await usuarioConRol("client");
       const taller = await crearTallerPublicado(c, await usuarioConRol("craftsman"));
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await insertar(taller)).error?.code).toBe(PERMISO_DENEGADO);
     });

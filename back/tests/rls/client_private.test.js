@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 
@@ -88,8 +88,7 @@ describe("client_private", () => {
 
   test("un cliente desactivado no puede escribir", async () => {
     const uid = await usuarioConRol("client");
-    await c.query("reset role");
-    await c.query("update public.profiles set active = false where id = $1", [uid]);
+    await desactivarUsuario(c, uid);
     await actuarComo(c, uid);
     const r = await intentar(c, "insert into public.client_private (user_id, age, address) values ($1, 20, 'X')", [uid]);
     expect(r.error?.code).toBe(PERMISO_DENEGADO);

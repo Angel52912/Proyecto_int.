@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, crearUsuarioFactory, desactivarUsuario, crearArchivoStorage } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, UUID_A, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
@@ -199,8 +199,7 @@ describe("backend completo (0019 y 0020)", () => {
       expect((await resenas()).error?.code).toBe(PERMISO_DENEGADO);
       await actuarComo(c, artesano);
       for (const [limite, desfase] of [[0, 0], [101, 0], [10, -1]]) expect((await resenas(limite, desfase)).error?.message).toContain("invalid_input");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [artesano]);
+      await desactivarUsuario(c, artesano);
       await actuarComo(c, artesano);
       expect((await estadisticas()).error?.message).toContain("inactive_user");
     });
@@ -275,7 +274,7 @@ describe("backend completo (0019 y 0020)", () => {
     test("un artesano con el taller suspendido ya no sube fotos del taller, pero sí puede borrar las suyas", async () => {
       const { id, artesano } = await taller(marca());
       const archivo = `${id}/${uuid()}`;
-      await c.query("insert into storage.objects (bucket_id, name) values ('workshop-photos', $1)", [archivo]);
+      await crearArchivoStorage(c, "workshop-photos", archivo);
       await c.query("update public.workshops set suspended = true where id = $1", [id]);
       await actuarComo(c, artesano);
       expect((await subir("workshop-photos", `${id}/${uuid()}`)).error?.code).toBe(PERMISO_DENEGADO);

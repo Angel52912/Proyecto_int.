@@ -1,12 +1,11 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
-import { PERMISO_DENEGADO } from "../helpers/solicitudes.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
+import { PERMISO_DENEGADO, UUID_AJENO as AJENA } from "../helpers/solicitudes.js";
 import { crearEscenarioPedido } from "../helpers/escenarios.js";
 
 /** CU-06: reviews, create_review y el promedio del taller (flujo principal y alternos). */
 describe("reseñas y calificación (CU-06)", () => {
   /** @type {import("pg").Client} */
   let c;
-  const AJENA = "99999999-9999-4999-8999-999999999999";
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -123,8 +122,7 @@ describe("reseñas y calificación (CU-06)", () => {
       expect((await calificar(orden, 5)).error?.code).toBe(PERMISO_DENEGADO);
       await actuarSinUsuario(c);
       expect((await calificar(orden, 5)).error?.message).toContain("not_authenticated");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await calificar(orden, 5)).error?.message).toContain("inactive_user");
     });
@@ -152,8 +150,7 @@ describe("reseñas y calificación (CU-06)", () => {
         await actuarComo(c, uid);
         expect((await intentar(c, "select id from public.reviews")).rows).toEqual([]);
       }
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await intentar(c, "select id from public.reviews")).rows).toEqual([]);
       await actuarComo(c, null);

@@ -1,12 +1,4 @@
-import {
-  abrirTransaccion,
-  actuarComo,
-  actuarSinUsuario,
-  asignarRol,
-  cerrarTransaccion,
-  crearUsuario,
-  intentar,
-} from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, asignarRol, cerrarTransaccion, crearUsuario, intentar, desactivarUsuario } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 
@@ -93,8 +85,7 @@ describe("profiles y set_my_role", () => {
 
     test("un usuario desactivado recibe inactive_user", async () => {
       const uid = await crearUsuario(c, correo());
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [uid]);
+      await desactivarUsuario(c, uid);
       await actuarComo(c, uid);
       const r = await intentar(c, "select public.set_my_role('client')");
       expect(r.error?.message).toBe("inactive_user");
@@ -181,8 +172,7 @@ describe("profiles y set_my_role", () => {
     test("un usuario desactivado no puede editar su perfil", async () => {
       const uid = await crearUsuario(c, correo());
       await asignarRol(c, uid, "client");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [uid]);
+      await desactivarUsuario(c, uid);
       await actuarComo(c, uid);
       const r = await intentar(c, "update public.profiles set full_name = 'Ana' where id = $1", [uid]);
       expect(r.rowCount).toBe(0);

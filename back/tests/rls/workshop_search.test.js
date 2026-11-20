@@ -1,12 +1,11 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
-import { PERMISO_DENEGADO } from "../helpers/solicitudes.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
+import { PERMISO_DENEGADO, UUID_AJENO as AJENA } from "../helpers/solicitudes.js";
 
 /** CU-02: search_workshops, get_workshop_profile y los helpers de horario y distancia. */
 describe("búsqueda de talleres (CU-02)", () => {
   /** @type {import("pg").Client} */
   let c;
   let n = 0;
-  const AJENA = "99999999-9999-4999-8999-999999999999";
   const TODO_EL_DIA = { mon: [{ open: "00:00", close: "23:59" }], tue: [{ open: "00:00", close: "23:59" }], wed: [{ open: "00:00", close: "23:59" }], thu: [{ open: "00:00", close: "23:59" }], fri: [{ open: "00:00", close: "23:59" }], sat: [{ open: "00:00", close: "23:59" }], sun: [{ open: "00:00", close: "23:59" }] };
   const CENTRO = { lat: 20.9674, lng: -89.5926 };
 
@@ -84,8 +83,7 @@ describe("búsqueda de talleres (CU-02)", () => {
       await actuarSinUsuario(c);
       expect((await buscar()).error?.message).toContain("not_authenticated");
       expect((await perfil(AJENA)).error?.message).toContain("not_authenticated");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await buscar()).error?.message).toContain("inactive_user");
       expect((await perfil(AJENA)).error?.message).toContain("inactive_user");

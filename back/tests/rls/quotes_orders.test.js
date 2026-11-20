@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, crearSolicitud } from "../helpers/solicitudes.js";
 import { crearEscenarioPedido } from "../helpers/escenarios.js";
@@ -51,8 +51,7 @@ describe("quotes y orders: RLS", () => {
 
     test("el cliente inactivo no ve nada", async () => {
       const e = await escenario();
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [e.cliente]);
+      await desactivarUsuario(c, e.cliente);
       await actuarComo(c, e.cliente);
       expect((await intentar(c, "select id from public.quotes")).rows).toEqual([]);
     });
@@ -141,7 +140,7 @@ describe("quotes y orders: RLS", () => {
       const requestInactivo = await crearSolicitud(c, inactivo, e.taller, "accepted");
       const quoteInactivo = await crearPresupuesto(c, requestInactivo, "accepted");
       await crearOrden(c, { quote: quoteInactivo, request: requestInactivo, cliente: inactivo, taller: e.taller });
-      await c.query("update public.profiles set active = false where id = $1", [inactivo]);
+      await desactivarUsuario(c, inactivo);
       for (const uid of [e.otroCliente, e.otroArtesano, e.admin, e.sinRol, inactivo]) {
         await actuarComo(c, uid);
         expect((await intentar(c, "select id from public.orders")).rows).toEqual([]);

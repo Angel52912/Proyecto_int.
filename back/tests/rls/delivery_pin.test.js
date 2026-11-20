@@ -1,12 +1,11 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
-import { PERMISO_DENEGADO } from "../helpers/solicitudes.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
+import { PERMISO_DENEGADO, UUID_AJENO as AJENA } from "../helpers/solicitudes.js";
 import { crearEscenarioPedido } from "../helpers/escenarios.js";
 
 /** CU-06: private.order_pins, reveal_delivery_pin y verify_delivery_pin (flujo principal y alternos). */
 describe("PIN de entrega (CU-06)", () => {
   /** @type {import("pg").Client} */
   let c;
-  const AJENA = "99999999-9999-4999-8999-999999999999";
 
   beforeAll(async () => {
     c = await abrirTransaccion();
@@ -119,8 +118,7 @@ describe("PIN de entrega (CU-06)", () => {
       expect((await revelarIntento(orden)).error?.code).toBe(PERMISO_DENEGADO);
       await actuarSinUsuario(c);
       expect((await revelarIntento(orden)).error?.message).toContain("not_authenticated");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await revelarIntento(orden)).error?.message).toContain("inactive_user");
     });
@@ -260,7 +258,7 @@ describe("PIN de entrega (CU-06)", () => {
       expect((await verificar(orden, pin)).error?.message).toContain("forbidden");
       await c.query("reset role");
       await c.query("update public.workshops set suspended = false where id = $1", [taller]);
-      await c.query("update public.profiles set active = false where id = $1", [artesano]);
+      await desactivarUsuario(c, artesano);
       await actuarComo(c, artesano);
       expect((await verificar(orden, pin)).error?.message).toContain("inactive_user");
     });

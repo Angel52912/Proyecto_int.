@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 import { crearPresupuesto, fechaFutura } from "../helpers/presupuestos.js";
 import { PERMISO_DENEGADO, crearSolicitud } from "../helpers/solicitudes.js";
 import { crearEscenarioSolicitud } from "../helpers/escenarios.js";
@@ -106,8 +106,7 @@ describe("send_quote, respond_quote y cancel_request", () => {
       expect((await enviar(solicitud)).error?.code).toBe(PERMISO_DENEGADO);
       await actuarSinUsuario(c);
       expect((await enviar(solicitud)).error?.message).toContain("not_authenticated");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [artesano]);
+      await desactivarUsuario(c, artesano);
       await actuarComo(c, artesano);
       expect((await enviar(solicitud)).error?.message).toContain("inactive_user");
     });
@@ -236,8 +235,7 @@ describe("send_quote, respond_quote y cancel_request", () => {
       expect((await responder(quote, true)).error?.code).toBe(PERMISO_DENEGADO);
       await actuarSinUsuario(c);
       expect((await responder(quote, true)).error?.message).toContain("not_authenticated");
-      await c.query("reset role");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await responder(quote, true)).error?.message).toContain("inactive_user");
     });

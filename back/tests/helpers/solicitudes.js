@@ -1,6 +1,9 @@
 // Datos de apoyo para las pruebas RLS de CU-03 (solicitudes, fotos, chat). Todo se inserta como superusuario.
+import { crearArchivoStorage } from "./db.js";
+
 export const UUID_A = "11111111-1111-4111-8111-111111111111";
 export const UUID_B = "22222222-2222-4222-8222-222222222222";
+export const UUID_AJENO = "99999999-9999-4999-8999-999999999999";
 export const PERMISO_DENEGADO = "42501";
 
 /**
@@ -53,6 +56,6 @@ export async function agregarFoto(c, solicitud, uuid = UUID_A) {
   const path = `${solicitud}/${uuid}`;
   await c.query("insert into public.request_photos (request_id, path) values ($1, $2)", [solicitud, path]);
   // Desde 0020 submit_request exige que el archivo exista de verdad en Storage.
-  await c.query("insert into storage.objects (bucket_id, name) values ('request-photos', $1)", [path]);
+  await crearArchivoStorage(c, "request-photos", path);
   return path;
 }

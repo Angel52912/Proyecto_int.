@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, intentarBorradoStorage, sinAcceso, crearUsuarioFactory, desactivarUsuario, crearArchivoStorage } from "../helpers/db.js";
 import { PERMISO_DENEGADO, UUID_A, UUID_B, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 
 /** CU-01: bucket privado avatars y la restricción de profiles.avatar_path (migración 0017). */
@@ -25,7 +25,7 @@ describe("fotos de perfil (bucket avatars)", () => {
   /** Inserta un archivo como superusuario. */
   async function existente(/** @type {string} */ ruta) {
     await c.query("reset role");
-    await c.query("insert into storage.objects (bucket_id, name) values ('avatars', $1)", [ruta]);
+    await crearArchivoStorage(c, "avatars", ruta);
   }
 
   /** Cliente y artesano con una solicitud en el estado indicado. */
@@ -64,7 +64,7 @@ describe("fotos de perfil (bucket avatars)", () => {
 
     test("un usuario desactivado no sube", async () => {
       const uid = await usuarioConRol("client");
-      await c.query("update public.profiles set active = false where id = $1", [uid]);
+      await desactivarUsuario(c, uid);
       await actuarComo(c, uid);
       expect((await subir(`${uid}/${UUID_A}`)).error?.code).toBe(PERMISO_DENEGADO);
     });
@@ -127,7 +127,7 @@ describe("fotos de perfil (bucket avatars)", () => {
       const { cliente } = await conSolicitud("open");
       await existente(`${cliente}/${UUID_A}`);
       const inactivo = await usuarioConRol("client");
-      await c.query("update public.profiles set active = false where id = $1", [inactivo]);
+      await desactivarUsuario(c, inactivo);
       for (const uid of [await usuarioConRol("client"), await usuarioConRol("craftsman"), await usuarioConRol("admin"), await usuarioConRol(null), inactivo]) {
         await actuarComo(c, uid);
         expect((await leer(`${cliente}/${UUID_A}`)).rows).toEqual([]);
@@ -165,7 +165,7 @@ describe("fotos de perfil (bucket avatars)", () => {
       }
       const inactivo = await usuarioConRol("client");
       await existente(`${inactivo}/${UUID_A}`);
-      await c.query("update public.profiles set active = false where id = $1", [inactivo]);
+      await desactivarUsuario(c, inactivo);
       await actuarComo(c, inactivo);
       expect((await borrar(`${inactivo}/${UUID_A}`)).rowCount).toBe(0);
       await actuarComo(c, null);

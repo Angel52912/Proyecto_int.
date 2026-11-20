@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 import { PERMISO_DENEGADO, agregarFoto, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
 import { crearEscenarioSolicitud } from "../helpers/escenarios.js";
 
@@ -139,7 +139,7 @@ describe("submit_request y cancel_request", () => {
     test("un cliente desactivado lanza inactive_user", async () => {
       const { cliente, solicitud } = await escenario("draft");
       await agregarFoto(c, solicitud);
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await enviar(solicitud)).error?.message).toContain("inactive_user");
     });
@@ -214,7 +214,7 @@ describe("submit_request y cancel_request", () => {
 
     test("un cliente desactivado lanza inactive_user; sin usuario, not_authenticated; anónimo, sin EXECUTE", async () => {
       const { cliente, solicitud } = await escenario("open");
-      await c.query("update public.profiles set active = false where id = $1", [cliente]);
+      await desactivarUsuario(c, cliente);
       await actuarComo(c, cliente);
       expect((await cancelar(solicitud)).error?.message).toContain("inactive_user");
       await actuarSinUsuario(c);

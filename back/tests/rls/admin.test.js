@@ -1,13 +1,12 @@
-import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, actuarSinUsuario, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 import { crearOrden, crearPresupuesto } from "../helpers/presupuestos.js";
-import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado } from "../helpers/solicitudes.js";
+import { PERMISO_DENEGADO, crearSolicitud, crearTallerPublicado, UUID_AJENO as AJENA } from "../helpers/solicitudes.js";
 
 /** CU-08: admin_actions y las funciones admin_* (flujo principal, A1 y roles). */
 describe("administración (CU-08)", () => {
   /** @type {import("pg").Client} */
   let c;
   let n = 0;
-  const AJENA = "99999999-9999-4999-8999-999999999999";
   // Ancho fijo: una marca nunca es prefijo de otra (las búsquedas son por subcadena).
   const marca = () => `adm${Date.now()}x${String(n++).padStart(5, "0")}`;
 
@@ -77,7 +76,7 @@ describe("administración (CU-08)", () => {
 
     test("admin inactivo: inactive_user", async () => {
       const inactivo = await usuarioConRol("admin");
-      await c.query("update public.profiles set active = false where id = $1", [inactivo]);
+      await desactivarUsuario(c, inactivo);
       await actuarComo(c, inactivo);
       for (const [funcion, args] of todasLasFunciones()) {
         expect((await llamar(String(funcion), /** @type {unknown[]} */ (args))).error?.message).toContain("inactive_user");
@@ -208,7 +207,7 @@ describe("administración (CU-08)", () => {
     test("filtra por rol y estado; el comodín % y _ se toma literal", async () => {
       const admin = await usuarioConRol("admin");
       const e = await escenario();
-      await c.query("update public.profiles set active = false where id = $1", [e.artesano]);
+      await desactivarUsuario(c, e.artesano);
       await actuarComo(c, admin);
       expect((await llamar("admin_list_users", [e.token, "craftsman"])).rows[0].r.total).toBe(1);
       expect((await llamar("admin_list_users", [e.token, null, false])).rows[0].r.items.map((/** @type {{ id: string }} */ u) => u.id)).toEqual([e.artesano]);

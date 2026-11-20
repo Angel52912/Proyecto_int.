@@ -1,4 +1,4 @@
-import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory } from "../helpers/db.js";
+import { abrirTransaccion, actuarComo, cerrarTransaccion, intentar, crearUsuarioFactory, desactivarUsuario } from "../helpers/db.js";
 
 const PERMISO_DENEGADO = "42501";
 const HORARIO = JSON.stringify({ mon: [{ open: "09:00", close: "18:00" }] });
@@ -103,7 +103,7 @@ describe("publicar taller", () => {
 
   test("un artesano desactivado: inactive_user", async () => {
     const uid = await artesanoConTallerCompleto();
-    await c.query("update public.profiles set active = false where id = $1", [uid]);
+    await desactivarUsuario(c, uid);
     await actuarComo(c, uid);
     expect((await intentar(c, "select public.publish_my_workshop()")).error?.message).toContain("inactive_user");
   });
