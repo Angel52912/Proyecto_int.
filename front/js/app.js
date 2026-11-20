@@ -1,6 +1,6 @@
-import { USAR_API_SIMULADA } from "./config.js";
+import { USAR_API_SIMULADA } from "../../apis/config.js";
 import { crearRouter } from "./router.js";
-import { obtenerSesion } from "./supabaseClient.js";
+import { obtenerSesion } from "../../apis/supabaseClient.js";
 import { rutas as rutasAdmin } from "./features/admin/routes.js";
 import { rutas as rutasAuth } from "./features/auth/routes.js";
 import { rutas as rutasChat } from "./features/chat/routes.js";

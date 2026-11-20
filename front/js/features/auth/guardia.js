@@ -1,6 +1,6 @@
 // Guardia por rol (CU-01): decide a dónde va cada usuario según su perfil y protege las rutas de cada rol.
 // La base de datos ya impide el acceso (RLS); esto solo evita mostrar una pantalla que no le toca al usuario.
-import { USAR_API_SIMULADA } from "../../config.js";
+import { USAR_API_SIMULADA } from "../../../../apis/config.js";
 import { RUTA_ACCESO } from "../../router.js";
 import { crear, ir } from "../../ui/dom.js";
 import { api } from "./index.js";
@@ -51,7 +51,7 @@ export function olvidarPerfil() {
 
 /** @returns {Promise<PerfilMinimo | null>} */
 async function perfilSimulado() {
-  const { estado } = await import("../requests/simulacion.js");
+  const { estado } = await import("../../../../apis/api-mixanab/requests/simulacion.js");
   if (!estado.sesion) return null;
   // El simulado de solicitudes no guarda nombre; la guardia solo revisa el rol.
   return { role: /** @type {Rol | null} */ (estado.rol), full_name: "Simulado" };
@@ -63,7 +63,7 @@ async function perfilSimulado() {
  */
 export async function sincronizarSesionSimulada({ sesion, rol = null }) {
   if (!USAR_API_SIMULADA) return;
-  const [simulacion, taller] = await Promise.all([import("../requests/simulacion.js"), import("../workshop/api.mock.js")]);
+  const [simulacion, taller] = await Promise.all([import("../../../../apis/api-mixanab/requests/simulacion.js"), import("../../../../apis/api-mixanab/workshop/api.mock.js")]);
   simulacion.fijarSesionSimulada(sesion ? { sesion: true, rol } : { sesion: false });
   if (sesion && rol !== null) taller.fijarSesionSimulada({ rol });
 }

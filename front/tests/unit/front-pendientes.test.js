@@ -1,5 +1,5 @@
 // Pendientes del frontend: avisos, fotos de perfil, Mi taller con datos del servidor y panel de administración.
-import * as adminMock from "../../js/features/admin/api.mock.js";
+import * as adminMock from "../../../apis/api-mixanab/admin/api.mock.js";
 import { NOMBRE_ACCION, textoConteo } from "../../js/features/admin/componentes.js";
 import { textoDeAccion } from "../../js/features/admin/pages/bitacora.js";
 import { renderPanel } from "../../js/features/admin/pages/panel.js";
@@ -9,8 +9,8 @@ import { renderUsuarios } from "../../js/features/admin/pages/usuarios.js";
 import { crearAvatar, olvidarAvatares, urlDeAvatar } from "../../js/features/auth/avatar.js";
 import { crearCampana, textoContador, textoDelAviso } from "../../js/features/requests/avisos.js";
 import { renderAvisos } from "../../js/features/requests/pages/avisos.js";
-import { fijarSesionSimulada, notificar, reiniciarSimulacion, UID_CLIENTE } from "../../js/features/requests/simulacion.js";
-import * as tallerMock from "../../js/features/workshop/api.mock.js";
+import { fijarSesionSimulada, notificar, reiniciarSimulacion, UID_CLIENTE } from "../../../apis/api-mixanab/requests/simulacion.js";
+import * as tallerMock from "../../../apis/api-mixanab/workshop/api.mock.js";
 import { renderMiTaller } from "../../js/features/workshop/pages/mi-taller.js";
 
 const esperar = (ms = 0) => new Promise((resolver) => setTimeout(resolver, ms));
@@ -67,7 +67,7 @@ describe("avisos", () => {
 describe("fotos de perfil", () => {
   test("reutiliza la URL firmada mientras sigue vigente", async () => {
     const { api } = await import("../../js/features/auth/index.js");
-    const { signInWithEmail, verifyEmailCode, setMyRole, addAvatar, CODIGO_SIMULADO, reiniciarSimulacion: reiniciarAuth } = await import("../../js/features/auth/api.mock.js");
+    const { signInWithEmail, verifyEmailCode, setMyRole, addAvatar, CODIGO_SIMULADO, reiniciarSimulacion: reiniciarAuth } = await import("../../../apis/api-inicio-sesion/api.mock.js");
     reiniciarAuth();
     olvidarAvatares();
     await signInWithEmail("ana@correo.com");

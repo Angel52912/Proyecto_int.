@@ -1,8 +1,8 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const real = await import("../../js/features/requests/api.js");
-const mock = await import("../../js/features/requests/api.mock.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const real = await import("../../../apis/api-mixanab/requests/api.js");
+const mock = await import("../../../apis/api-mixanab/requests/api.mock.js");
 
 const FUNCIONES_DEL_CONTRATO = [
   "createRequestDraft",
@@ -154,7 +154,7 @@ describe("requests/api.mock.js: enviar y cancelar", () => {
 
   test("máximo 5 activas por cliente: la sexta lanza limit_reached", async () => {
     // Un solo taller simulado: se llenan las activas con solicitudes de otros talleres sembradas en el estado.
-    const sim = await import("../../js/features/requests/simulacion.js");
+    const sim = await import("../../../apis/api-mixanab/requests/simulacion.js");
     for (let i = 0; i < 5; i++) {
       sim.estado.solicitudes.push({
         id: sim.idSimulado(),

@@ -4,7 +4,7 @@ import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { folio } from "../../chat/pages/chat.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
-import { TIPOS_IMAGEN, validarImagen } from "../../../lib/validate.js";
+import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";

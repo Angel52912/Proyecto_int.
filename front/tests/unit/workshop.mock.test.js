@@ -1,9 +1,9 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const real = await import("../../js/features/workshop/api.js");
-const mock = await import("../../js/features/workshop/api.mock.js");
-const { validarHorario } = await import("../../js/features/workshop/validar.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const real = await import("../../../apis/api-mixanab/workshop/api.js");
+const mock = await import("../../../apis/api-mixanab/workshop/api.mock.js");
+const { validarHorario } = await import("../../../apis/api-mixanab/workshop/validar.js");
 
 const FUNCIONES_DEL_CONTRATO = [
   "getMyWorkshop",

@@ -1,13 +1,13 @@
 // 15 · Califica tu experiencia (CU-06): estrellas, etiquetas, reseña opcional y Enviar calificación (sin edición posterior).
 import { api as apiMapa } from "../../map/index.js";
-import { validarCalificacion } from "../../../lib/validate.js";
+import { validarCalificacion } from "../../../../../apis/lib/validate.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearEstrellas, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
-import { MAX_COMENTARIO, MAX_ETIQUETAS } from "../validar.js";
+import { MAX_COMENTARIO, MAX_ETIQUETAS } from "../../../../../apis/api-mixanab/orders/validar.js";
 
 export const ETIQUETAS = Object.freeze(["Puntual", "Buen acabado", "Buen trato", "Buen precio", "Como nuevo"]);
 export const TEXTO_CALIFICACION = Object.freeze({ 1: "Malo", 2: "Regular", 3: "Bien", 4: "Muy bien", 5: "Excelente" });

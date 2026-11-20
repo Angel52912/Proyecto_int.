@@ -37,10 +37,10 @@ function crearFalso() {
 if (!globalThis.crypto?.randomUUID) Object.defineProperty(globalThis, "crypto", { value: webcrypto, configurable: true });
 
 let falso = crearFalso();
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => falso.cliente }));
-const api = await import("../../js/features/auth/api.js");
-const mock = await import("../../js/features/auth/api.mock.js");
-const { esRutaAvatar } = await import("../../js/features/auth/validar.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => falso.cliente }));
+const api = await import("../../../apis/api-inicio-sesion/api.js");
+const mock = await import("../../../apis/api-inicio-sesion/api.mock.js");
+const { esRutaAvatar } = await import("../../../apis/api-inicio-sesion/validar.js");
 
 /** @param {Promise<unknown>} promesa @returns {Promise<string>} */
 async function codigoDe(promesa) {

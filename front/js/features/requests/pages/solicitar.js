@@ -2,7 +2,7 @@
 import { api as apiMapa } from "../../map/index.js";
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
-import { TIPOS_IMAGEN, validarImagen } from "../../../lib/validate.js";
+import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace, ir } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
@@ -11,7 +11,7 @@ import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
-import { MAX_DESCRIPCION, MAX_FOTOS_SOLICITUD } from "../validar.js";
+import { MAX_DESCRIPCION, MAX_FOTOS_SOLICITUD } from "../../../../../apis/api-mixanab/requests/validar.js";
 
 const MENSAJES = {
   invalid_state: "Ya tienes una solicitud activa con este taller. Revísala en Mis pedidos.",

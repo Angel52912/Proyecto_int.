@@ -1,8 +1,8 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const real = await import("../../js/features/auth/api.js");
-const mock = await import("../../js/features/auth/api.mock.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const real = await import("../../../apis/api-inicio-sesion/api.js");
+const mock = await import("../../../apis/api-inicio-sesion/api.mock.js");
 
 const FUNCIONES_DEL_CONTRATO = [
   "signInWithGoogle",

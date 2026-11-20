@@ -1,8 +1,8 @@
 // Única capa que toca Supabase para acceso, rol y perfil (CU-01). Contrato: docs/contrato-api.md.
 // api.mock.js debe tener las mismas funciones, respuestas y errores.
-import { obtenerCliente } from "../../supabaseClient.js";
-import { ApiError, traducirError } from "../../lib/apiError.js";
-import { validarCodigo, validarCorreo, validarImagen } from "../../lib/validate.js";
+import { obtenerCliente } from "../supabaseClient.js";
+import { ApiError, traducirError } from "../lib/apiError.js";
+import { validarCodigo, validarCorreo, validarImagen } from "../lib/validate.js";
 
 import { esRutaAvatar } from "./validar.js";
 

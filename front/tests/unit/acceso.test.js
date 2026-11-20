@@ -1,6 +1,6 @@
 // Pantallas de acceso (CU-01) y guardia por rol contra el api simulado.
-import { ApiError } from "../../js/lib/apiError.js";
-import { reiniciarSimulacion as reiniciarAuth } from "../../js/features/auth/api.mock.js";
+import { ApiError } from "../../../apis/lib/apiError.js";
+import { reiniciarSimulacion as reiniciarAuth } from "../../../apis/api-inicio-sesion/api.mock.js";
 import { datosAcceso, guardarDatosAcceso, limpiarDatosAcceso } from "../../js/features/auth/flujo.js";
 import { destinoPorPerfil, soloPara } from "../../js/features/auth/guardia.js";
 import { renderBienvenida } from "../../js/features/auth/pages/bienvenida.js";
@@ -8,7 +8,7 @@ import { formatoCuenta, repartirCodigo } from "../../js/features/auth/pages/codi
 import { validarDatosPerfil } from "../../js/features/auth/pages/completar-perfil.js";
 import { renderCorreo, validarFormularioAcceso } from "../../js/features/auth/pages/correo.js";
 import { renderRol } from "../../js/features/auth/pages/rol.js";
-import { fijarSesionSimulada, reiniciarSimulacion } from "../../js/features/requests/simulacion.js";
+import { fijarSesionSimulada, reiniciarSimulacion } from "../../../apis/api-mixanab/requests/simulacion.js";
 import { mensajeDeError } from "../../js/ui/mensajes.js";
 
 const esperar = () => new Promise((resolver) => setTimeout(resolver, 0));
@@ -112,7 +112,7 @@ describe("código de verificación", () => {
 
 describe("rol y perfil", () => {
   test("elegir rol lleva a completar el perfil", async () => {
-    const { signInWithEmail, verifyEmailCode, CODIGO_SIMULADO } = await import("../../js/features/auth/api.mock.js");
+    const { signInWithEmail, verifyEmailCode, CODIGO_SIMULADO } = await import("../../../apis/api-inicio-sesion/api.mock.js");
     await signInWithEmail("ana@correo.com");
     await verifyEmailCode("ana@correo.com", CODIGO_SIMULADO);
     const pantalla = /** @type {HTMLElement} */ (renderRol());

@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 import { diasHasta, formatearFecha, formatearHace, formatearHora } from "../../js/lib/fechas.js";
-import { ApiError } from "../../js/lib/apiError.js";
+import { ApiError } from "../../../apis/lib/apiError.js";
 import { crear, enlace } from "../../js/ui/dom.js";
 import { cargarEn, crearError, crearVacio } from "../../js/ui/estados.js";
 import { crearFoto } from "../../js/ui/foto.js";

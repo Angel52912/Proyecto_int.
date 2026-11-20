@@ -1,7 +1,7 @@
 // Solo con la API simulada: cambia la sesión simulada entre cliente, artesano y admin para recorrer los flujos
 // (por ejemplo: el cliente envía una solicitud y luego el artesano la cotiza). No existe con la API real.
 // El admin no se puede elegir en el registro (es una cuenta interna), por eso solo se entra como admin desde aquí.
-import { USAR_API_SIMULADA } from "../../../config.js";
+import { USAR_API_SIMULADA } from "../../../../../apis/config.js";
 import { sincronizarSesionSimulada } from "../../auth/guardia.js";
 import { crear, ir } from "../../../ui/dom.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";

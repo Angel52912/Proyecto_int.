@@ -28,8 +28,8 @@ function crearFalso({ uid = "u-1" } = {}) {
 }
 
 let falso = crearFalso();
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => falso.cliente }));
-const api = await import("../../js/features/auth/api.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => falso.cliente }));
+const api = await import("../../../apis/api-inicio-sesion/api.js");
 
 /** @param {Promise<unknown>} promesa @returns {Promise<string>} */
 async function codigoDe(promesa) {

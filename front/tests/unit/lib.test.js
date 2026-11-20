@@ -8,7 +8,7 @@ import {
   validarCoordenadas,
   validarCorreo,
   validarImagen,
-} from "../../js/lib/validate.js";
+} from "../../../apis/lib/validate.js";
 
 describe("escaparHtml", () => {
   test("escapa caracteres peligrosos", () => {

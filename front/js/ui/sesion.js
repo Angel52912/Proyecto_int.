@@ -1,4 +1,4 @@
-import { USAR_API_SIMULADA } from "../config.js";
+import { USAR_API_SIMULADA } from "../../../apis/config.js";
 
 /**
  * Con la API simulada no hay Supabase configurado y `js/app.js` reporta "sin sesión", así que las pantallas solo

@@ -1,6 +1,6 @@
 // 03 · Verificación (CU-01): código de 6 dígitos y reenvío con cuenta regresiva (A2).
-import { USAR_API_SIMULADA } from "../../../config.js";
-import { LONGITUD_CODIGO } from "../../../lib/validate.js";
+import { USAR_API_SIMULADA } from "../../../../../apis/config.js";
+import { LONGITUD_CODIGO } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, ir } from "../../../ui/dom.js";
 import { icono } from "../../../ui/iconos.js";

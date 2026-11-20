@@ -19,7 +19,7 @@ export function crearCliente(fabrica, url, clave) {
     throw new Error("supabase-js no está cargado. Ejecuta `npm run vendor` y revisa index.html.");
   }
   if (url.includes("REEMPLAZAR") || clave.includes("REEMPLAZAR")) {
-    throw new Error("Configura SUPABASE_URL y SUPABASE_ANON_KEY en js/config.js.");
+    throw new Error("Configura SUPABASE_URL y SUPABASE_ANON_KEY en apis/config.js.");
   }
   return fabrica(url, clave, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" },

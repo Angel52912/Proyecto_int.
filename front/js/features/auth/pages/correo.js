@@ -1,6 +1,6 @@
 // 02 · Crear cuenta / Iniciar sesión (CU-01): nombre (solo al crear), correo y aceptación de términos.
 // Sin contraseña: el backend solo usa Google o un código de 6 dígitos por correo (docs/frontend/PENDIENTES.md, 1.1).
-import { validarCorreo } from "../../../lib/validate.js";
+import { validarCorreo } from "../../../../../apis/lib/validate.js";
 import { crear, ir } from "../../../ui/dom.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";

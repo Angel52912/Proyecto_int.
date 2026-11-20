@@ -5,7 +5,7 @@ import { crear } from "../../ui/dom.js";
 import { crearCargando, crearError } from "../../ui/estados.js";
 import { icono } from "../../ui/iconos.js";
 import { mensajeDeError } from "../../ui/mensajes.js";
-import { MAX_MENSAJE } from "../requests/validar.js";
+import { MAX_MENSAJE } from "../../../../apis/api-mixanab/requests/validar.js";
 import { api } from "./index.js";
 
 const POR_PAGINA = 50;

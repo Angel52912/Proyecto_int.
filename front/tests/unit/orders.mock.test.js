@@ -1,12 +1,12 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const realOrders = await import("../../js/features/orders/api.js");
-const quotes = await import("../../js/features/quotes/api.mock.js");
-const orders = await import("../../js/features/orders/api.mock.js");
-const solicitudes = await import("../../js/features/requests/api.mock.js");
-const sim = await import("../../js/features/requests/simulacion.js");
-const { fechaDeHoy } = await import("../../js/features/quotes/validar.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const realOrders = await import("../../../apis/api-mixanab/orders/api.js");
+const quotes = await import("../../../apis/api-mixanab/quotes/api.mock.js");
+const orders = await import("../../../apis/api-mixanab/orders/api.mock.js");
+const solicitudes = await import("../../../apis/api-mixanab/requests/api.mock.js");
+const sim = await import("../../../apis/api-mixanab/requests/simulacion.js");
+const { fechaDeHoy } = await import("../../../apis/api-mixanab/quotes/validar.js");
 
 const FOTO = { type: "image/png", size: 1000 };
 const MANANA = fechaDeHoy(new Date(Date.now() + 86_400_000));

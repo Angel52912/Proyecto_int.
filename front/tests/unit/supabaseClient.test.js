@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { crearCliente } from "../../js/supabaseClient.js";
+import { crearCliente } from "../../../apis/supabaseClient.js";
 
 describe("crearCliente", () => {
   test("falla si supabase-js no está cargado", () => {
@@ -8,7 +8,7 @@ describe("crearCliente", () => {
 
   test("falla con la configuración de ejemplo", () => {
     const fabrica = jest.fn();
-    expect(() => crearCliente(fabrica, "https://REEMPLAZAR.supabase.co", "REEMPLAZAR")).toThrow(/js\/config\.js/);
+    expect(() => crearCliente(fabrica, "https://REEMPLAZAR.supabase.co", "REEMPLAZAR")).toThrow(/apis\/config\.js/);
     expect(fabrica).not.toHaveBeenCalled();
   });
 

@@ -1,14 +1,14 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const realQuotes = await import("../../js/features/quotes/api.js");
-const realOrders = await import("../../js/features/orders/api.js");
-const quotes = await import("../../js/features/quotes/api.mock.js");
-const orders = await import("../../js/features/orders/api.mock.js");
-const solicitudes = await import("../../js/features/requests/api.mock.js");
-const chat = await import("../../js/features/chat/api.mock.js");
-const sim = await import("../../js/features/requests/simulacion.js");
-const { fechaDeHoy, validarDatosPresupuesto } = await import("../../js/features/quotes/validar.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const realQuotes = await import("../../../apis/api-mixanab/quotes/api.js");
+const realOrders = await import("../../../apis/api-mixanab/orders/api.js");
+const quotes = await import("../../../apis/api-mixanab/quotes/api.mock.js");
+const orders = await import("../../../apis/api-mixanab/orders/api.mock.js");
+const solicitudes = await import("../../../apis/api-mixanab/requests/api.mock.js");
+const chat = await import("../../../apis/api-mixanab/chat/api.mock.js");
+const sim = await import("../../../apis/api-mixanab/requests/simulacion.js");
+const { fechaDeHoy, validarDatosPresupuesto } = await import("../../../apis/api-mixanab/quotes/validar.js");
 
 const FOTO = { type: "image/png", size: 1000 };
 const UUID_AJENO = "99999999-9999-4999-8999-999999999999";

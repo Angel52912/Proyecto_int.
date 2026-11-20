@@ -1,9 +1,9 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const real = await import("../../js/features/admin/api.js");
-const admin = await import("../../js/features/admin/api.mock.js");
-const sim = await import("../../js/features/requests/simulacion.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const real = await import("../../../apis/api-mixanab/admin/api.js");
+const admin = await import("../../../apis/api-mixanab/admin/api.mock.js");
+const sim = await import("../../../apis/api-mixanab/requests/simulacion.js");
 const { ID_TALLER_SIMULADO } = sim;
 
 const UUID_AJENO = "99999999-9999-4999-8999-999999999999";

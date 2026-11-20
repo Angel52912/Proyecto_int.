@@ -1,7 +1,7 @@
 // 05 · Completar perfil (CU-01): foto, nombre y, solo para el cliente, edad y dirección (`client_private`).
 // Con `?desde=perfil` funciona como "Editar perfil" y regresa a la pestaña Perfil.
 import { comprimirImagen } from "../../../lib/imagen.js";
-import { validarImagen } from "../../../lib/validate.js";
+import { validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace, ir } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";

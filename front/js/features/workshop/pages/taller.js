@@ -2,7 +2,7 @@
 // precio "desde", Guardar y Publicar taller. A1: resalta los campos obligatorios que faltan.
 import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet } from "../../map/componentes.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
-import { TIPOS_IMAGEN, validarImagen } from "../../../lib/validate.js";
+import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, ir } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";

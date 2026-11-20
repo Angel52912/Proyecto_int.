@@ -1,5 +1,5 @@
 // 01 · Bienvenida (CU-01): Iniciar sesión, Crear cuenta y Continuar con Google.
-import { USAR_API_SIMULADA } from "../../../config.js";
+import { USAR_API_SIMULADA } from "../../../../../apis/config.js";
 import { crear, enlace, ir } from "../../../ui/dom.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearPantalla } from "../../../ui/layout.js";

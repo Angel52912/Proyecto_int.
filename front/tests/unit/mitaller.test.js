@@ -21,12 +21,12 @@ function crearFalso() {
 }
 
 let falso = crearFalso();
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => falso.cliente }));
-const taller = await import("../../js/features/workshop/api.js");
-const tallerMock = await import("../../js/features/workshop/api.mock.js");
-const solicitudes = await import("../../js/features/requests/api.js");
-const solicitudesMock = await import("../../js/features/requests/api.mock.js");
-const sim = await import("../../js/features/requests/simulacion.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => falso.cliente }));
+const taller = await import("../../../apis/api-mixanab/workshop/api.js");
+const tallerMock = await import("../../../apis/api-mixanab/workshop/api.mock.js");
+const solicitudes = await import("../../../apis/api-mixanab/requests/api.js");
+const solicitudesMock = await import("../../../apis/api-mixanab/requests/api.mock.js");
+const sim = await import("../../../apis/api-mixanab/requests/simulacion.js");
 
 /** @param {Promise<unknown>} promesa @returns {Promise<string>} */
 async function codigoDe(promesa) {

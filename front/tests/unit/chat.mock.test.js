@@ -1,10 +1,10 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const real = await import("../../js/features/chat/api.js");
-const chat = await import("../../js/features/chat/api.mock.js");
-const solicitudes = await import("../../js/features/requests/api.mock.js");
-const sim = await import("../../js/features/requests/simulacion.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const real = await import("../../../apis/api-mixanab/chat/api.js");
+const chat = await import("../../../apis/api-mixanab/chat/api.mock.js");
+const solicitudes = await import("../../../apis/api-mixanab/requests/api.mock.js");
+const sim = await import("../../../apis/api-mixanab/requests/simulacion.js");
 
 const FUNCIONES_DEL_CONTRATO = ["listMessages", "sendMessage", "subscribeToMessages"];
 const FOTO = { type: "image/png", size: 1000 };

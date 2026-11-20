@@ -1,10 +1,10 @@
 import { jest } from "@jest/globals";
 
-jest.unstable_mockModule("../../js/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
-const real = await import("../../js/features/map/api.js");
-const mapa = await import("../../js/features/map/api.mock.js");
-const { ID_TALLER_SIMULADO } = await import("../../js/features/requests/simulacion.js");
-const { distanciaKm, estaAbierto, validarFiltros } = await import("../../js/features/map/validar.js");
+jest.unstable_mockModule("../../../apis/supabaseClient.js", () => ({ obtenerCliente: () => ({}) }));
+const real = await import("../../../apis/api-mixanab/map/api.js");
+const mapa = await import("../../../apis/api-mixanab/map/api.mock.js");
+const { ID_TALLER_SIMULADO } = await import("../../../apis/api-mixanab/requests/simulacion.js");
+const { distanciaKm, estaAbierto, validarFiltros } = await import("../../../apis/api-mixanab/map/validar.js");
 
 const CENTRO = { lat: 20.9674, lng: -89.5926 };
 const UUID_AJENO = "99999999-9999-4999-8999-999999999999";

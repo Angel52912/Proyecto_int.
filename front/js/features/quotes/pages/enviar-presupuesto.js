@@ -13,7 +13,7 @@ import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
-import { MAX_MONTO_MXN, fechaDeHoy } from "../validar.js";
+import { MAX_MONTO_MXN, fechaDeHoy } from "../../../../../apis/api-mixanab/quotes/validar.js";
 import { descripcionDelDetalle } from "./presupuesto.js";
 
 /**

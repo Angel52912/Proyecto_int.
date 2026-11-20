@@ -38,7 +38,7 @@ describe("búsqueda de talleres (CU-02)", () => {
     expect(filtroDeLugar("")).toEqual({});
   });
   test("busca en el simulado: 'Todos' sin repetir y ordenado por precio", async () => {
-    const { reiniciarSimulacion } = await import("../../js/features/requests/simulacion.js");
+    const { reiniciarSimulacion } = await import("../../../apis/api-mixanab/requests/simulacion.js");
     reiniciarSimulacion();
     const todos = await buscarTalleres({ service: "all", orden: "precio" });
     expect(new Set(todos.map((t) => t.id)).size).toBe(todos.length);

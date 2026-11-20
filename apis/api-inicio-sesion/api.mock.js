@@ -1,7 +1,7 @@
 // Simulado en memoria de api.js (CU-01). Misma forma de respuesta y de errores que el real.
 // Código de verificación válido en el simulado: CODIGO_SIMULADO. No usa red ni Supabase.
-import { ApiError } from "../../lib/apiError.js";
-import { validarCodigo, validarCorreo, validarImagen } from "../../lib/validate.js";
+import { ApiError } from "../lib/apiError.js";
+import { validarCodigo, validarCorreo, validarImagen } from "../lib/validate.js";
 import { esRutaAvatar } from "./validar.js";
 
 export const CODIGO_SIMULADO = "123456";

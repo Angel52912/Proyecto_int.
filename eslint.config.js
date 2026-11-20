@@ -5,7 +5,7 @@ export default [
   { ignores: ["node_modules/**", "front/js/vendor/**", "back/supabase/**", "coverage/**"] },
   js.configs.recommended,
   {
-    files: ["front/js/**/*.js", "front/sw.js"],
+    files: ["front/js/**/*.js", "apis/**/*.js", "front/sw.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",

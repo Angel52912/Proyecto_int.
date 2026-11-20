@@ -1,8 +1,8 @@
 // Componente de chat reutilizable contra el api simulado (CU-03).
 import { crearChat } from "../../js/features/chat/componente.js";
-import * as chat from "../../js/features/chat/api.mock.js";
-import * as solicitudes from "../../js/features/requests/api.mock.js";
-import { ID_TALLER_SIMULADO, UID_CLIENTE, reiniciarSimulacion } from "../../js/features/requests/simulacion.js";
+import * as chat from "../../../apis/api-mixanab/chat/api.mock.js";
+import * as solicitudes from "../../../apis/api-mixanab/requests/api.mock.js";
+import { ID_TALLER_SIMULADO, UID_CLIENTE, reiniciarSimulacion } from "../../../apis/api-mixanab/requests/simulacion.js";
 
 const esperar = () => new Promise((resolver) => setTimeout(resolver, 0));
 
@@ -68,8 +68,8 @@ describe("crearChat", () => {
 
   test("usa crearTarjeta para los mensajes de presupuesto", async () => {
     const id = await solicitudEnviada();
-    const { fijarSesionSimulada } = await import("../../js/features/requests/simulacion.js");
-    const { sendQuote } = await import("../../js/features/quotes/api.mock.js");
+    const { fijarSesionSimulada } = await import("../../../apis/api-mixanab/requests/simulacion.js");
+    const { sendQuote } = await import("../../../apis/api-mixanab/quotes/api.mock.js");
     fijarSesionSimulada({ rol: "craftsman" });
     const hoy = new Date();
     const fecha = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
