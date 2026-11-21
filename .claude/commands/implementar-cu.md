@@ -14,7 +14,7 @@ Antes de escribir código:
 
 Implementación:
 4. Rama `feat/<cu>-<tema>`.
-5. Migración SQL nueva en `supabase/migrations/` con RLS en cada tabla y bucket (nunca edites una ya aplicada). **No la apliques**: yo lo hago.
+5. Migración SQL nueva en `back/supabase/migrations/` con RLS en cada tabla y bucket (nunca edites una ya aplicada). **No la apliques**: yo lo hago.
 6. Lógica sensible en funciones SQL `security definer` con `search_path = ''`, no en el navegador.
 7. Pantallas mobile-first según `docs/diseno.md`, con los tokens de color y tipografía, en español.
 8. Pruebas Jest: casos felices, errores y **permisos por rol** (qué puede y qué no cada actor).

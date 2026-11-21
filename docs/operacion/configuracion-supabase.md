@@ -6,11 +6,11 @@ Lo que **no** vive en las migraciones y se configura a mano en el panel de cada 
 
 | Proyecto | Para qué | Quién aplica migraciones |
 |---|---|---|
-| Desarrollo | El frontend contra el backend real y los datos de ejemplo (`supabase/seed.sql`) | Angel, con confirmación |
+| Desarrollo | El frontend contra el backend real y los datos de ejemplo (`back/supabase/seed.sql`) | Angel, con confirmación |
 | Pruebas | `npm run test:rls` (cada prueba revierte su transacción) | José |
 | Producción | Usuarios reales | Angel, con confirmación |
 
-Hoy la CLI marca `mixanab` como *production*. Antes de tener usuarios reales conviene crear un proyecto aparte de desarrollo y dejar `mixanab` solo para producción. Para cada proyecto: `npx supabase link` y `npx supabase db push` (siempre con `--dry-run` primero). `supabase/seed.sql` **solo** se ejecuta en desarrollo y pruebas.
+Hoy la CLI marca `mixanab` como *production*. Antes de tener usuarios reales conviene crear un proyecto aparte de desarrollo y dejar `mixanab` solo para producción. Para cada proyecto: `npx supabase link` y `npx supabase db push` (siempre con `--dry-run` primero). `back/supabase/seed.sql` **solo** se ejecuta en desarrollo y pruebas.
 
 ## 2. Authentication
 
@@ -27,7 +27,7 @@ Hoy la CLI marca `mixanab` como *production*. Antes de tener usuarios reales con
 ## 3. Data API (PostgREST)
 
 - **Settings → API → Exposed schemas:** solo `public`. El esquema `private` (helpers de RLS y `private.order_pins`) **no** debe estar expuesto.
-- La `anon key` es pública y puede ir en `js/config.js`. La `service_role` **nunca** va en el frontend ni en el repositorio.
+- La `anon key` es pública y puede ir en `apis/config.js`. La `service_role` **nunca** va en el frontend ni en el repositorio.
 
 ## 4. Realtime
 

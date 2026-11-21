@@ -10,12 +10,12 @@
     "test:rls": "node --experimental-vm-modules node_modules/jest/bin/jest.js --selectProjects rls --passWithNoTests",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "vendor": "node scripts/vendor.mjs",
-    "postinstall": "node scripts/vendor.mjs",
-    "db:init": "npx supabase init",
-    "db:start": "npx supabase start",
-    "db:reset": "npx supabase db reset",
-    "db:stop": "npx supabase stop"
+    "vendor": "node back/scripts/vendor.mjs",
+    "postinstall": "node back/scripts/vendor.mjs",
+    "db:init": "cd back && npx supabase init",
+    "db:start": "cd back && npx supabase start",
+    "db:reset": "cd back && npx supabase db reset",
+    "db:stop": "cd back && npx supabase stop"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",

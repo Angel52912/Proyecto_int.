@@ -10,14 +10,14 @@ export default {
       displayName: "unit",
       testEnvironment: "jsdom",
       transform: {},
-      testMatch: ["<rootDir>/tests/unit/**/*.test.js"],
+      testMatch: ["<rootDir>/front/tests/unit/**/*.test.js"],
     },
     {
       // Requiere un proyecto de Supabase de pruebas (TEST_DATABASE_URL en .env.test) o Supabase local (`npm run db:start`).
       displayName: "rls",
       testEnvironment: "node",
       transform: {},
-      testMatch: ["<rootDir>/tests/rls/**/*.test.js"],
+      testMatch: ["<rootDir>/back/tests/rls/**/*.test.js"],
     },
   ],
 };

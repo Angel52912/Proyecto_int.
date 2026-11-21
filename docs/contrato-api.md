@@ -5,18 +5,18 @@ Si algo cambia aquí, se actualiza en el mismo commit que el cambio de código.
 
 ## Convenciones
 
-- Cada función de `api.js` devuelve una promesa. Éxito: el valor descrito en "Respuesta". Error: lanza `ApiError` (`js/lib/apiError.js`) con `error.code` igual a uno de los códigos de la tabla de errores.
-- Las pantallas importan `api` de `js/features/<modulo>/index.js`, que elige real o simulado según `USAR_API_SIMULADA`.
+- Cada función de `api.js` devuelve una promesa. Éxito: el valor descrito en "Respuesta". Error: lanza `ApiError` (`apis/lib/apiError.js`) con `error.code` igual a uno de los códigos de la tabla de errores.
+- Las pantallas importan `api` de `front/js/features/<modulo>/index.js`, que elige entre `api.js` y `api.mock.js` de `apis/` según `USAR_API_SIMULADA`.
 - Los errores de funciones SQL viajan en el mensaje de la excepción (`raise exception 'role_already_set'`) y `traducirError` los convierte en `code`.
 - Excepción: las funciones que lo indiquen (p. ej. `verify_delivery_pin`) devuelven el resultado en lugar de lanzar.
 - Nombres de campos en `snake_case` (igual que la base de datos). Fechas en ISO 8601; montos en MXN como número.
-- El frontend nunca llama a Supabase directo: solo importa `api.js` del módulo.
+- El frontend nunca llama a Supabase directo: solo importa el `index.js` del módulo, que elige la versión de `apis/`.
 - Roles: `client`, `craftsman`, `admin`, `sin rol` (sesión sin rol elegido) y `anónimo` (sin sesión).
 
 ## Plantilla por función
 
 ### `nombreFuncion(parametros)`
-- **Módulo:** `js/features/<modulo>/api.js`
+- **Módulo:** `apis/api-mixanab/<modulo>/api.js` (para `auth`, `apis/api-inicio-sesion/api.js`)
 - **Parámetros:** `nombre: tipo` (obligatorio u opcional, restricciones).
 - **Respuesta:** forma del objeto devuelto.
 - **Errores:** códigos que puede lanzar.
@@ -32,11 +32,11 @@ Si algo cambia aquí, se actualiza en el mismo commit que el cambio de código.
 | `inactive_user` | `profiles.active` es falso. |
 | `not_found` | El recurso no existe o no es visible para el usuario. |
 | `invalid_input` | Parámetros inválidos (formato, longitud, rango). |
-| `unexpected` | Error no reconocido (se traduce en `js/lib/apiError.js`). |
+| `unexpected` | Error no reconocido (se traduce en `apis/lib/apiError.js`). |
 
 ## CU-01. Registro, rol y perfil (módulo `auth`)
 
-Estado: **backend listo para revisión** (migraciones `0001_base`, `0002_profiles`, `0003_client_private`; sin aplicar). `api.js` y `api.mock.js` en `js/features/auth/`.
+Estado: **backend listo para revisión** (migraciones `0001_base`, `0002_profiles`, `0003_client_private`; sin aplicar). `api.js` y `api.mock.js` en `apis/api-inicio-sesion/`.
 Simulado: el código de verificación válido es `123456` (`CODIGO_SIMULADO`); `reiniciarSimulacion()` limpia el estado (solo mock, para pruebas).
 
 Tipos: `Perfil = { id, role: 'client' | 'craftsman' | 'admin' | null, full_name: string, avatar_path: string | null, active: boolean }`.
@@ -107,7 +107,7 @@ Perfil nuevo: `role: null`, `full_name: ''`, `active: true`. El nombre no se tom
 
 ## CU-07. Perfil de taller (módulo `workshop`)
 
-Estado: **backend listo para revisión** (migraciones `0004_workshops`, `0005_workshop_photos`, `0006_workshop_publish`; sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/workshop/`.
+Estado: **backend listo para revisión** (migraciones `0004_workshops`, `0005_workshop_photos`, `0006_workshop_publish`; sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/workshop/`.
 Simulado: la sesión es de un artesano activo; `reiniciarSimulacion()` y `fijarSesionSimulada({ sesion, rol, activo })` solo existen en el mock (para pruebas). Las URLs de fotos son `https://simulado.local/workshop-photos/{path}`.
 
 Código nuevo en errores comunes: `limit_reached` (se superó un límite de negocio: 10 fotos de trabajos por taller; CU-03 lo usará para las 5 solicitudes activas).
@@ -159,8 +159,8 @@ Notas de visibilidad (para CU-02): el cliente activo solo ve talleres `published
 
 ## CU-03. Solicitud de cotización y chat (módulos `requests` y `chat`)
 
-Estado: **backend listo para revisión** (migraciones `0007_service_requests`, `0008_request_photos`, `0009_messages_notifications`, `0010_request_functions`; sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/requests/` y `js/features/chat/`.
-Simulado: ambos módulos comparten estado (`js/features/requests/simulacion.js`). La sesión por defecto es un cliente activo y hay un taller simulado publicado (`ID_TALLER_SIMULADO`, servicios `repair` y `cleaning`). Solo en el mock: `reiniciarSimulacion()`, `fijarSesionSimulada({ sesion, rol, activo })` (cambia a `craftsman` para actuar como el artesano de esa solicitud) y `fijarTallerSimulado({ published, suspended, services })`. Las URLs de fotos son `https://simulado.local/request-photos/{path}`.
+Estado: **backend listo para revisión** (migraciones `0007_service_requests`, `0008_request_photos`, `0009_messages_notifications`, `0010_request_functions`; sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/requests/` y `apis/api-mixanab/chat/`.
+Simulado: ambos módulos comparten estado (`apis/api-mixanab/requests/simulacion.js`). La sesión por defecto es un cliente activo y hay un taller simulado publicado (`ID_TALLER_SIMULADO`, servicios `repair` y `cleaning`). Solo en el mock: `reiniciarSimulacion()`, `fijarSesionSimulada({ sesion, rol, activo })` (cambia a `craftsman` para actuar como el artesano de esa solicitud) y `fijarTallerSimulado({ published, suspended, services })`. Las URLs de fotos son `https://simulado.local/request-photos/{path}`.
 
 Códigos nuevos en errores comunes:
 
@@ -247,8 +247,8 @@ Límites: descripción de 1 a 1000 caracteres, mensaje de 1 a 2000, máximo 5 fo
 
 ## CU-04. Presupuesto y orden de trabajo (módulos `quotes` y `orders`)
 
-Estado: **backend listo para revisión** (migración `0011_quotes_orders`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/quotes/`; `api.js` y `api.mock.js` (solo lectura) en `js/features/orders/`.
-Simulado: comparte estado con `requests` y `chat` (`js/features/requests/simulacion.js`). El artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`. La tarjeta de presupuesto aparece en `listMessages` como mensaje `kind: 'quote_card'` con `quote_id`.
+Estado: **backend listo para revisión** (migración `0011_quotes_orders`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/quotes/`; `api.js` y `api.mock.js` (solo lectura) en `apis/api-mixanab/orders/`.
+Simulado: comparte estado con `requests` y `chat` (`apis/api-mixanab/requests/simulacion.js`). El artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`. La tarjeta de presupuesto aparece en `listMessages` como mensaje `kind: 'quote_card'` con `quote_id`.
 
 Tipos:
 - `Presupuesto = { id, request_id, amount_mxn: number, delivery_date: 'YYYY-MM-DD', detail: object, status: 'sent' | 'accepted' | 'rejected' | 'superseded', created_at, responded_at: string | null }`. `detail` es un objeto libre (p. ej. desglose); máximo 2000 caracteres al serializar.
@@ -287,7 +287,7 @@ Sin códigos de error nuevos.
 
 ## CU-05. Fases del pedido y fotos de avance (módulo `orders`)
 
-Estado: **backend listo para revisión** (migración `0012_order_phases`, sin aplicar). `api.js` y `api.mock.js` en `js/features/orders/`. Simulado: comparte estado con `requests`; el artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`.
+Estado: **backend listo para revisión** (migración `0012_order_phases`, sin aplicar). `api.js` y `api.mock.js` en `apis/api-mixanab/orders/`. Simulado: comparte estado con `requests`; el artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`.
 
 Tipos:
 - `Avance = { id, order_id, phase: 1 a 4, photo_path, note: string | null, corrected: boolean, created_by, created_at }`; `AvanceConFoto = Avance & { url }` (URL firmada de 1 h; el bucket `progress-photos` es privado).
@@ -315,7 +315,7 @@ Tipos:
 
 ## CU-06. Entrega con PIN y calificación (módulo `orders`)
 
-Estado: **backend listo para revisión** (migraciones `0013_order_pins` y `0014_delivery_reviews`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/orders/`. Simulado: comparte estado con `requests`; el cliente es la sesión por defecto y el artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`.
+Estado: **backend listo para revisión** (migraciones `0013_order_pins` y `0014_delivery_reviews`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/orders/`. Simulado: comparte estado con `requests`; el cliente es la sesión por defecto y el artesano actúa con `fijarSesionSimulada({ rol: "craftsman" })`.
 
 Tipos:
 - `PinEntrega = { order_id, pin: string }` (6 dígitos). `ResultadoPin = { ok: boolean, attempts_left: 0 a 5, locked_until: string | null, status }`.
@@ -349,7 +349,7 @@ Tipos:
 
 ## CU-02. Búsqueda de talleres en el mapa (módulo `map`)
 
-Estado: **backend listo para revisión** (migración `0015_workshop_search`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/map/`. Simulado: 5 talleres de muestra en Mérida (uno suspendido, otro sin calificación, uno siempre abierto y otro siempre cerrado); la sesión es la compartida de `requests` (cliente por defecto). Pruebas: `reiniciarSimulacion()`, `fijarTalleresSimulados(lista)` y `fijarSesionSimulada(...)`.
+Estado: **backend listo para revisión** (migración `0015_workshop_search`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/map/`. Simulado: 5 talleres de muestra en Mérida (uno suspendido, otro sin calificación, uno siempre abierto y otro siempre cerrado); la sesión es la compartida de `requests` (cliente por defecto). Pruebas: `reiniciarSimulacion()`, `fijarTalleresSimulados(lista)` y `fijarSesionSimulada(...)`.
 
 Solo el **cliente activo** busca y ve perfiles. Artesano, admin y usuario sin rol reciben `forbidden`. Solo aparecen talleres publicados y no suspendidos; nunca se devuelve `owner_id`, `published` ni `suspended`.
 
@@ -374,7 +374,7 @@ Tipos:
 
 ## CU-08. Administración de la plataforma (módulo `admin`)
 
-Estado: **backend listo para revisión** (migración `0016_admin`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `js/features/admin/`. Simulado: 7 usuarios (2 admin, 2 clientes, 2 artesanos, 1 sin rol), 3 talleres, 3 reseñas, 4 solicitudes y 3 pedidos. Para actuar como admin: `fijarSesionSimulada({ rol: "admin" })` (el `reiniciarSimulacion()` del módulo ya lo deja así).
+Estado: **backend listo para revisión** (migración `0016_admin`, sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/admin/`. Simulado: 7 usuarios (2 admin, 2 clientes, 2 artesanos, 1 sin rol), 3 talleres, 3 reseñas, 4 solicitudes y 3 pedidos. Para actuar como admin: `fijarSesionSimulada({ rol: "admin" })` (el `reiniciarSimulacion()` del módulo ya lo deja así).
 
 **Acceso:** el admin es una cuenta interna creada a mano con la clave de servicio (no se elige en el registro). Inicia sesión con el acceso normal y `getMyProfile()` devuelve `role: 'admin'`; la pantalla del panel solo se muestra con ese rol. **Todas** las funciones exigen un admin activo: cliente, artesano, sin rol y admin inactivo reciben `forbidden` o `inactive_user`.
 

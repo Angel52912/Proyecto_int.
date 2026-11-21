@@ -1,0 +1,191 @@
+import { randomUUID } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
+import pg from "pg";
+
+/**
+ * Lee `TEST_DATABASE_URL` del entorno o de `.env.test` (ignorado por Git). Nunca la imprime.
+ * @returns {string}
+ */
+function leerUrlDePruebas() {
+  const deEntorno = process.env.TEST_DATABASE_URL;
+  if (deEntorno) return deEntorno;
+  if (existsSync(".env.test")) {
+    for (const linea of readFileSync(".env.test", "utf8").split(/\r?\n/)) {
+      const coincidencia = /^\s*TEST_DATABASE_URL\s*=\s*(.+?)\s*$/.exec(linea);
+      if (coincidencia) return coincidencia[1].replace(/^["']|["']$/g, "");
+    }
+  }
+  throw new Error("Falta TEST_DATABASE_URL (ver back/tests/rls/ejemplo-env-pruebas.txt). Debe apuntar al proyecto de PRUEBAS.");
+}
+
+/**
+ * Abre una conexión y una transacción. Todo lo que hagan las pruebas se revierte al cerrar.
+ * @returns {Promise<pg.Client>}
+ */
+export async function abrirTransaccion() {
+  const cliente = new pg.Client({ connectionString: leerUrlDePruebas(), ssl: { rejectUnauthorized: false } });
+  await cliente.connect();
+  await cliente.query("begin");
+  return cliente;
+}
+
+/**
+ * Revierte la transacción y cierra la conexión.
+ * @param {pg.Client} cliente
+ * @returns {Promise<void>}
+ */
+export async function cerrarTransaccion(cliente) {
+  try {
+    await cliente.query("rollback");
+  } finally {
+    await cliente.end();
+  }
+}
+
+/**
+ * Crea un usuario en auth.users (el trigger crea su perfil) y devuelve su id.
+ * @param {pg.Client} cliente
+ * @param {string} correo
+ * @param {object} [metadata] raw_user_meta_data (para probar que se ignora)
+ * @returns {Promise<string>}
+ */
+export async function crearUsuario(cliente, correo, metadata = {}) {
+  await cliente.query("reset role");
+  const { rows } = await cliente.query(
+    "insert into auth.users (id, email, raw_user_meta_data) values (gen_random_uuid(), $1, $2::jsonb) returning id",
+    [correo, JSON.stringify(metadata)],
+  );
+  return rows[0].id;
+}
+
+/**
+ * Crea un usuario con el rol indicado (o sin rol) y, si se da, le asigna nombre.
+ * @param {pg.Client} cliente
+ * @param {"client" | "craftsman" | "admin" | null} rol
+ * @param {{ correo?: string, nombre?: string }} [opciones]
+ * @returns {Promise<string>}
+ */
+export async function crearUsuarioConRol(cliente, rol, opciones = {}) {
+  const uid = await crearUsuario(cliente, opciones.correo ?? `${randomUUID()}@prueba.test`);
+  if (rol) await asignarRol(cliente, uid, rol);
+  if (opciones.nombre) {
+    await cliente.query("update public.profiles set full_name = $2 where id = $1", [uid, opciones.nombre]);
+  }
+  return uid;
+}
+
+/**
+ * Devuelve `usuarioConRol(rol, nombre)` ligado a una conexión para no repetirlo en cada archivo de pruebas.
+ * @param {pg.Client} cliente
+ * @returns {(rol: "client" | "craftsman" | "admin" | null, nombre?: string) => Promise<string>}
+ */
+export function crearUsuarioFactory(cliente) {
+  return (rol, nombre) => crearUsuarioConRol(cliente, rol, { nombre });
+}
+
+/**
+ * Asigna el rol como superusuario (simula la creación manual del admin o un rol ya elegido).
+ * @param {pg.Client} cliente
+ * @param {string} uid
+ * @param {"client" | "craftsman" | "admin"} rol
+ * @returns {Promise<void>}
+ */
+export async function asignarRol(cliente, uid, rol) {
+  await cliente.query("reset role");
+  await cliente.query("update public.profiles set role = $2::public.user_role where id = $1", [uid, rol]);
+}
+
+/**
+ * Desactiva un perfil como superusuario (las pruebas lo usan para simular cuentas inactivas).
+ * @param {pg.Client} cliente
+ * @param {string} uid
+ * @returns {Promise<void>}
+ */
+export async function desactivarUsuario(cliente, uid) {
+  await cliente.query("reset role");
+  await cliente.query("update public.profiles set active = false where id = $1", [uid]);
+}
+
+/**
+ * Actúa como un usuario autenticado (uid) o como anónimo (uid nulo) hasta el siguiente cambio.
+ * @param {pg.Client} cliente
+ * @param {string | null} uid
+ * @returns {Promise<void>}
+ */
+export async function actuarComo(cliente, uid) {
+  await cliente.query("reset role");
+  if (uid === null) {
+    await cliente.query("select set_config('request.jwt.claims', '', true)");
+    await cliente.query("set local role anon");
+    return;
+  }
+  const claims = JSON.stringify({ sub: uid, role: "authenticated" });
+  await cliente.query("select set_config('request.jwt.claims', $1, true)", [claims]);
+  await cliente.query("set local role authenticated");
+}
+
+/**
+ * Autenticado pero sin `sub` (token sin usuario): auth.uid() es nulo.
+ * @param {pg.Client} cliente
+ * @returns {Promise<void>}
+ */
+export async function actuarSinUsuario(cliente) {
+  await cliente.query("reset role");
+  await cliente.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify({ role: "authenticated" })]);
+  await cliente.query("set local role authenticated");
+}
+
+/**
+ * Ejecuta una consulta que puede fallar sin abortar la transacción (usa un savepoint).
+ * @param {pg.Client} cliente
+ * @param {string} sql
+ * @param {unknown[]} [parametros]
+ * @returns {Promise<{ rows: any[], rowCount: number, error: (Error & { code?: string }) | null }>}
+ */
+export async function intentar(cliente, sql, parametros = []) {
+  await cliente.query("savepoint intento");
+  try {
+    const resultado = await cliente.query(sql, parametros);
+    await cliente.query("release savepoint intento");
+    return { rows: resultado.rows, rowCount: resultado.rowCount ?? 0, error: null };
+  } catch (error) {
+    await cliente.query("rollback to savepoint intento");
+    return { rows: [], rowCount: 0, error: /** @type {Error & { code?: string }} */ (error) };
+  }
+}
+
+/**
+ * Ejecuta un DELETE directo sobre storage.objects. En Supabase real está bloqueado ("Direct deletion from storage
+ * tables is not allowed") salvo que la transacción lo permita con este ajuste local; así se prueban las políticas
+ * de DELETE sin pasar por la API de Storage.
+ * @param {pg.Client} cliente
+ * @param {string} sql
+ * @param {unknown[]} [parametros]
+ * @returns {Promise<{ rows: any[], rowCount: number, error: (Error & { code?: string }) | null }>}
+ */
+export async function intentarBorradoStorage(cliente, sql, parametros = []) {
+  await cliente.query("select set_config('storage.allow_delete_query', 'true', true)");
+  return intentar(cliente, sql, parametros);
+}
+
+/**
+ * Inserta un archivo en Storage como superusuario (simula una subida ya realizada).
+ * @param {pg.Client} cliente
+ * @param {string} bucket
+ * @param {string} ruta
+ * @returns {Promise<void>}
+ */
+export async function crearArchivoStorage(cliente, bucket, ruta) {
+  await cliente.query("reset role");
+  await cliente.query("insert into storage.objects (bucket_id, name) values ($1, $2)", [bucket, ruta]);
+}
+
+/**
+ * ¿El resultado equivale a "sin acceso"? En Supabase real `anon` conserva SELECT sobre las tablas de Storage y las
+ * políticas devuelven cero filas; con Supabase local falla con permission denied (42501). Ambas cuentan como denegado.
+ * @param {{ rows: any[], error: (Error & { code?: string }) | null }} resultado
+ * @returns {boolean}
+ */
+export function sinAcceso(resultado) {
+  return resultado.error?.code === "42501" || (resultado.error === null && resultado.rows.length === 0);
+}
