@@ -15,7 +15,7 @@ sirva desde ahí; las librerías y los datos viven en `apis/`.
 | `js/ui/` | Componentes compartidos de interfaz (mensajes, sesión, `vista.js` para el alternador Android/PC de admin). |
 | `js/features/auth/pages/portada.js` | Pantalla de inicio pública: logo, eslogan y acceso. |
 | `js/features/<modulo>/` | `routes.js`, `index.js` (elige API real/simulada), `pages/`, `componentes.js` y lógica de presentación. |
-| `js/lib/` | Utilidades de la interfaz (escape, fechas, imágenes, formato MXN). |
+| `js/lib/` | Utilidades de la interfaz (escape, fechas, imágenes, formato MXN y `geocodificar.js`). |
 | `js/vendor/` | Generado por `npm run vendor`; no se versiona. |
 | `tests/unit/` | Pruebas Jest/jsdom de la interfaz. |
 
@@ -37,6 +37,10 @@ sirva desde ahí; las librerías y los datos viven en `apis/`.
 
 El ancho y la navegación se adaptan a escritorio desde `css/layout.css`. El botón flotante
 `js/ui/vista.js` solo aparece para `admin` y fuerza la vista Android o PC.
+
+En **Tu taller**, al tocar el mapa se completa Dirección, Colonia y C.P. con la geocodificación
+inversa de Nominatim (OpenStreetMap). La CSP de `index.html` permite ese único origen externo en
+`connect-src`; las peticiones se encolan (máximo 1 por segundo) y se cachean por coordenada.
 
 ## Cómo servirlo
 
