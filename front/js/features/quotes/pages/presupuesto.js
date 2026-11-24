@@ -85,7 +85,7 @@ function pintarPresupuesto({ presupuesto, solicitud, taller }) {
   return [
     crear("article", { clase: "tarjeta presupuesto__tarjeta" }, [
       crear("div", { clase: "tarjeta--enlace" }, [
-        crearFoto(taller?.photos?.find((/** @type {any} */ f) => f.kind === "profile")?.url, "Foto del taller"),
+        crearFoto(taller?.photos?.find((/** @type {any} */ f) => f.kind === "profile")?.url, "Foto del taller", undefined, taller?.name ?? solicitud.counterpart?.full_name),
         crear("div", { clase: "tarjeta__cuerpo" }, [
           crear("p", { clase: "tarjeta__titulo", texto: taller?.name ?? solicitud.counterpart?.full_name ?? "Taller" }),
           taller ? crear("p", { clase: "tarjeta__detalle linea-calificacion" }, [crearEstrellas(taller.rating_avg), crear("span", { texto: taller.rating_avg?.toFixed(1) ?? "Nuevo" })]) : null,

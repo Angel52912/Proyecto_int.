@@ -29,6 +29,21 @@ export function textoHorarioHoy(horario, ahora = new Date()) {
 }
 
 /**
+ * Etiqueta de estado del taller. `is_open` (del servidor, hora de Mérida) decide si está abierto;
+ * el horario solo agrega detalle ("Abierto hasta 19:00", "Abre a las 16:00").
+ * @param {{ is_open: boolean, hours: Record<string, { open: string, close: string }[]> | null }} taller
+ * @param {Date} [ahora]
+ * @returns {{ texto: string, tono: "exito" | "miel" | "neutra" }}
+ */
+export function estadoDeHoy(taller, ahora = new Date()) {
+  const hoy = textoHorarioHoy(taller.hours, ahora);
+  const diceAbierto = hoy.startsWith("Abierto");
+  if (taller.is_open) return { texto: diceAbierto ? hoy : "Abierto ahora", tono: "exito" };
+  if (diceAbierto) return { texto: "Cerrado ahora", tono: "neutra" };
+  return { texto: hoy, tono: hoy.startsWith("Abre") ? "miel" : "neutra" };
+}
+
+/**
  * Enlace de indicaciones en Google Maps (abre la app de mapas del teléfono).
  * @param {number} lat
  * @param {number} lng
@@ -85,9 +100,10 @@ function pintarRecoger({ pedido, taller }) {
     taller
       ? crear("div", { clase: "tarjeta tarjeta--enlace" }, [
           icono("mapa", { clase: "recoger__pin-icono" }),
-          crear("div", { clase: "tarjeta__cuerpo" }, [
+          crear("div", { clase: "tarjeta__cuerpo recoger__taller" }, [
             crear("p", { clase: "tarjeta__titulo", texto: taller.name }),
-            crear("p", { clase: "tarjeta__detalle", texto: `${taller.address}, ${taller.colonia} · ${textoHorarioHoy(taller.hours)}` }),
+            crear("p", { clase: "tarjeta__detalle", texto: `${taller.address}, ${taller.colonia}` }),
+            crearInsignia(estadoDeHoy(taller).texto, estadoDeHoy(taller).tono),
           ]),
         ])
       : null,

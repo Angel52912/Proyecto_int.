@@ -9,8 +9,9 @@ import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearInsignia, crearPantalla, crearProgreso } from "../../../ui/layout.js";
+import { crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { ESTADO_ORDEN, NOMBRE_FASE } from "../fases.js";
+import { crearPasos } from "../pasos.js";
 import { api } from "../index.js";
 
 /**
@@ -63,7 +64,8 @@ function pintarSeguimiento({ pedido, avances, solicitud, taller }) {
         crear("span", { clase: "texto-secundario", texto: pedido.status === "in_progress" ? `Fase ${pedido.phase} de 4` : estado.texto }),
         crear("strong", { clase: "seguimiento__porcentaje", texto: `${Math.round(progreso * 100)}%` }),
       ]),
-      crearProgreso(progreso, "Avance del pedido"),
+      // Misma barra de 4 pasos que en Inicio y Mis pedidos.
+      crearPasos(pedido),
     ]),
     crear(
       "ol",

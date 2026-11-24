@@ -1,6 +1,6 @@
 // 09 · Perfil del taller (CU-02): calificación, servicios, horario, precio "desde", trabajos recientes y Solicitar cotización.
 import { api as apiSolicitudes } from "../../requests/index.js";
-import { textoHorarioHoy, urlComoLlegar } from "../../orders/pages/recoger.js";
+import { estadoDeHoy, urlComoLlegar } from "../../orders/pages/recoger.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
@@ -44,20 +44,8 @@ export function indiceDeHoy(ahora = new Date()) {
   return (ahora.getDay() + 6) % 7;
 }
 
-/**
- * Etiqueta de estado del taller. `is_open` (del servidor, hora de Mérida) decide si está abierto;
- * el horario solo agrega detalle ("Abierto hasta 19:00", "Abre a las 16:00").
- * @param {{ is_open: boolean, hours: Record<string, { open: string, close: string }[]> | null }} taller
- * @param {Date} [ahora]
- * @returns {{ texto: string, tono: "exito" | "miel" | "neutra" }}
- */
-export function estadoDeHoy(taller, ahora = new Date()) {
-  const hoy = textoHorarioHoy(taller.hours, ahora);
-  const diceAbierto = hoy.startsWith("Abierto");
-  if (taller.is_open) return { texto: diceAbierto ? hoy : "Abierto ahora", tono: "exito" };
-  if (diceAbierto) return { texto: "Cerrado ahora", tono: "neutra" };
-  return { texto: hoy, tono: hoy.startsWith("Abre") ? "miel" : "neutra" };
-}
+// Vive en recoger.js junto a textoHorarioHoy; se reexporta para las pruebas y otros usos.
+export { estadoDeHoy };
 
 /** @param {"repair" | "cleaning"} servicio */
 function crearServicio(servicio) {
