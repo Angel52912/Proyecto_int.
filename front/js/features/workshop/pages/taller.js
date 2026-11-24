@@ -1,7 +1,7 @@
 // 17 · Datos del taller (Artesano, CU-07): nombre, fotos, dirección, ubicación en el mapa, servicios, horario,
 // precio "desde", Guardar y Publicar taller. A1: resalta los campos obligatorios que faltan.
 import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet } from "../../map/componentes.js";
-import { geocodificarDireccion, reverseGeocode } from "../../../lib/geocodificar.js";
+import { geocodificarDireccion, reverseGeocodeDetallado } from "../../../lib/geocodificar.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
@@ -207,14 +207,32 @@ function pintarFormulario(tallerInicial) {
   // Mapa: al tocarlo se fija el punto y se completa la dirección; al escribir la dirección se mueve el punto.
   const mapaContenedor = crear("div", { clase: "taller__mapa", attrs: { role: "application", "aria-label": "Toca el mapa para marcar la ubicación del taller" } });
   const textoUbicacion = crear("p", { clase: "texto-secundario", texto: "Toca el mapa para marcar tu taller o escribe la dirección." });
+  const avisoUbicacion = crear("p", { clase: "campo__error", attrs: { role: "alert", "aria-live": "assertive" } });
+  avisoUbicacion.hidden = true;
   /** @type {any} */
   let mapaTaller = null;
   /** @type {any} */
   let marcador = null;
   let versionCampos = 0;
-  let versionConsultada = -1;
   /** @type {ReturnType<typeof setTimeout> | null} */
   let temporizadorCampos = null;
+
+  const limpiarAviso = () => {
+    avisoUbicacion.textContent = "";
+    avisoUbicacion.hidden = true;
+  };
+  /** @param {string} mensaje */
+  const mostrarAviso = (mensaje) => {
+    avisoUbicacion.textContent = mensaje;
+    avisoUbicacion.hidden = false;
+  };
+  /** @param {string} motivo */
+  const mensajeDeUbicacion = (motivo) =>
+    ({
+      no_encontrado: "No encontramos esa dirección en el mapa. Revisa la calle, el número, la colonia y el C.P.",
+      incompleto: "Para ubicar el taller escribe la calle y el número, además de la colonia o el C.P.",
+      error: "No se pudo consultar la dirección. Revisa tu conexión e inténtalo de nuevo.",
+    })[motivo] ?? "No se pudo consultar la dirección. Inténtalo de nuevo.";
 
   /** @param {{ lat: number, lng: number }} punto */
   const colocar = (punto) => {
@@ -228,29 +246,42 @@ function pintarFormulario(tallerInicial) {
   /** @param {{ lat: number, lng: number }} punto */
   const completarCampos = async (punto) => {
     const version = versionCampos;
+    limpiarAviso();
     textoUbicacion.textContent = "Ubicación marcada. Buscando dirección…";
-    const datos = await reverseGeocode(punto);
+    const { direccion: datos, motivo } = await reverseGeocodeDetallado(punto);
     // Descarta la respuesta si el artesano movió el pin o editó los campos mientras llegaba.
     if (versionCampos !== version || !ubicacion || ubicacion.lat !== punto.lat || ubicacion.lng !== punto.lng) return;
-    if (datos?.direccion) direccion.value = datos.direccion;
-    if (datos?.colonia) colonia.value = datos.colonia;
-    if (datos?.codigoPostal) cp.value = datos.codigoPostal;
-    textoUbicacion.textContent = datos
-      ? "Ubicación marcada. Dirección, colonia y C.P. completados. Puedes mover el punto."
-      : "Ubicación marcada. No se encontró la dirección; puedes escribirla.";
+    if (datos) {
+      direccion.value = datos.direccion;
+      colonia.value = datos.colonia;
+      cp.value = datos.codigoPostal;
+      textoUbicacion.textContent = "Ubicación marcada. Dirección, colonia y C.P. completados. Puedes mover el punto.";
+      return;
+    }
+    textoUbicacion.textContent = "Ubicación marcada, pero no se pudo completar la dirección.";
+    mostrarAviso(mensajeDeUbicacion(motivo));
   };
 
   const moverDesdeCampos = () => {
     versionCampos += 1;
     if (temporizadorCampos) clearTimeout(temporizadorCampos);
+    limpiarAviso();
+    if (![direccion.value, colonia.value, cp.value].some((valor) => valor.trim())) {
+      textoUbicacion.textContent = "Toca el mapa para marcar tu taller o escribe la dirección.";
+      return;
+    }
+    textoUbicacion.textContent = "Buscando la dirección en el mapa…";
     temporizadorCampos = setTimeout(async () => {
       const version = versionCampos;
-      if (version === versionConsultada) return;
-      const punto = await geocodificarDireccion({ direccion: direccion.value, colonia: colonia.value, codigoPostal: cp.value });
-      versionConsultada = version;
-      if (!punto || version !== versionCampos) return;
-      colocar(punto);
-      textoUbicacion.textContent = "Ubicación actualizada desde la dirección. Puedes mover el punto en el mapa.";
+      const { punto, motivo } = await geocodificarDireccion({ direccion: direccion.value, colonia: colonia.value, codigoPostal: cp.value });
+      if (version !== versionCampos) return;
+      if (punto) {
+        colocar(punto);
+        textoUbicacion.textContent = "Ubicación actualizada desde la dirección. Puedes mover el punto en el mapa.";
+        return;
+      }
+      textoUbicacion.textContent = "No se pudo actualizar el punto desde la dirección.";
+      mostrarAviso(mensajeDeUbicacion(motivo));
     }, 600);
   };
   for (const campo of [direccion, colonia, cp]) campo.addEventListener("input", moverDesdeCampos);
@@ -262,6 +293,7 @@ function pintarFormulario(tallerInicial) {
     mapaTaller = crearMapaLeaflet(mapaContenedor, { centro: ubicacion ?? CENTRO_MERIDA, zoom: ubicacion ? 16 : 13 });
     if (mapaTaller === null) {
       textoUbicacion.textContent = "No se pudo cargar el mapa.";
+      mostrarAviso("No se pudo cargar el mapa. Revisa tu conexión e inténtalo de nuevo.");
       return;
     }
     alSalir(() => mapaTaller?.remove());
@@ -537,7 +569,7 @@ function pintarFormulario(tallerInicial) {
     crear("div", { clase: "campo" }, [crear("span", { clase: "campo__etiqueta", texto: "Fotos del taller" }), entradaFoto, fotos, avisoFotos]),
     campo("direccion", "Dirección", direccion, "mapa"),
     crear("div", { clase: "filtros__fila" }, [campo("colonia", "Colonia", colonia), campo("cp", "C.P.", cp)]),
-    crear("div", { clase: "campo", attrs: { "data-campo": "ubicacion" } }, [crear("span", { clase: "campo__etiqueta", texto: "Ubicación en el mapa" }), mapaContenedor, textoUbicacion]),
+    crear("div", { clase: "campo", attrs: { "data-campo": "ubicacion" } }, [crear("span", { clase: "campo__etiqueta", texto: "Ubicación en el mapa" }), mapaContenedor, textoUbicacion, avisoUbicacion]),
     crear("div", { clase: "campo", attrs: { "data-campo": "servicios" } }, [crear("span", { clase: "campo__etiqueta", texto: "Servicios" }), chipsServicios]),
     crear("section", { clase: "campo taller__horario", attrs: { "data-campo": "horario" } }, [
       crear("span", { clase: "campo__etiqueta", texto: "Horario" }),
