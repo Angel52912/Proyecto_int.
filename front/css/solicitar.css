@@ -66,6 +66,24 @@
   outline: 3px solid var(--color-miel);
 }
 
+.solicitar__servicios {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.solicitar__servicios .chip {
+  flex: 1 1 calc(50% - var(--espacio-2));
+  justify-content: flex-start;
+  min-width: 120px;
+  border-radius: var(--radio);
+}
+
+.solicitar__descripcion {
+  resize: vertical;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
 .contador {
   align-self: flex-end;
   color: var(--color-gris);
