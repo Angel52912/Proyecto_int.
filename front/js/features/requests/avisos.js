@@ -55,6 +55,34 @@ export function textoDelAviso({ type, payload }) {
   }
 }
 
+/** @typedef {"cuero" | "cenote" | "miel" | "exito" | "error"} TonoAviso */
+
+/** Color del ícono de cada tipo de aviso: buenas noticias en verde, dinero en cenote, problemas en rojo. */
+const TONO_AVISO = /** @type {Readonly<Record<string, TonoAviso>>} */ (
+  Object.freeze({
+    request_received: "miel",
+    request_cancelled: "error",
+    quote_received: "cenote",
+    quote_accepted: "exito",
+    quote_rejected: "error",
+    order_created: "cenote",
+    order_phase_changed: "cuero",
+    order_ready: "exito",
+    order_delivered: "miel",
+    review_received: "miel",
+    workshop_suspended: "error",
+    workshop_reactivated: "exito",
+  })
+);
+
+/**
+ * @param {string} tipo
+ * @returns {TonoAviso}
+ */
+export function tonoDelAviso(tipo) {
+  return TONO_AVISO[tipo] ?? "cuero";
+}
+
 /**
  * Texto del contador de la campana ("9+" a partir de 10). Vacío si no hay avisos sin leer.
  * @param {number} sinLeer

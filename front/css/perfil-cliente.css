@@ -1,0 +1,160 @@
+/* Mi perfil (Cliente) */
+.perfil-cliente__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+}
+
+/* Encabezado: avatar grande, nombre, rol y Editar. */
+.perfil-encabezado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-4) var(--espacio-3);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--sombra-1);
+  text-align: center;
+}
+
+.perfil-encabezado__avatar {
+  width: 88px;
+  height: 88px;
+  background: var(--degradado-marca);
+  color: var(--color-hueso);
+  font-family: var(--fuente-titulo);
+  font-size: 30px;
+  box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--color-cuero-suave);
+}
+
+.perfil-encabezado__nombre {
+  margin: var(--espacio-1) 0 0;
+  font-size: var(--texto-subtitulo);
+}
+
+.perfil-encabezado__editar {
+  min-height: 40px;
+  margin-top: var(--espacio-2);
+  font-size: var(--texto-secundario);
+}
+
+/* Secciones con lista de datos u opciones. */
+.perfil-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.perfil-seccion__titulo {
+  margin: 0;
+  color: var(--color-gris);
+  font-family: var(--fuente-texto);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.perfil-lista {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radio-tarjeta);
+  background: #fff;
+  box-shadow: var(--sombra-1);
+  list-style: none;
+}
+
+.perfil-lista > li + li {
+  border-top: 1px solid rgb(231 222 211 / 70%);
+}
+
+.perfil-dato,
+.perfil-opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  min-height: 60px;
+  padding: 10px var(--espacio-3);
+}
+
+.perfil-opcion {
+  color: inherit;
+  text-decoration: none;
+}
+
+.perfil-opcion:active {
+  background: var(--color-hueso);
+}
+
+.perfil-dato__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 10px;
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero);
+}
+
+.perfil-dato__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.perfil-dato__texto p {
+  margin: 0;
+}
+
+.perfil-dato__etiqueta {
+  color: var(--color-gris);
+  font-size: 12px;
+}
+
+.perfil-dato__valor {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.perfil-dato__valor--vacio {
+  color: var(--color-gris);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.perfil-opcion__texto {
+  flex: 1;
+  font-weight: 600;
+}
+
+.perfil-seccion__nota {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--color-gris);
+  font-size: 12px;
+}
+
+/* Cerrar sesión: acción destructiva suave, en rojo y sin relleno. */
+.perfil-salir {
+  min-height: 52px;
+  border: 1px solid rgb(179 38 30 / 25%);
+  border-radius: var(--radio);
+  background: #fff;
+  color: var(--color-error);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.perfil-salir:active {
+  background: #f9e1df;
+}
+
+.perfil-cliente__simulado {
+  align-self: center;
+}

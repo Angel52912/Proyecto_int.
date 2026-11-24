@@ -6,7 +6,7 @@ import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
-import { textoDelAviso } from "../avisos.js";
+import { textoDelAviso, tonoDelAviso } from "../avisos.js";
 import { api } from "../index.js";
 
 /**
@@ -17,7 +17,7 @@ function crearFila(aviso) {
   const { titulo, detalle, ruta, icono: nombreIcono } = textoDelAviso(aviso);
   const sinLeer = aviso.read_at === null;
   const contenido = [
-    crear("span", { clase: "aviso-fila__icono", attrs: { "aria-hidden": "true" } }, [icono(nombreIcono, { tam: 20 })]),
+    crear("span", { clase: `aviso-fila__icono aviso-fila__icono--${tonoDelAviso(aviso.type)}`, attrs: { "aria-hidden": "true" } }, [icono(nombreIcono, { tam: 20 })]),
     crear("span", { clase: "aviso-fila__cuerpo" }, [
       crear("span", { clase: "aviso-fila__titulo", texto: titulo }),
       crear("span", { clase: "aviso-fila__detalle", texto: detalle }),
@@ -45,6 +45,16 @@ function crearFila(aviso) {
     contenido,
   );
   return /** @type {HTMLLIElement} */ (crear("li", {}, [boton]));
+}
+
+/**
+ * Separa los avisos sin leer (Nuevos) de los ya leídos (Anteriores), respetando el orden recibido.
+ * @template {{ read_at: string | null }} T
+ * @param {T[]} avisos
+ * @returns {{ nuevos: T[], anteriores: T[] }}
+ */
+export function agruparAvisos(avisos) {
+  return { nuevos: avisos.filter((a) => a.read_at === null), anteriores: avisos.filter((a) => a.read_at !== null) };
 }
 
 /**
@@ -79,13 +89,26 @@ export function renderAvisos(rol) {
       })
     );
 
+    // Dos grupos: Nuevos (sin leer) y Anteriores. Los avisos que llegan en vivo entran arriba de Nuevos.
     /** @type {HTMLUListElement | null} */
     let lista = null;
+    const seccionNuevos = crear("section", { clase: "avisos__grupo", attrs: { "aria-labelledby": "avisos-nuevos" } });
     const pintar = (/** @type {any[]} */ avisos) => {
-      if (avisos.length === 0) return crearVacio("No tienes avisos todavía. Aquí verás presupuestos, avances y entregas.");
-      marcarTodas.hidden = !avisos.some((a) => a.read_at === null);
-      lista = /** @type {HTMLUListElement} */ (crear("ul", { clase: "lista avisos__lista" }, avisos.map(crearFila)));
-      return lista;
+      if (avisos.length === 0) return crearVacio("No tienes avisos todavía. Aquí verás presupuestos, avances y entregas.", null, { icono: "campana" });
+      const { nuevos, anteriores } = agruparAvisos(avisos);
+      marcarTodas.hidden = nuevos.length === 0;
+      lista = /** @type {HTMLUListElement} */ (crear("ul", { clase: "lista avisos__lista" }, nuevos.map(crearFila)));
+      seccionNuevos.replaceChildren(crear("h2", { clase: "avisos__titulo-grupo", texto: "Nuevos", attrs: { id: "avisos-nuevos" } }), lista);
+      seccionNuevos.hidden = nuevos.length === 0;
+      return [
+        seccionNuevos,
+        anteriores.length > 0
+          ? crear("section", { clase: "avisos__grupo", attrs: { "aria-labelledby": "avisos-anteriores" } }, [
+              crear("h2", { clase: "avisos__titulo-grupo", texto: "Anteriores", attrs: { id: "avisos-anteriores" } }),
+              crear("ul", { clase: "lista avisos__lista" }, anteriores.map(crearFila)),
+            ])
+          : null,
+      ];
     };
     cargarEn(contenido, () => api.listMyNotifications(), pintar);
 
@@ -104,6 +127,7 @@ export function renderAvisos(rol) {
           return;
         }
         lista.prepend(crearFila(nuevo));
+        seccionNuevos.hidden = false;
         marcarTodas.hidden = false;
       })
       .then((c) => {

@@ -7,8 +7,8 @@ import { textoPromedioNuevo } from "../../js/features/admin/pages/resenas.js";
 import { estadoDelTaller } from "../../js/features/admin/pages/talleres.js";
 import { renderUsuarios } from "../../js/features/admin/pages/usuarios.js";
 import { crearAvatar, olvidarAvatares, urlDeAvatar } from "../../js/features/auth/avatar.js";
-import { crearCampana, textoContador, textoDelAviso } from "../../js/features/requests/avisos.js";
-import { renderAvisos } from "../../js/features/requests/pages/avisos.js";
+import { crearCampana, textoContador, textoDelAviso, tonoDelAviso } from "../../js/features/requests/avisos.js";
+import { agruparAvisos, renderAvisos } from "../../js/features/requests/pages/avisos.js";
 import { fijarSesionSimulada, notificar, reiniciarSimulacion, UID_CLIENTE } from "../../../apis/api-mixanab/requests/simulacion.js";
 import * as tallerMock from "../../../apis/api-mixanab/workshop/api.mock.js";
 import { renderMiTaller } from "../../js/features/workshop/pages/mi-taller.js";
@@ -61,6 +61,18 @@ describe("avisos", () => {
     /** @type {HTMLButtonElement} */ (pantalla.querySelector(".avisos__acciones button")).click();
     await esperar();
     expect(pantalla.querySelectorAll(".aviso-fila--nueva")).toHaveLength(0);
+  });
+  test("agrupa en Nuevos y Anteriores, y colorea por tipo", () => {
+    const { nuevos, anteriores } = agruparAvisos([
+      { id: "1", read_at: null },
+      { id: "2", read_at: "2026-11-20T10:00:00Z" },
+      { id: "3", read_at: null },
+    ]);
+    expect(nuevos.map((a) => a.id)).toEqual(["1", "3"]);
+    expect(anteriores.map((a) => a.id)).toEqual(["2"]);
+    expect(tonoDelAviso("order_ready")).toBe("exito");
+    expect(tonoDelAviso("quote_received")).toBe("cenote");
+    expect(tonoDelAviso("desconocido")).toBe("cuero");
   });
 });
 
