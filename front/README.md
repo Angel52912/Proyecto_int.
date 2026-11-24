@@ -40,8 +40,11 @@ El ancho y la navegación se adaptan a escritorio desde `css/layout.css`. El bot
 
 En **Tu taller**, al tocar el mapa se completa Dirección, Colonia y C.P. con la geocodificación
 inversa de Nominatim (OpenStreetMap); al escribir esos campos se mueve el punto al lugar encontrado.
-La CSP de `index.html` permite ese único origen externo en `connect-src`; las peticiones se encolan
-(máximo 1 por segundo), se cachean por coordenada o consulta y las respuestas obsoletas se descartan.
+La búsqueda elimina `#` y `C.P.` de la consulta (Nominatim no devuelve resultados con esos caracteres)
+y reintenta sin el número de casa si hace falta. Si no hay resultados, faltan datos o falla la
+petición, se muestra una alerta accesible bajo el mapa. La CSP de `index.html` permite ese único
+origen externo en `connect-src`; las peticiones se encolan (máximo 1 por segundo), se cachean por
+coordenada o consulta y las respuestas obsoletas se descartan.
 
 ## Cómo servirlo
 
