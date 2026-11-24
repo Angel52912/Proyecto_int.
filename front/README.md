@@ -9,6 +9,7 @@ sirva desde ahí; las librerías y los datos viven en `apis/`.
 | Ruta | Contenido |
 | --- | --- |
 | `css/` | Tokens, componentes y una hoja por pantalla. |
+| `fonts/` | Poppins (600 y 700) e Inter variable en `.woff2`, subconjunto latino (Fontsource, OFL). |
 | `icons/` | Íconos 192 y 512 px de la PWA. |
 | `js/app.js` | Arranque de la app y carga del cliente de Supabase. |
 | `js/router.js` | Router por hash. |

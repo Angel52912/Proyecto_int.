@@ -1,4 +1,32 @@
 /* Tokens de diseño: ver docs/diseno.md */
+
+/* Fuentes locales (Fontsource, licencia OFL), subconjunto latino: cubre á, é, ñ, ¿ y ¡.
+   Inter es variable (un archivo para 400–700); Poppins solo en los grosores de títulos.
+   Se sirven desde el propio sitio para que el service worker las guarde y funcionen sin red. */
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/inter-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("../fonts/poppins-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("../fonts/poppins-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --color-cuero: #7a4a2a;
   --color-cenote: #1f7a7a;
