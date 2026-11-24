@@ -14,7 +14,7 @@ import { saludoPorHora } from "../../js/features/map/pages/inicio.js";
 import { textoFaltante } from "../../js/features/requests/pages/solicitar.js";
 import { textoHorarioHoy, urlComoLlegar } from "../../js/features/orders/pages/recoger.js";
 import { lineaDeTiempo } from "../../js/features/orders/pages/seguimiento.js";
-import { columnasDelTablero } from "../../js/features/orders/pages/tablero.js";
+import { columnasDelTablero, textoEntrega } from "../../js/features/orders/pages/tablero.js";
 import { mensajeResultadoPin } from "../../js/features/orders/pages/verificar-entrega.js";
 import { distribucionDeResenas, textoATiempo } from "../../js/features/workshop/pages/mi-taller.js";
 import { horarioDeFilas } from "../../js/features/workshop/pages/taller.js";
@@ -188,6 +188,16 @@ describe("pasos del pedido (CU-05)", () => {
     expect(barra.getAttribute("aria-valuenow")).toBe("2");
     expect(barra.getAttribute("aria-valuetext")).toBe("Fase 3 de 4 · Limpieza / reparación");
     expect(barra.querySelectorAll(".pasos__segmento")).toHaveLength(4);
+  });
+});
+
+describe("tablero (CU-05)", () => {
+  test("fecha de entrega: próxima, hoy o atrasada", () => {
+    const hoy = new Date(2026, 10, 23, 12);
+    expect(textoEntrega("2026-11-26", hoy)).toEqual({ texto: "Entrega 26 nov", atrasado: false });
+    expect(textoEntrega("2026-11-23", hoy)).toEqual({ texto: "Entrega hoy", atrasado: false });
+    expect(textoEntrega("2026-11-20", hoy)).toEqual({ texto: "Atrasado · 20 nov", atrasado: true });
+    expect(textoEntrega(null, hoy)).toBeNull();
   });
 });
 

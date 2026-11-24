@@ -431,11 +431,17 @@ fieldset.campo {
   margin: 0 0 var(--espacio-3);
 }
 
+/* Solo para lectores de pantalla. El tamaño va con !important: reglas más específicas como `.campo input
+   { width: 100% }` lo ganaban y un input de archivos oculto medía todo el ancho, ensanchando la página. */
 .oculto-visual {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 1px !important;
+  min-width: 0 !important;
+  height: 1px !important;
+  margin: -1px;
+  padding: 0 !important;
   overflow: hidden;
+  border: 0 !important;
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }

@@ -48,3 +48,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.solicitud-artesano__cliente {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.solicitud-artesano__cabeza .insignia {
+  flex: none;
+}

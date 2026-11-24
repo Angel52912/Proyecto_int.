@@ -109,17 +109,6 @@
   background: var(--color-cenote);
 }
 
-/* El input de archivos está oculto visualmente: se fija dentro de su grupo para que no ensanche la página. */
-.solicitar fieldset {
-  position: relative;
-  min-width: 0;
-}
-
-#fotos-calzado {
-  top: 0;
-  left: 0;
-}
-
 .solicitar__leyenda {
   display: flex;
   justify-content: space-between;

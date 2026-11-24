@@ -93,7 +93,7 @@ function pintar({ taller, stats, resenas }) {
 
   return [
     crear("div", { clase: "tarjeta tarjeta--enlace" }, [
-      crearFoto(taller.photos?.find((/** @type {any} */ f) => f.kind === "profile")?.url, "Foto del taller"),
+      crearFoto(taller.photos?.find((/** @type {any} */ f) => f.kind === "profile")?.url, "Foto del taller", undefined, taller.name ?? undefined),
       crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__titulo", texto: taller.name ?? "Mi taller" }), crear("p", { clase: "tarjeta__detalle", texto: taller.colonia ? `${taller.colonia}, Mérida` : "Sin dirección" }), estado]),
     ]),
     crear("div", { clase: "tarjeta reputacion" }, [

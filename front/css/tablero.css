@@ -6,31 +6,86 @@
 }
 
 .kanban__total {
-  align-self: flex-end;
-  margin: calc(-1 * var(--espacio-4)) 0 0;
+  margin: calc(-1 * var(--espacio-2)) 0 0;
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
 }
 
+/* Resumen: pastillas con el número de pedidos de cada columna. */
+.kanban__resumen {
+  margin: 0 calc(-1 * var(--espacio-3));
+  padding: 2px var(--espacio-3) 4px;
+}
+
+.kanban__resumen .chip {
+  gap: 6px;
+  color: var(--color-gris);
+}
+
+.kanban__resumen .chip strong {
+  color: var(--color-espresso);
+}
+
+.kanban__resumen .kanban__chip--con {
+  border-color: var(--color-cuero);
+  color: var(--color-espresso);
+}
+
+/* Columnas: se deslizan de borde a borde y la siguiente asoma para que se note que hay más. */
 .kanban {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(118px, 1fr);
+  grid-auto-columns: minmax(220px, 76%);
   gap: var(--espacio-2);
+  margin: 0 calc(-1 * var(--espacio-3));
+  padding: 2px var(--espacio-3) var(--espacio-2);
   overflow-x: auto;
-  padding-bottom: var(--espacio-2);
   scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--espacio-3);
+  scrollbar-width: none;
+}
+
+.kanban::-webkit-scrollbar {
+  display: none;
 }
 
 .kanban__columna {
   display: flex;
   flex-direction: column;
   gap: var(--espacio-2);
+  min-height: 180px;
+  padding: 10px;
+  border-top: 3px solid var(--color-miel);
+  border-radius: var(--radio-tarjeta);
+  background: rgb(231 222 211 / 45%);
   scroll-snap-align: start;
+}
+
+.kanban__columna--cenote {
+  border-top-color: var(--color-cenote);
+}
+
+.kanban__columna--cuero {
+  border-top-color: var(--color-cuero);
+}
+
+.kanban__columna--exito {
+  border-top-color: var(--color-exito);
+}
+
+.kanban__encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+  padding: 0 2px;
 }
 
 .kanban__titulo {
   margin: 0;
-  text-align: center;
-  font-family: var(--fuente-texto);
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-secundario);
+  font-weight: 600;
 }
 
 .kanban__lista {
@@ -45,44 +100,90 @@
 .kanban__tarjeta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: var(--espacio-2);
-  border: 1px solid var(--color-arena);
-  border-bottom: 3px solid var(--color-miel);
+  gap: 8px;
+  padding: 10px;
   border-radius: var(--radio);
   background: #fff;
+  box-shadow: var(--sombra-1);
   color: inherit;
   text-decoration: none;
   font-size: 12px;
+  transition: transform var(--transicion);
 }
 
-.kanban__tarjeta .foto {
-  width: 100%;
-  height: 52px;
+.kanban__tarjeta:active {
+  transform: scale(0.98);
 }
 
-.kanban__tarjeta--cenote {
-  border-bottom-color: var(--color-cenote);
+.kanban__fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.kanban__tarjeta--cuero {
-  border-bottom-color: var(--color-cuero);
+.kanban__tarjeta .kanban__foto {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
 }
 
-.kanban__tarjeta--exito {
-  border-bottom-color: var(--color-exito);
+.kanban__texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .kanban__nombre {
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-secundario);
   font-weight: 600;
 }
 
 .kanban__cliente {
+  overflow: hidden;
   color: var(--color-gris);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kanban__entrega,
+.kanban__accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-hueso);
+  color: var(--color-gris);
+  font-weight: 600;
+}
+
+.kanban__entrega--atrasado {
+  background: #f9e1df;
+  color: var(--color-error);
+}
+
+.kanban__accion {
+  background: #e1f1e7;
+  color: var(--color-exito);
 }
 
 .kanban__vacia {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   margin: 0;
-  text-align: center;
+  padding: var(--espacio-3);
+  border: 1.5px dashed rgb(125 111 102 / 35%);
+  border-radius: var(--radio);
   color: var(--color-gris);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kanban__tarjeta {
+    transition: none;
+  }
 }

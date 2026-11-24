@@ -29,12 +29,13 @@ function crearTarjetaSolicitud(detalle) {
     enlace(ruta, { clase: "tarjeta tarjeta--enlace" }, [
       crearFoto(detalle.photos?.[0]?.url, "Foto del calzado"),
       crear("div", { clase: "tarjeta__cuerpo" }, [
-        crear("div", { clase: "fila-entre" }, [
-          crear("p", { clase: "tarjeta__titulo", texto: `${NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (detalle.service_type)]} · ${detalle.counterpart?.full_name ?? "Cliente"}` }),
+        // Título corto (nombre del cliente) y el servicio en la línea de abajo, para que no se parta en dos renglones.
+        crear("div", { clase: "fila-entre solicitud-artesano__cabeza" }, [
+          crear("p", { clase: "tarjeta__titulo solicitud-artesano__cliente", texto: detalle.counterpart?.full_name ?? "Cliente" }),
           crearInsignia(estado.texto, estado.tono),
         ]),
         crear("p", { clase: "tarjeta__detalle solicitud-artesano__descripcion", texto: detalle.description }),
-        crear("p", { clase: "tarjeta__detalle", texto: formatearHace(detalle.submitted_at ?? detalle.created_at) }),
+        crear("p", { clase: "tarjeta__detalle", texto: `${NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (detalle.service_type)]} · ${formatearHace(detalle.submitted_at ?? detalle.created_at)}` }),
       ]),
     ]),
   ]);
