@@ -12,7 +12,8 @@ sirva desde ahí; las librerías y los datos viven en `apis/`.
 | `icons/` | Íconos 192 y 512 px de la PWA. |
 | `js/app.js` | Arranque de la app y carga del cliente de Supabase. |
 | `js/router.js` | Router por hash. |
-| `js/ui/` | Componentes compartidos de interfaz (mensajes, sesión, etc.). |
+| `js/ui/` | Componentes compartidos de interfaz (mensajes, sesión, `vista.js` para el alternador Android/PC de admin). |
+| `js/features/auth/pages/portada.js` | Pantalla de inicio pública: logo, eslogan y acceso. |
 | `js/features/<modulo>/` | `routes.js`, `index.js` (elige API real/simulada), `pages/`, `componentes.js` y lógica de presentación. |
 | `js/lib/` | Utilidades de la interfaz (escape, fechas, imágenes, formato MXN). |
 | `js/vendor/` | Generado por `npm run vendor`; no se versiona. |
@@ -25,6 +26,17 @@ sirva desde ahí; las librerías y los datos viven en `apis/`.
   `front/js/features/<modulo>/index.js`.
 - SQL, migraciones, RLS ni pruebas de permisos: están en [`../back/`](../back/README.md).
 - Configuración de npm y de lint: está en la raíz.
+
+## Rutas de la interfaz
+
+| Ruta | Pantalla |
+| --- | --- |
+| `/`, `/inicio` | Inicio público: logo, “No lo tires, restáuralo.” y **Iniciar sesión**. |
+| `/acceso/entrar` | Inicio de sesión; al entrar, el cliente va a `/principal`. |
+| `/principal` | Pantalla principal del cliente: buscador, categorías, talleres y pedido en curso. |
+
+El ancho y la navegación se adaptan a escritorio desde `css/layout.css`. El botón flotante
+`js/ui/vista.js` solo aparece para `admin` y fuerza la vista Android o PC.
 
 ## Cómo servirlo
 
