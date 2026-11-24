@@ -8,8 +8,9 @@
   position: fixed;
   inset: 0;
   z-index: 0;
-  max-width: 480px;
-  margin: 0 auto;
+  max-width: var(--ancho-pantalla);
+  margin-left: var(--pantalla-margen-izquierdo);
+  margin-right: auto;
   background: #e3ece2;
 }
 
@@ -30,7 +31,7 @@
 .mapa__ubicar {
   position: fixed;
   z-index: 5;
-  right: max(var(--espacio-3), calc((100% - 480px) / 2 + var(--espacio-3)));
+  right: max(var(--espacio-3), calc((100% - var(--ancho-pantalla)) / 2 + var(--espacio-3)));
   bottom: calc(var(--alto-nav) + 190px + env(safe-area-inset-bottom));
   box-shadow: 0 2px 8px rgb(43 33 27 / 15%);
 }
@@ -41,8 +42,9 @@
   left: 0;
   right: 0;
   bottom: calc(var(--alto-nav) + var(--espacio-3) + env(safe-area-inset-bottom));
-  max-width: 480px;
-  margin: 0 auto;
+  max-width: var(--ancho-pantalla);
+  margin-left: var(--pantalla-margen-izquierdo);
+  margin-right: auto;
   padding: 0 var(--espacio-3);
 }
 

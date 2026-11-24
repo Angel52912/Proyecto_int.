@@ -24,7 +24,7 @@ describe("destino tras entrar", () => {
   test("sin rol, sin nombre o con rol", () => {
     expect(destinoPorPerfil({ role: null, full_name: "" })).toBe("/acceso/rol");
     expect(destinoPorPerfil({ role: "client", full_name: " " })).toBe("/acceso/perfil");
-    expect(destinoPorPerfil({ role: "client", full_name: "Ana" })).toBe("/");
+    expect(destinoPorPerfil({ role: "client", full_name: "Ana" })).toBe("/principal");
     expect(destinoPorPerfil({ role: "craftsman", full_name: "Luis" })).toBe("/artesano/tablero");
     expect(destinoPorPerfil({ role: "admin", full_name: "" })).toBe("/admin");
   });
@@ -41,7 +41,7 @@ describe("guardia por rol", () => {
   test("manda al cliente a su inicio si abre una ruta de artesano", async () => {
     const nodo = await soloPara(["craftsman"], vista)({ params: {}, consulta: new URLSearchParams() });
     expect(nodo.nodeName).not.toBe("SECTION");
-    expect(window.location.hash).toBe("#/");
+    expect(window.location.hash).toBe("#/principal");
   });
 
   test("al artesano lo manda a su tablero", async () => {

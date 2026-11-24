@@ -18,7 +18,7 @@
 
 .categorias {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: var(--columnas-categorias);
   gap: var(--espacio-2);
 }
 

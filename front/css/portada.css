@@ -1,0 +1,50 @@
+/* Portada pública: marca centrada y una sola entrada a Acceso. */
+.portada .pantalla__cuerpo {
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-4);
+  text-align: center;
+}
+
+.portada .acceso__marca {
+  margin: 0;
+  font-size: 34px;
+}
+
+.portada .acceso__logo {
+  width: 64px;
+  height: 64px;
+}
+
+.portada__eslogan {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-subtitulo);
+  font-weight: 600;
+  text-align: center;
+}
+
+.portada .portada__entrar {
+  max-width: 320px;
+}
+
+/* Acceso al modo simulado: solo en Inicio, flotante abajo a la derecha. */
+.portada__simulado {
+  position: fixed;
+  right: var(--espacio-3);
+  bottom: var(--espacio-3);
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  min-height: var(--tactil-min);
+  padding: 0 var(--espacio-3);
+  border: 1px solid var(--color-cuero);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-cuero);
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgb(43 33 27 / 15%);
+}

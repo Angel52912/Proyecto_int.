@@ -1,6 +1,5 @@
 // Perfil del cliente (pestaña Perfil de la navegación inferior): nombre, foto, datos privados y cerrar sesión.
 // La edición usa la pantalla 05 · Completar perfil (CU-01) con `?desde=perfil`.
-import { USAR_API_SIMULADA } from "../../../../../apis/config.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";
@@ -33,7 +32,6 @@ export async function renderPerfilCliente() {
   const pantalla = crearPantalla({ rol: "client", activa: "perfil", clase: "perfil-cliente" }, [
     crear("h1", { clase: "pantalla__titulo", texto: "Mi perfil" }),
     contenido,
-    USAR_API_SIMULADA ? enlace("/simulacion", { clase: "boton-texto", texto: "Cambiar de rol (modo simulado)" }) : null,
   ]);
   cargarEn(
     contenido,

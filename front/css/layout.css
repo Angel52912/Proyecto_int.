@@ -1,4 +1,23 @@
 /* Estructura de pantalla: barra superior, cuerpo y navegación inferior (mobile-first). */
+/* Fase 2: una sola fuente de verdad para el ancho y la navegación; el toggle admin solo cambia estas variables. */
+:root {
+  --ancho-pantalla: 480px;
+  --cuerpo-relleno: var(--espacio-3);
+  --cuerpo-relleno-inferior: calc(var(--alto-nav) + var(--espacio-4) + env(safe-area-inset-bottom));
+  --nav-posicion: fixed;
+  --nav-superior: auto;
+  --nav-derecha: 0;
+  --nav-izquierda: 0;
+  --nav-ancho: 100%;
+  --nav-columnas: repeat(4, 1fr);
+  --nav-borde-superior: 1px solid var(--color-arena);
+  --nav-borde-derecho: 0;
+  --nav-relleno-superior: 0;
+  --pantalla-margen-izquierdo: auto;
+  --columnas-categorias: repeat(2, minmax(0, 1fr));
+  --alto-portada: 220px;
+}
+
 #app {
   padding: 0;
 }
@@ -7,8 +26,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  max-width: 480px;
-  margin: 0 auto;
+  max-width: var(--ancho-pantalla);
+  margin-left: var(--pantalla-margen-izquierdo);
+  margin-right: auto;
   background: var(--color-hueso);
 }
 
@@ -17,11 +37,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--espacio-3);
-  padding: var(--espacio-3);
+  padding: var(--cuerpo-relleno);
 }
 
 .pantalla--con-nav .pantalla__cuerpo {
-  padding-bottom: calc(var(--alto-nav) + var(--espacio-4) + env(safe-area-inset-bottom));
+  padding-bottom: var(--cuerpo-relleno-inferior);
 }
 
 .pantalla--oscura {
@@ -60,20 +80,24 @@
 }
 
 .nav-inferior {
-  position: fixed;
-  left: 0;
-  right: 0;
+  position: var(--nav-posicion);
+  top: var(--nav-superior);
+  left: var(--nav-izquierda);
+  right: var(--nav-derecha);
   bottom: 0;
   z-index: 20;
+  width: var(--nav-ancho);
   background: #fff;
-  border-top: 1px solid var(--color-arena);
+  border-top: var(--nav-borde-superior);
+  border-right: var(--nav-borde-derecho);
+  padding: var(--nav-relleno-superior) 0 0;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 .nav-inferior ul {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  max-width: 480px;
+  grid-template-columns: var(--nav-columnas);
+  max-width: var(--ancho-pantalla);
   margin: 0 auto;
   padding: 0;
   list-style: none;
@@ -97,33 +121,116 @@
 }
 
 @media (min-width: 720px) {
-  .pantalla {
+  html:not([data-vista="movil"]) .pantalla {
     box-shadow: 0 0 0 1px var(--color-arena);
   }
 }
 
-/* Escritorio: la navegación pasa a una barra lateral (idea del shell de feature/frontend). */
+/* Fases 2 y 3: mismo bloque para ancho natural de PC y para la vista forzada por el admin. */
 @media (min-width: 1024px) {
-  .nav-inferior {
-    top: 0;
-    right: auto;
-    width: 96px;
-    border-top: 0;
-    border-right: 1px solid var(--color-arena);
-    padding: var(--espacio-4) 0 0;
+  html:not([data-vista="movil"]) {
+    --ancho-pantalla: 1120px;
+    --cuerpo-relleno: var(--espacio-4);
+    --cuerpo-relleno-inferior: var(--espacio-4);
+    --nav-superior: 0;
+    --nav-derecha: auto;
+    --nav-ancho: 96px;
+    --nav-columnas: 1fr;
+    --nav-borde-superior: 0;
+    --nav-borde-derecho: 1px solid var(--color-arena);
+    --nav-relleno-superior: var(--espacio-4);
+    --pantalla-margen-izquierdo: max(96px, calc((100vw - var(--ancho-pantalla)) / 2));
+    --columnas-categorias: repeat(4, minmax(0, 1fr));
+    --alto-portada: 320px;
   }
+}
 
-  .nav-inferior ul {
-    grid-template-columns: 1fr;
-    grid-auto-rows: min-content;
-    gap: var(--espacio-2);
-  }
+html[data-vista="pc"] {
+  --ancho-pantalla: 1120px;
+  --cuerpo-relleno: var(--espacio-4);
+  --cuerpo-relleno-inferior: var(--espacio-4);
+  --nav-superior: 0;
+  --nav-derecha: auto;
+  --nav-ancho: 96px;
+  --nav-columnas: 1fr;
+  --nav-borde-superior: 0;
+  --nav-borde-derecho: 1px solid var(--color-arena);
+  --nav-relleno-superior: var(--espacio-4);
+  --pantalla-margen-izquierdo: max(96px, calc((100vw - var(--ancho-pantalla)) / 2));
+  --columnas-categorias: repeat(4, minmax(0, 1fr));
+  --alto-portada: 320px;
+}
 
-  .nav-inferior__enlace {
-    font-size: var(--texto-secundario);
-  }
+/* La vista Android forzada reaplica los valores base aunque la ventana sea ancha. */
+html[data-vista="movil"] {
+  --ancho-pantalla: 480px;
+  --cuerpo-relleno: var(--espacio-3);
+  --cuerpo-relleno-inferior: calc(var(--alto-nav) + var(--espacio-4) + env(safe-area-inset-bottom));
+  --nav-superior: auto;
+  --nav-derecha: 0;
+  --nav-ancho: 100%;
+  --nav-columnas: repeat(4, 1fr);
+  --nav-borde-superior: 1px solid var(--color-arena);
+  --nav-borde-derecho: 0;
+  --nav-relleno-superior: 0;
+  --pantalla-margen-izquierdo: auto;
+  --columnas-categorias: repeat(2, minmax(0, 1fr));
+  --alto-portada: 220px;
+}
 
-  .pantalla--con-nav .pantalla__cuerpo {
-    padding-bottom: var(--espacio-4);
+html[data-vista="movil"] .nav-inferior {
+  left: 50%;
+  right: auto;
+  width: var(--ancho-pantalla);
+  transform: translateX(-50%);
+}
+
+html:is([data-vista="movil"], [data-vista="pc"]) .nav-inferior ul {
+  grid-auto-rows: min-content;
+  gap: var(--espacio-2);
+}
+
+html:is([data-vista="movil"], [data-vista="pc"]) .nav-inferior__enlace {
+  font-size: var(--texto-secundario);
+}
+
+/* Fase 4: control flotante de escritorio; en Android se eleva sobre la navegación inferior. */
+.alternador-vista {
+  position: fixed;
+  right: var(--espacio-3);
+  bottom: calc(var(--alto-nav) + var(--espacio-3) + env(safe-area-inset-bottom));
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  min-height: var(--tactil-min);
+  padding: 0 var(--espacio-3);
+  border: 1px solid var(--color-cuero);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-cuero);
+  font: inherit;
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgb(43 33 27 / 15%);
+  cursor: pointer;
+}
+
+.alternador-vista[aria-pressed="true"] {
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+}
+
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .alternador-vista {
+    bottom: var(--espacio-3);
   }
+}
+
+html[data-vista="pc"] .alternador-vista {
+  bottom: var(--espacio-3);
+}
+
+html[data-vista="movil"] .alternador-vista {
+  bottom: calc(var(--alto-nav) + var(--espacio-3) + env(safe-area-inset-bottom));
 }

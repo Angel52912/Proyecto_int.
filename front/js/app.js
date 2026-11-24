@@ -1,5 +1,6 @@
 import { USAR_API_SIMULADA } from "../../apis/config.js";
 import { crearRouter } from "./router.js";
+import { instalarAlternadorVista } from "./ui/vista.js";
 import { obtenerSesion } from "../../apis/supabaseClient.js";
 import { rutas as rutasAdmin } from "./features/admin/routes.js";
 import { rutas as rutasAuth } from "./features/auth/routes.js";
@@ -38,5 +39,6 @@ function registrarServiceWorker() {
 const contenedor = document.getElementById("app");
 if (contenedor !== null) {
   crearRouter({ rutas, contenedor, obtenerSesion: sesionActual }).iniciar();
+  instalarAlternadorVista();
   registrarServiceWorker();
 }
