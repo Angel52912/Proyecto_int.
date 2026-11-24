@@ -39,8 +39,9 @@ El ancho y la navegación se adaptan a escritorio desde `css/layout.css`. El bot
 `js/ui/vista.js` solo aparece para `admin` y fuerza la vista Android o PC.
 
 En **Tu taller**, al tocar el mapa se completa Dirección, Colonia y C.P. con la geocodificación
-inversa de Nominatim (OpenStreetMap). La CSP de `index.html` permite ese único origen externo en
-`connect-src`; las peticiones se encolan (máximo 1 por segundo) y se cachean por coordenada.
+inversa de Nominatim (OpenStreetMap); al escribir esos campos se mueve el punto al lugar encontrado.
+La CSP de `index.html` permite ese único origen externo en `connect-src`; las peticiones se encolan
+(máximo 1 por segundo), se cachean por coordenada o consulta y las respuestas obsoletas se descartan.
 
 ## Cómo servirlo
 
