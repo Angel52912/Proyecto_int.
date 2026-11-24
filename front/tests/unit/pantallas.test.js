@@ -1,7 +1,7 @@
 // Lógica pura de las pantallas de cliente y artesano (sin DOM de la página completa).
 import { buscarTalleres, parametrosDeBusqueda, textoServicios } from "../../js/features/map/componentes.js";
 import { filtroDeTexto } from "../../js/features/map/pages/mapa.js";
-import { filasHorario } from "../../js/features/map/pages/perfil-taller.js";
+import { estadoDeHoy, filasHorario, indiceDeHoy } from "../../js/features/map/pages/perfil-taller.js";
 import { filtroDeLugar } from "../../js/features/map/pages/talleres.js";
 import { folio } from "../../js/features/chat/pages/chat.js";
 import { filtrarConversaciones } from "../../js/features/chat/pages/chats.js";
@@ -50,6 +50,21 @@ describe("búsqueda de talleres (CU-02)", () => {
     const filas = filasHorario({ mon: [{ open: "09:00", close: "14:00" }, { open: "16:00", close: "19:00" }] });
     expect(filas[0]).toEqual({ dia: "Lunes", texto: "09:00–14:00, 16:00–19:00" });
     expect(filas[6]).toEqual({ dia: "Domingo", texto: "Cerrado" });
+  });
+  test("hoy: índice con lunes = 0 y domingo = 6", () => {
+    expect(indiceDeHoy(new Date(2026, 10, 23))).toBe(0); // lunes
+    expect(indiceDeHoy(new Date(2026, 10, 29))).toBe(6); // domingo
+  });
+  test("estado de hoy: is_open decide; el horario agrega detalle", () => {
+    const hours = { mon: [{ open: "09:00", close: "14:00" }, { open: "16:00", close: "19:00" }] };
+    const lunes = (/** @type {number} */ h) => new Date(2026, 10, 23, h, 0);
+    expect(estadoDeHoy({ is_open: true, hours }, lunes(10))).toEqual({ texto: "Abierto hasta 14:00", tono: "exito" });
+    expect(estadoDeHoy({ is_open: false, hours }, lunes(15))).toEqual({ texto: "Abre a las 16:00", tono: "miel" });
+    expect(estadoDeHoy({ is_open: false, hours }, lunes(20))).toEqual({ texto: "Cerrado ahora", tono: "neutra" });
+    expect(estadoDeHoy({ is_open: false, hours }, new Date(2026, 10, 24, 10))).toEqual({ texto: "Cerrado hoy", tono: "neutra" });
+    // El reloj del teléfono no coincide con Mérida: se respeta is_open.
+    expect(estadoDeHoy({ is_open: false, hours }, lunes(10))).toEqual({ texto: "Cerrado ahora", tono: "neutra" });
+    expect(estadoDeHoy({ is_open: true, hours }, lunes(20))).toEqual({ texto: "Abierto ahora", tono: "exito" });
   });
 });
 

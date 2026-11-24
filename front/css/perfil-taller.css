@@ -41,7 +41,7 @@
 .perfil-taller__hoja {
   display: flex;
   flex-direction: column;
-  gap: var(--espacio-2);
+  gap: var(--espacio-4);
   margin-top: -24px;
   padding: var(--espacio-4) var(--espacio-3);
   border-radius: 24px 24px 0 0;
@@ -49,43 +49,222 @@
   position: relative;
 }
 
+.perfil-taller__encabezado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .perfil-taller__nombre {
   margin: 0;
-  font-size: var(--texto-subtitulo);
+  font-size: var(--texto-titulo);
+  line-height: 1.2;
 }
 
-.perfil-taller__precio {
-  margin: 0;
+.perfil-taller__estado {
+  margin-top: var(--espacio-1);
 }
 
-.perfil-taller__horario summary {
-  cursor: pointer;
+.perfil-taller__estado .insignia {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.perfil-taller__seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+/* Acciones rápidas: Cómo llegar y Compartir. */
+.acciones-rapidas {
+  display: flex;
+  gap: var(--espacio-2);
+}
+
+.accion-rapida {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-2);
   min-height: var(--tactil-min);
+  border: 1px solid rgb(231 222 211 / 70%);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: var(--sombra-1);
+  color: var(--color-cuero);
+  font: inherit;
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--transicion);
+}
+
+.accion-rapida:active {
+  transform: scale(0.97);
+}
+
+/* Servicios. */
+.servicios {
+  gap: var(--espacio-2);
+}
+
+.servicio {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: 12px var(--espacio-3);
+  border-radius: var(--radio-tarjeta);
+  background: #fff;
+  box-shadow: var(--sombra-1);
 }
 
-.perfil-taller__horario summary::after {
-  content: "▾";
+.servicio__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: var(--radio);
+  background: var(--color-cuero-suave);
   color: var(--color-cuero);
 }
 
-.perfil-taller__horario[open] summary::after {
-  content: "▴";
+.servicio--cleaning .servicio__icono {
+  background: #dcefef;
+  color: var(--color-cenote);
+}
+
+.servicio__nombre {
+  margin: 0;
+  font-weight: 600;
+}
+
+.precio-desde {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  padding: var(--espacio-3);
+  border-radius: var(--radio-tarjeta);
+  background: var(--degradado-marca);
+  color: var(--color-hueso);
+}
+
+.precio-desde p {
+  margin: 0;
+}
+
+.precio-desde__etiqueta {
+  font-size: var(--texto-secundario);
+  opacity: 0.85;
+}
+
+.precio-desde__monto {
+  font-family: var(--fuente-titulo);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.precio-desde__nota {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Trabajos recientes: carrusel deslizable con imán. */
+.carrusel {
+  display: flex;
+  gap: var(--espacio-2);
+  margin: 0 calc(-1 * var(--espacio-3));
+  padding: 2px var(--espacio-3) var(--espacio-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--espacio-3);
+  scrollbar-width: none;
+}
+
+.carrusel::-webkit-scrollbar {
+  display: none;
+}
+
+.carrusel__item {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+.carrusel .foto {
+  width: 148px;
+  height: 148px;
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-1);
+}
+
+/* Horario: resumen con el día de hoy y flecha que gira al abrir. */
+.perfil-taller__horario {
+  padding: 0 var(--espacio-3);
+  border-radius: var(--radio-tarjeta);
+  background: #fff;
+  box-shadow: var(--sombra-1);
+}
+
+.perfil-taller__horario summary {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: 52px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.perfil-taller__horario summary::-webkit-details-marker {
+  display: none;
+}
+
+.perfil-taller__hoy {
+  flex: 1;
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+  text-align: right;
+}
+
+.perfil-taller__chevron {
+  flex: none;
+  color: var(--color-cuero);
+  transform: rotate(90deg);
+  transition: transform var(--transicion);
+}
+
+.perfil-taller__horario[open] .perfil-taller__chevron {
+  transform: rotate(-90deg);
 }
 
 .horario {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: var(--espacio-1) var(--espacio-3);
+  gap: var(--espacio-2) var(--espacio-3);
   margin: 0;
+  padding: 0 0 var(--espacio-3);
   font-size: var(--texto-secundario);
 }
 
 .horario dd {
   margin: 0;
   text-align: right;
+}
+
+.horario .horario__hoy {
+  color: var(--color-cuero);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .perfil-taller__chevron,
+  .accion-rapida {
+    transition: none;
+  }
 }
 
 .perfil-taller__acciones {
