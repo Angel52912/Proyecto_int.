@@ -7,6 +7,7 @@ import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { continuarTrasEntrar, datosAcceso } from "../flujo.js";
+import { crearPasosRegistro } from "./bienvenida.js";
 import { api } from "../index.js";
 
 /** Segundos de espera antes de poder pedir otro código. */
@@ -167,6 +168,8 @@ export function renderCodigo() {
       },
     },
     [
+      // Solo en el registro (el nombre se captura al crear la cuenta); al iniciar sesión no hay más pasos.
+      datosAcceso().nombre !== "" ? crearPasosRegistro(2) : null,
       crear("span", { clase: "acceso__icono", attrs: { "aria-hidden": "true" } }, [icono("correo", { tam: 30 })]),
       crear("h2", { clase: "acceso__titulo", texto: "Revisa tu correo" }),
       crear("p", { clase: "acceso__texto" }, [`Escribe el código de ${LONGITUD_CODIGO} dígitos que enviamos a `, crear("span", { clase: "acceso__correo", texto: correo }), "."]),

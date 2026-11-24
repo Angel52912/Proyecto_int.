@@ -6,6 +6,7 @@ import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { datosAcceso, guardarDatosAcceso } from "../flujo.js";
+import { crearPasosRegistro } from "./bienvenida.js";
 import { api } from "../index.js";
 
 /** @typedef {"crear" | "entrar"} ModoAcceso */
@@ -97,6 +98,7 @@ export function renderCorreo(modo) {
         },
       },
       [
+        crearCuenta ? crearPasosRegistro(1) : null,
         crear("h2", { clase: "acceso__titulo", texto: crearCuenta ? "Únete a MiXanab" : "Hola de nuevo" }),
         crear("p", { clase: "acceso__texto", texto: crearCuenta ? "Te enviaremos un código para verificar tu correo." : "Te enviaremos un código a tu correo para entrar." }),
         crearCuenta ? campo("nombre", "Nombre completo", nombre, "perfil", errores.nombre) : null,

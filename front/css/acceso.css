@@ -59,30 +59,110 @@
   justify-content: center;
   min-height: 260px;
   margin-bottom: var(--espacio-4);
+  overflow: hidden;
   border-radius: 24px;
-  background: var(--color-arena);
+  background:
+    radial-gradient(circle at 85% 15%, rgb(250 246 240 / 22%) 0 60px, transparent 61px),
+    radial-gradient(circle at 10% 95%, rgb(250 246 240 / 14%) 0 80px, transparent 81px),
+    var(--degradado-marca);
+  box-shadow: 0 10px 28px rgb(122 74 42 / 30%);
 }
 
 .acceso__circulo {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 168px;
-  height: 168px;
+  width: 152px;
+  height: 152px;
   border-radius: 50%;
-  background: #efe4d6;
+  background: var(--color-hueso);
+  box-shadow: 0 0 0 12px rgb(250 246 240 / 20%), 0 8px 24px rgb(43 33 27 / 25%);
   color: var(--color-cuero);
+}
+
+/* Íconos que flotan alrededor del círculo (servicios y confianza). */
+.acceso__flotante {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--sombra-2);
+}
+
+.acceso__flotante--limpieza {
+  top: 30%;
+  left: 12%;
+  color: var(--color-cenote);
+  transform: rotate(-8deg);
+}
+
+.acceso__flotante--estrella {
+  top: 18%;
+  right: 14%;
+  width: 38px;
+  height: 38px;
+  color: var(--color-miel);
+  transform: rotate(10deg);
+}
+
+.acceso__flotante--check {
+  right: 16%;
+  bottom: 16%;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-exito);
+  color: #fff;
 }
 
 .acceso__chip {
   position: absolute;
   top: var(--espacio-3);
   left: var(--espacio-3);
-  padding: 2px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
   border-radius: 999px;
-  background: #fff;
+  background: rgb(255 255 255 / 92%);
+  color: var(--color-cuero);
   font-size: 11px;
   font-weight: 600;
+}
+
+/* Indicador del registro: "Paso 2 de 4 · Código" con barra de 4 segmentos. */
+.acceso__pasos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--espacio-4);
+}
+
+.acceso__pasos-texto {
+  margin: 0;
+  color: var(--color-gris);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.acceso__pasos-barra {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.acceso__pasos-segmento {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-arena);
+}
+
+.acceso__pasos-segmento--hecho {
+  background: var(--color-cuero);
 }
 
 .acceso--bienvenida .acceso__titulo {
@@ -213,8 +293,38 @@
   cursor: pointer;
 }
 
+.rol-opcion {
+  box-shadow: var(--sombra-1);
+  transition:
+    background-color var(--transicion),
+    box-shadow var(--transicion),
+    transform var(--transicion);
+}
+
+.rol-opcion:active {
+  transform: scale(0.98);
+}
+
+/* Elegida: fondo de color, borde grueso, ícono relleno y sombra cálida (no solo el color del borde). */
 .rol-opcion:has(input:checked) {
   border: 2px solid var(--color-cuero);
+  background: #fdf6ef;
+  box-shadow: 0 4px 14px rgb(122 74 42 / 18%);
+}
+
+.rol-opcion:has(input:checked) .rol-opcion__icono {
+  background: var(--color-cuero);
+  color: var(--color-hueso);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rol-opcion {
+    transition: none;
+  }
+
+  .rol-opcion:active {
+    transform: none;
+  }
 }
 
 .rol-opcion:has(input:focus-visible) {

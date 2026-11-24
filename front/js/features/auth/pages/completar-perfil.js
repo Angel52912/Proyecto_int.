@@ -11,6 +11,7 @@ import { mensajeDeError } from "../../../ui/mensajes.js";
 import { datosAcceso, limpiarDatosAcceso } from "../flujo.js";
 import { olvidarPerfil } from "../guardia.js";
 import { api } from "../index.js";
+import { crearPasosRegistro } from "./bienvenida.js";
 
 /**
  * @param {{ rol: string | null, nombre: string, edad: string, direccion: string }} valores
@@ -80,16 +81,18 @@ function pintar({ perfil, privados, urlFoto }, regreso) {
     if (urlVista) URL.revokeObjectURL(urlVista);
   });
   const avatar = crear("span", { clase: "avatar avatar--grande" });
+  // Sin nombre todavía: ícono de persona en lugar de "?"; con nombre, sus iniciales.
+  const sinFoto = () => (nombre.value.trim() === "" ? icono("perfil", { tam: 40 }) : iniciales(nombre.value));
   const textoFoto = crear("button", { clase: "boton-texto", attrs: { type: "button" } });
   const entrada = /** @type {HTMLInputElement} */ (crear("input", { clase: "oculto-visual", attrs: { type: "file", accept: "image/jpeg,image/png,image/webp", tabindex: -1, "aria-hidden": "true" } }));
   const pintarAvatar = () => {
     const url = quitarFoto ? null : (urlVista ?? urlFoto);
     if (url) {
       const img = crear("img", { attrs: { src: url, alt: "Tu foto de perfil" } });
-      img.addEventListener("error", () => avatar.replaceChildren(iniciales(nombre.value)));
+      img.addEventListener("error", () => avatar.replaceChildren(sinFoto()));
       avatar.replaceChildren(img);
     } else {
-      avatar.replaceChildren(iniciales(nombre.value));
+      avatar.replaceChildren(sinFoto());
     }
     textoFoto.textContent = url ? "Quitar foto" : "Agregar foto";
   };
@@ -120,7 +123,7 @@ function pintar({ perfil, privados, urlFoto }, regreso) {
     pintarAvatar();
   });
   nombre.addEventListener("input", () => {
-    if (avatar.querySelector("img") === null) avatar.textContent = iniciales(nombre.value);
+    if (avatar.querySelector("img") === null) avatar.replaceChildren(sinFoto());
   });
   pintarAvatar();
 
@@ -162,6 +165,7 @@ function pintar({ perfil, privados, urlFoto }, regreso) {
       },
     },
     [
+      editando ? null : crearPasosRegistro(4),
       crear("div", { clase: "foto-perfil" }, [
         crear("div", { clase: "foto-perfil__marco" }, [
           avatar,

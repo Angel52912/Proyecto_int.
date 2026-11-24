@@ -8,6 +8,26 @@ import { continuarTrasEntrar } from "../flujo.js";
 import { destinoPorPerfil, obtenerPerfilActual } from "../guardia.js";
 import { api } from "../index.js";
 
+/** Pasos del registro: Cuenta → Código → Rol → Perfil. */
+export const PASOS_REGISTRO = Object.freeze(["Cuenta", "Código", "Rol", "Perfil"]);
+
+/**
+ * Indicador "Paso 2 de 4 · Código" con barra de 4 segmentos, para las pantallas del registro.
+ * @param {number} actual 1 a 4.
+ * @returns {HTMLElement}
+ */
+export function crearPasosRegistro(actual) {
+  const total = PASOS_REGISTRO.length;
+  return crear("div", { clase: "acceso__pasos" }, [
+    crear("p", { clase: "acceso__pasos-texto", texto: `Paso ${actual} de ${total} · ${PASOS_REGISTRO[actual - 1]}` }),
+    crear(
+      "div",
+      { clase: "acceso__pasos-barra", attrs: { role: "progressbar", "aria-valuemin": 1, "aria-valuemax": total, "aria-valuenow": actual, "aria-label": "Avance del registro" } },
+      PASOS_REGISTRO.map((_, i) => crear("span", { clase: `acceso__pasos-segmento${i < actual ? " acceso__pasos-segmento--hecho" : ""}` })),
+    ),
+  ]);
+}
+
 /** @returns {HTMLElement} */
 export function crearMarca() {
   return crear("p", { clase: "acceso__marca" }, [crear("span", { clase: "acceso__logo", attrs: { "aria-hidden": "true" } }, [icono("reparacion", { tam: 24 })]), "MiXanab"]);
@@ -53,8 +73,12 @@ export function renderBienvenida() {
 
   return crearPantalla({ clase: "acceso acceso--bienvenida" }, [
     crearMarca(),
+    // Ilustración de marca: degradado cuero → miel, el ícono principal en un círculo y los servicios flotando.
     crear("div", { clase: "acceso__ilustracion", attrs: { "aria-hidden": "true" } }, [
-      crear("span", { clase: "acceso__chip", texto: "Mérida, Yuc." }),
+      crear("span", { clase: "acceso__chip" }, [icono("mapa", { tam: 12 }), crear("span", { texto: "Mérida, Yuc." })]),
+      crear("span", { clase: "acceso__flotante acceso__flotante--limpieza" }, [icono("limpieza", { tam: 22 })]),
+      crear("span", { clase: "acceso__flotante acceso__flotante--estrella" }, [icono("estrella", { tam: 18, relleno: true })]),
+      crear("span", { clase: "acceso__flotante acceso__flotante--check" }, [icono("check", { tam: 18 })]),
       crear("span", { clase: "acceso__circulo" }, [icono("reparacion", { tam: 72 })]),
     ]),
     crear("h1", { clase: "acceso__titulo", texto: "No lo tires, restáuralo." }),

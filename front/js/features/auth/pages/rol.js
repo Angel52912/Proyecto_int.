@@ -7,6 +7,7 @@ import { mensajeDeError } from "../../../ui/mensajes.js";
 import { continuarTrasEntrar } from "../flujo.js";
 import { olvidarPerfil, sincronizarSesionSimulada } from "../guardia.js";
 import { api } from "../index.js";
+import { crearPasosRegistro } from "./bienvenida.js";
 
 export const OPCIONES_ROL = Object.freeze([
   { valor: /** @type {const} */ ("client"), titulo: "Soy cliente", detalle: "Quiero reparar o limpiar mi calzado", icono: "perfil" },
@@ -62,6 +63,7 @@ export function renderRol() {
         },
       },
       [
+        crearPasosRegistro(3),
         crear("h2", { clase: "acceso__titulo", texto: "¿Cómo usarás MiXanab?" }),
         crear("p", { clase: "acceso__texto", texto: "Solo lo eliges una vez; después no se puede cambiar." }),
         crear("fieldset", { clase: "rol-opciones" }, [crear("legend", { clase: "oculto-visual", texto: "Tipo de cuenta" }), ...opciones]),

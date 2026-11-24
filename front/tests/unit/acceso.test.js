@@ -3,7 +3,7 @@ import { ApiError } from "../../../apis/lib/apiError.js";
 import { reiniciarSimulacion as reiniciarAuth } from "../../../apis/api-inicio-sesion/api.mock.js";
 import { datosAcceso, guardarDatosAcceso, limpiarDatosAcceso } from "../../js/features/auth/flujo.js";
 import { destinoPorPerfil, soloPara } from "../../js/features/auth/guardia.js";
-import { renderBienvenida } from "../../js/features/auth/pages/bienvenida.js";
+import { crearPasosRegistro, renderBienvenida } from "../../js/features/auth/pages/bienvenida.js";
 import { formatoCuenta, repartirCodigo } from "../../js/features/auth/pages/codigo.js";
 import { validarDatosPerfil } from "../../js/features/auth/pages/completar-perfil.js";
 import { renderCorreo, validarFormularioAcceso } from "../../js/features/auth/pages/correo.js";
@@ -129,6 +129,17 @@ describe("rol y perfil", () => {
     expect(Object.keys(mal.errores).sort()).toEqual(["direccion", "edad", "nombre"]);
     expect(validarDatosPerfil({ rol: "client", nombre: "Ana", edad: "2.5", direccion: "Centro" }).errores.edad).toBeDefined();
     expect(validarDatosPerfil({ rol: "client", nombre: " Ana ", edad: "30", direccion: " Centro " }).datos).toEqual({ full_name: "Ana", age: 30, address: "Centro" });
+  });
+});
+
+describe("indicador del registro", () => {
+  test("dice el paso y marca los segmentos hechos", () => {
+    const indicador = crearPasosRegistro(2);
+    expect(indicador.querySelector(".acceso__pasos-texto")?.textContent).toBe("Paso 2 de 4 · Código");
+    const barra = indicador.querySelector('[role="progressbar"]');
+    expect(barra?.getAttribute("aria-valuenow")).toBe("2");
+    expect(indicador.querySelectorAll(".acceso__pasos-segmento--hecho")).toHaveLength(2);
+    expect(indicador.querySelectorAll(".acceso__pasos-segmento")).toHaveLength(4);
   });
 });
 
