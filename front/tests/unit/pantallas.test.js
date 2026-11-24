@@ -11,6 +11,7 @@ import { esCorreccion } from "../../js/features/orders/pages/actualizar-fase.js"
 import { elementosDePedidos } from "../../js/features/orders/pages/pedidos.js";
 import { crearPasos, estadosDePasos, textoDeAvance } from "../../js/features/orders/pasos.js";
 import { saludoPorHora } from "../../js/features/map/pages/inicio.js";
+import { textoFaltante } from "../../js/features/requests/pages/solicitar.js";
 import { textoHorarioHoy, urlComoLlegar } from "../../js/features/orders/pages/recoger.js";
 import { lineaDeTiempo } from "../../js/features/orders/pages/seguimiento.js";
 import { columnasDelTablero } from "../../js/features/orders/pages/tablero.js";
@@ -187,6 +188,15 @@ describe("pasos del pedido (CU-05)", () => {
     expect(barra.getAttribute("aria-valuenow")).toBe("2");
     expect(barra.getAttribute("aria-valuetext")).toBe("Fase 3 de 4 · Limpieza / reparación");
     expect(barra.querySelectorAll(".pasos__segmento")).toHaveLength(4);
+  });
+});
+
+describe("solicitar cotización (CU-03)", () => {
+  test("dice qué falta para enviar", () => {
+    expect(textoFaltante({ fotos: 0, texto: "" })).toBe("Falta agregar una foto y describir el problema.");
+    expect(textoFaltante({ fotos: 2, texto: "  " })).toBe("Falta describir el problema.");
+    expect(textoFaltante({ fotos: 0, texto: "Suela" })).toBe("Falta agregar una foto.");
+    expect(textoFaltante({ fotos: 1, texto: "Suela" })).toBe("");
   });
 });
 

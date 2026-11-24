@@ -25,6 +25,18 @@ const MENSAJES = {
  * @typedef {{ archivo: File, vista: string, subidaId: string | null }} FotoLocal
  */
 
+/**
+ * Qué falta para poder enviar ("Falta agregar una foto y describir el problema"), o "" si está completo.
+ * @param {{ fotos: number, texto: string }} estado
+ * @returns {string}
+ */
+export function textoFaltante({ fotos, texto }) {
+  const faltan = [];
+  if (fotos === 0) faltan.push("agregar una foto");
+  if (texto.trim() === "") faltan.push("describir el problema");
+  return faltan.length === 0 ? "" : `Falta ${faltan.join(" y ")}.`;
+}
+
 /** @param {any} taller PerfilTaller */
 function crearFormulario(taller) {
   /** @type {FotoLocal[]} */
@@ -35,6 +47,31 @@ function crearFormulario(taller) {
   let servicio = taller.services[0];
 
   const rejilla = crear("div", { clase: "solicitar__fotos" });
+  const contadorFotos = crear("span", { clase: "solicitar__contador-fotos", texto: `0/${MAX_FOTOS_SOLICITUD}` });
+
+  // Lista de avance: Fotos → Servicio → Detalle. Se marca cada paso al completarlo.
+  /** @param {string} texto */
+  const crearPaso = (texto) => {
+    const estado = crear("span", { clase: "oculto-visual", texto: ": pendiente" });
+    const li = crear("li", { clase: "solicitar__paso" }, [crear("span", { clase: "solicitar__paso-marca", attrs: { "aria-hidden": "true" } }), crear("span", { texto }), estado]);
+    return { li, estado };
+  };
+  const pasos = { fotos: crearPaso("Fotos"), servicio: crearPaso("Servicio"), detalle: crearPaso("Detalle") };
+  const faltante = crear("p", { clase: "solicitar__faltante", attrs: { "aria-live": "polite" } });
+  // Texto actual de la descripción (se actualiza al escribir).
+  let textoActual = "";
+
+  function actualizarAvance() {
+    for (const [paso, listo] of /** @type {[{ li: HTMLElement, estado: HTMLElement }, boolean][]} */ ([
+      [pasos.fotos, fotos.length > 0],
+      [pasos.servicio, true],
+      [pasos.detalle, textoActual.trim() !== ""],
+    ])) {
+      paso.li.classList.toggle("solicitar__paso--listo", listo);
+      paso.estado.textContent = listo ? ": listo" : ": pendiente";
+    }
+    faltante.textContent = textoFaltante({ fotos: fotos.length, texto: textoActual });
+  }
   const errorFotos = crear("p", { clase: "campo__error", attrs: { "aria-live": "polite" } });
   const entradaArchivo = /** @type {HTMLInputElement} */ (
     crear("input", { clase: "oculto-visual", attrs: { type: "file", accept: TIPOS_IMAGEN.join(","), multiple: true, id: "fotos-calzado" } })
@@ -67,6 +104,8 @@ function crearFormulario(taller) {
         ? crear("label", { clase: "solicitar__agregar", attrs: { for: "fotos-calzado" } }, [icono("camara"), crear("span", { texto: "Agregar" })])
         : null;
     rejilla.replaceChildren(...miniaturas, agregar ?? "");
+    contadorFotos.textContent = `${fotos.length}/${MAX_FOTOS_SOLICITUD}`;
+    actualizarAvance();
   }
 
   entradaArchivo.addEventListener("change", () => {
@@ -119,6 +158,8 @@ function crearFormulario(taller) {
   const contador = crear("span", { clase: "texto-secundario contador", texto: `0/${MAX_DESCRIPCION}` });
   descripcion.addEventListener("input", () => {
     contador.textContent = `${descripcion.value.length}/${MAX_DESCRIPCION}`;
+    textoActual = descripcion.value;
+    actualizarAvance();
   });
 
   const errorGeneral = crear("div", { attrs: { "aria-live": "assertive" } });
@@ -173,11 +214,18 @@ function crearFormulario(taller) {
       crearFoto(taller.photos.find((/** @type {any} */ f) => f.kind === "profile")?.url, `Foto de ${taller.name}`, "foto--chica", taller.name),
       crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__detalle", texto: "Para" }), crear("p", { clase: "tarjeta__titulo", texto: taller.name })]),
     ]),
-    crear("fieldset", { clase: "campo" }, [crear("legend", { texto: "Fotos del calzado" }), entradaArchivo, rejilla, errorFotos]),
+    crear("ol", { clase: "solicitar__pasos", attrs: { "aria-label": "Avance de la solicitud" } }, [pasos.fotos.li, pasos.servicio.li, pasos.detalle.li]),
+    crear("fieldset", { clase: "campo" }, [
+      crear("legend", { clase: "solicitar__leyenda" }, [crear("span", { texto: "Fotos del calzado" }), contadorFotos]),
+      crear("p", { clase: "solicitar__ayuda", texto: "Toma fotos claras del daño: de frente, de lado y de la suela." }),
+      entradaArchivo,
+      rejilla,
+      errorFotos,
+    ]),
     crear("fieldset", { clase: "campo" }, [crear("legend", { texto: "Tipo de servicio" }), crear("div", { clase: "chips", attrs: { role: "radiogroup", "aria-label": "Tipo de servicio" } }, chips)]),
     crear("div", { clase: "campo" }, [crear("label", { texto: "Describe el problema", attrs: { for: "descripcion" } }), descripcion, contador]),
     errorGeneral,
-    crear("div", { clase: "acciones" }, [enviar]),
+    crear("div", { clase: "acciones solicitar__acciones" }, [faltante, enviar]),
   ]);
 }
 

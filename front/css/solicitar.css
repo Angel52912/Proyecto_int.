@@ -74,3 +74,97 @@
 .solicitar .acciones {
   padding-top: var(--espacio-3);
 }
+
+/* Avance: Fotos → Servicio → Detalle. */
+.solicitar__pasos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--espacio-2);
+  margin: 0 0 var(--espacio-3);
+  padding: 0;
+  list-style: none;
+}
+
+.solicitar__paso {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--color-gris);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.solicitar__paso-marca {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-arena);
+  transition: background-color var(--transicion);
+}
+
+.solicitar__paso--listo {
+  color: var(--color-cenote);
+}
+
+.solicitar__paso--listo .solicitar__paso-marca {
+  background: var(--color-cenote);
+}
+
+/* El input de archivos está oculto visualmente: se fija dentro de su grupo para que no ensanche la página. */
+.solicitar fieldset {
+  position: relative;
+  min-width: 0;
+}
+
+#fotos-calzado {
+  top: 0;
+  left: 0;
+}
+
+.solicitar__leyenda {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.solicitar__contador-fotos {
+  color: var(--color-gris);
+  font-weight: 400;
+}
+
+.solicitar__ayuda {
+  margin: 0 0 var(--espacio-1);
+  color: var(--color-gris);
+  font-size: 12px;
+}
+
+.solicitar__agregar {
+  background: var(--color-cuero-suave);
+  transition: background-color var(--transicion);
+}
+
+.solicitar__agregar:hover {
+  background: #ead9cb;
+}
+
+.solicitar__acciones {
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.solicitar__faltante {
+  margin: 0;
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+  text-align: center;
+}
+
+.solicitar__faltante:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .solicitar__paso-marca,
+  .solicitar__agregar {
+    transition: none;
+  }
+}
