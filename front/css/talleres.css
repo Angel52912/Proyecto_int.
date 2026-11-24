@@ -19,11 +19,62 @@
   color: var(--color-gris);
 }
 
-.tarjeta-taller .foto {
-  width: 64px;
-  height: 64px;
+.talleres__conteo {
+  margin: 0;
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
 }
 
-.tarjeta-taller .insignia {
-  margin-top: var(--espacio-1);
+/* Tarjeta de taller (lista y mapa). */
+.tarjeta-taller {
+  align-items: stretch;
+  padding: 12px;
+}
+
+.tarjeta-taller .foto {
+  width: 76px;
+  height: 76px;
+  align-self: center;
+}
+
+.tarjeta-taller .tarjeta__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tarjeta-taller .tarjeta__titulo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tarjeta-taller__servicios {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tarjeta-taller__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+  margin-top: 4px;
+}
+
+.tarjeta-taller__precio {
+  margin: 0;
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+  white-space: nowrap;
+}
+
+.tarjeta-taller__precio strong {
+  color: var(--color-espresso);
+  font-size: var(--texto-base);
+}
+
+.tarjeta-taller .tarjeta__flecha {
+  align-self: center;
 }

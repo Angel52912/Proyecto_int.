@@ -139,6 +139,9 @@ export function crearEstrellas(calificacion) {
   return crear("span", { clase: "estrellas", attrs: { role: "img", "aria-label": calificacion === null ? "Sin calificaciones" : `${valor} de 5 estrellas` } }, estrellas);
 }
 
+/** Palabras de enlace que no cuentan para las iniciales ("Limpieza de Tenis" → "LT"). */
+const CONECTORES = new Set(["de", "del", "la", "las", "los", "el", "y"]);
+
 /**
  * Iniciales para avatares ("José Cámara" → "JC").
  * @param {string | null | undefined} nombre
@@ -146,5 +149,6 @@ export function crearEstrellas(calificacion) {
  */
 export function iniciales(nombre) {
   const partes = String(nombre ?? "").trim().split(/\s+/).filter(Boolean);
-  return partes.slice(0, 2).map((p) => p[0].toUpperCase()).join("") || "?";
+  const utiles = partes.filter((p) => !CONECTORES.has(p.toLowerCase()));
+  return (utiles.length > 0 ? utiles : partes).slice(0, 2).map((p) => p[0].toUpperCase()).join("") || "?";
 }

@@ -87,6 +87,7 @@ export async function renderTalleres({ consulta }) {
     ],
   );
 
+  const puntoFiltros = crear("span", { clase: "punto-aviso", attrs: { hidden: true, "aria-hidden": "true" } });
   const botonFiltros = crear(
     "button",
     {
@@ -100,7 +101,7 @@ export async function renderTalleres({ consulta }) {
         },
       },
     },
-    [icono("filtro")],
+    [icono("filtro"), puntoFiltros],
   );
 
   /** @type {HTMLButtonElement[]} */
@@ -144,17 +145,23 @@ export async function renderTalleres({ consulta }) {
       ...(distancia ? { max_distance_km: distancia } : {}),
       ...(casillaAbierto.checked ? { open_now: true } : {}),
     };
+    // Punto en el botón de filtros cuando hay alguno aplicado además del orden.
+    const conFiltros = ["min_rating", "max_price", "max_distance_km", "open_now", "colonia", "postal_code"].some((clave) => clave in filtros) || filtros.service !== servicio;
+    puntoFiltros.hidden = !conFiltros;
     return cargarEn(
       lista,
       () => buscarTalleres(filtros),
       (talleres) =>
         talleres.length === 0
           ? crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros.")
-          : crear(
-              "ul",
-              { clase: "lista" },
-              talleres.map((t) => crear("li", {}, [crearTarjetaTaller(t)])),
-            ),
+          : [
+              crear("p", { clase: "talleres__conteo", attrs: { role: "status" }, texto: talleres.length === 1 ? "1 taller encontrado" : `${talleres.length} talleres encontrados` }),
+              crear(
+                "ul",
+                { clase: "lista" },
+                talleres.map((t) => crear("li", {}, [crearTarjetaTaller(t)])),
+              ),
+            ],
       { invalid_input: "Revisa los filtros: colonia, C.P. de 5 dígitos o precio." },
     );
   }

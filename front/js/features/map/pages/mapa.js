@@ -121,13 +121,30 @@ export async function renderMapa({ consulta }) {
     [icono("navegar")],
   );
 
+  /** Lo que tapan el buscador con filtros (arriba) y la tarjeta con la navegación (abajo). */
+  function margenDelMapa() {
+    const alto = window.innerHeight;
+    const arriba = superior.getBoundingClientRect().bottom;
+    const abajo = alto - tarjeta.getBoundingClientRect().top;
+    return { arriba: Math.max(0, Math.round(arriba)), abajo: Math.max(0, Math.round(Math.min(abajo, alto / 2))) };
+  }
+
+  /** @param {any} taller */
+  function pintarTarjeta(taller) {
+    estado.seleccionado = taller.id;
+    tarjeta.replaceChildren(
+      crear("p", { clase: "mapa__conteo", texto: resultados.length === 1 ? "1 taller" : `${resultados.length} talleres · toca un pin para ver otro` }),
+      crearTarjetaTaller(taller),
+    );
+  }
+
   /** @param {any} taller */
   function elegir(taller) {
-    estado.seleccionado = taller.id;
-    tarjeta.replaceChildren(crearTarjetaTaller(taller, { mostrarHorario: true }));
+    pintarTarjeta(taller);
     if (mapa) {
+      // Solo se repintan los pines para marcar el elegido; la vista no salta, solo se desliza hacia él.
       capa?.remove();
-      capa = pintarPines(mapa, resultados, { ubicacion: estado.ubicacion, alElegir: elegir, seleccionado: taller.id });
+      capa = pintarPines(mapa, resultados, { ubicacion: estado.ubicacion, alElegir: elegir, seleccionado: taller.id, ajustar: false });
       mapa.panTo([taller.lat, taller.lng]);
     }
   }
@@ -153,27 +170,26 @@ export async function renderMapa({ consulta }) {
       tarjeta.replaceChildren(crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros."));
       return;
     }
-    if (mapa) capa = pintarPines(mapa, resultados, { ubicacion: estado.ubicacion, alElegir: elegir });
+    // Primero la tarjeta, para medir cuánto tapa antes de encuadrar los pines.
     const elegido = resultados.find((t) => t.id === estado.seleccionado) ?? resultados[0];
-    tarjeta.replaceChildren(
-      crearTarjetaTaller(elegido, { mostrarHorario: true }),
-      crear("p", { clase: "texto-secundario mapa__conteo", texto: `${resultados.length} ${resultados.length === 1 ? "taller" : "talleres"} · toca un pin para ver otro` }),
-    );
-    estado.seleccionado = elegido.id;
+    pintarTarjeta(elegido);
+    if (mapa) capa = pintarPines(mapa, resultados, { ubicacion: estado.ubicacion, alElegir: elegir, seleccionado: elegido.id, margen: margenDelMapa() });
   }
+
+  const superior = crear("div", { clase: "mapa__superior" }, [
+    buscador,
+    crear("div", { clase: "chips", attrs: { role: "group", "aria-label": "Filtros" } }, [
+      chipServicio("Todos", "all"),
+      chipServicio(NOMBRE_SERVICIO.repair, "repair"),
+      chipServicio(NOMBRE_SERVICIO.cleaning, "cleaning"),
+      chipAbierto,
+    ]),
+  ]);
 
   const pantalla = crearPantalla({ rol: "client", activa: "mapa", clase: "mapa" }, [
     crear("h1", { clase: "oculto-visual", texto: "Mapa de talleres" }),
     mapaContenedor,
-    crear("div", { clase: "mapa__superior" }, [
-      buscador,
-      crear("div", { clase: "chips", attrs: { role: "group", "aria-label": "Filtros" } }, [
-        chipServicio("Todos", "all"),
-        chipServicio(NOMBRE_SERVICIO.repair, "repair"),
-        chipServicio(NOMBRE_SERVICIO.cleaning, "cleaning"),
-        chipAbierto,
-      ]),
-    ]),
+    superior,
     botonUbicacion,
     tarjeta,
   ]);

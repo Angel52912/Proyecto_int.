@@ -82,6 +82,9 @@ describe("layout", () => {
     expect(crearEstrellas(null).getAttribute("aria-label")).toBe("Sin calificaciones");
     expect(iniciales("José Cámara Pérez")).toBe("JC");
     expect(iniciales("")).toBe("?");
+    expect(iniciales("Limpieza de Tenis Itzimná")).toBe("LT");
+    expect(iniciales("José de la Cruz")).toBe("JC");
+    expect(iniciales("De")).toBe("D");
   });
   test("foto sin URL muestra respaldo", () => {
     expect(crearFoto(null, "x").classList.contains("foto--vacia")).toBe(true);

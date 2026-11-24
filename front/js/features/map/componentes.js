@@ -95,19 +95,24 @@ export function crearLineaCalificacion(taller) {
 }
 
 /**
- * Tarjeta de taller que lleva a su perfil.
+ * Tarjeta de taller que lleva a su perfil: foto, nombre, servicios, calificación y distancia,
+ * y abajo el precio "desde" junto al estado Abierto/Cerrado.
  * @param {any} taller ResultadoBusqueda
- * @param {{ mostrarHorario?: boolean }} [opciones]
+ * @param {{ mostrarHorario?: boolean }} [opciones] `mostrarHorario: false` oculta la etiqueta Abierto/Cerrado.
  * @returns {HTMLElement}
  */
 export function crearTarjetaTaller(taller, opciones = {}) {
+  const mostrarHorario = opciones.mostrarHorario !== false;
   return enlace(`/taller/${taller.id}`, { clase: "tarjeta tarjeta--enlace tarjeta-taller" }, [
     crearFoto(taller.profile_photo_url, `Foto de ${taller.name}`, undefined, taller.name),
     crear("div", { clase: "tarjeta__cuerpo" }, [
       crear("p", { clase: "tarjeta__titulo", texto: taller.name }),
-      crear("p", { clase: "tarjeta__detalle", texto: `${textoServicios(taller.services)} · desde ${formatearMxn(taller.price_from)}` }),
+      crear("p", { clase: "tarjeta__detalle tarjeta-taller__servicios", texto: textoServicios(taller.services) }),
       crearLineaCalificacion(taller),
-      opciones.mostrarHorario ? crearInsignia(taller.is_open ? "Abierto ahora" : "Cerrado", taller.is_open ? "exito" : "neutra") : null,
+      crear("div", { clase: "tarjeta-taller__pie" }, [
+        crear("p", { clase: "tarjeta-taller__precio" }, [crear("span", { texto: "desde " }), crear("strong", { texto: formatearMxn(taller.price_from) })]),
+        mostrarHorario ? crearInsignia(taller.is_open ? "Abierto" : "Cerrado", taller.is_open ? "exito" : "neutra") : null,
+      ]),
     ]),
     icono("adelante", { clase: "tarjeta__flecha" }),
   ]);
@@ -140,6 +145,8 @@ export function crearMapaLeaflet(contenedor, opciones = {}) {
   const mapa = L.map(contenedor, {
     zoomControl: false,
     attributionControl: true,
+    // Sin desvanecido de mosaicos: la animación podía quedarse a medias (mapa deslavado) y en 3G no aporta.
+    fadeAnimation: false,
     dragging: interactivo,
     scrollWheelZoom: interactivo,
     doubleClickZoom: interactivo,
@@ -150,6 +157,9 @@ export function crearMapaLeaflet(contenedor, opciones = {}) {
     maxZoom: 19,
     attribution: "© OpenStreetMap",
   }).addTo(mapa);
+  // El contenedor puede cambiar de tamaño al terminar de pintarse la pantalla (fuentes, tarjetas):
+  // se recalcula para que los mosaicos llenen todo el recuadro.
+  requestAnimationFrame(() => mapa.invalidateSize());
   return mapa;
 }
 
@@ -157,7 +167,9 @@ export function crearMapaLeaflet(contenedor, opciones = {}) {
  * Pinta los pines de los talleres y ajusta la vista. `alElegir` recibe el taller tocado.
  * @param {any} mapa L.Map
  * @param {any[]} talleres
- * @param {{ ubicacion?: { lat: number, lng: number } | null, alElegir?: (taller: any) => void, seleccionado?: string | null }} [opciones]
+ * @param {{ ubicacion?: { lat: number, lng: number } | null, alElegir?: (taller: any) => void, seleccionado?: string | null, margen?: { arriba: number, abajo: number }, ajustar?: boolean }} [opciones]
+ *   `margen`: px que tapan otros elementos arriba y abajo (buscador, tarjeta), para que ningún pin quede debajo.
+ *   `ajustar: false`: no mueve la vista (al elegir un pin).
  * @returns {any} L.LayerGroup
  */
 export function pintarPines(mapa, talleres, opciones = {}) {
@@ -178,7 +190,9 @@ export function pintarPines(mapa, talleres, opciones = {}) {
     L.circleMarker([opciones.ubicacion.lat, opciones.ubicacion.lng], { radius: 8, color: "#fff", weight: 3, fillColor: "#1f7a7a", fillOpacity: 1 }).addTo(capa);
     puntos.push([opciones.ubicacion.lat, opciones.ubicacion.lng]);
   }
-  if (puntos.length > 1) mapa.fitBounds(puntos, { padding: [40, 40], maxZoom: 15 });
+  const margen = opciones.margen ?? { arriba: 0, abajo: 0 };
+  if (opciones.ajustar === false) return capa;
+  if (puntos.length > 1) mapa.fitBounds(puntos, { paddingTopLeft: [40, 40 + margen.arriba], paddingBottomRight: [40, 40 + margen.abajo], maxZoom: 15 });
   else if (puntos.length === 1) mapa.setView(puntos[0], 15);
   return capa;
 }

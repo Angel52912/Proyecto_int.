@@ -31,7 +31,7 @@
   position: fixed;
   z-index: 5;
   right: max(var(--espacio-3), calc((100% - 480px) / 2 + var(--espacio-3)));
-  bottom: calc(var(--alto-nav) + 190px + env(safe-area-inset-bottom));
+  bottom: calc(var(--alto-nav) + 168px + env(safe-area-inset-bottom));
   box-shadow: 0 2px 8px rgb(43 33 27 / 15%);
 }
 
@@ -55,9 +55,36 @@
   box-shadow: 0 4px 16px rgb(43 33 27 / 15%);
 }
 
+/* Conteo: pastilla blanca centrada sobre la tarjeta. */
 .mapa__conteo {
-  margin: var(--espacio-1) 0 0;
-  text-align: center;
+  width: fit-content;
+  margin: 0 auto var(--espacio-2);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: var(--sombra-1);
   color: var(--color-espresso);
-  text-shadow: 0 0 4px #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Filtros: deslizan de borde a borde y se leen sobre el mapa. */
+.mapa__superior .chips {
+  margin: 0 calc(-1 * var(--espacio-3));
+  padding: 2px var(--espacio-3) 6px;
+}
+
+.mapa__superior .chip {
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgb(43 33 27 / 14%);
+  font-weight: 600;
+}
+
+.mapa__superior .chip[aria-pressed="true"] {
+  box-shadow: 0 2px 8px rgb(122 74 42 / 35%);
+}
+
+.mapa__tarjeta .tarjeta-taller {
+  border: 0;
+  box-shadow: var(--sombra-2);
 }
