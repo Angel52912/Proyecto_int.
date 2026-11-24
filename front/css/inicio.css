@@ -16,6 +16,109 @@
   font-size: 22px;
 }
 
+.inicio__acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.inicio__avatar {
+  width: var(--tactil-min);
+  height: var(--tactil-min);
+  background: var(--degradado-marca);
+  color: var(--color-hueso);
+  font-family: var(--fuente-titulo);
+  text-decoration: none;
+  box-shadow: var(--sombra-1);
+}
+
+/* Pedido en curso: tarjeta destacada con el degradado de marca. */
+.pedido-destacado {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--espacio-3);
+  border-radius: 18px;
+  /* Más oscuro que --degradado-marca: el texto claro necesita contraste en toda la tarjeta. */
+  background: linear-gradient(135deg, #6a3f22 0%, var(--color-cuero) 60%, #95592f 100%);
+  box-shadow: 0 6px 18px rgb(122 74 42 / 30%);
+  color: var(--color-hueso);
+  text-decoration: none;
+  transition: transform var(--transicion);
+}
+
+.pedido-destacado:active {
+  transform: scale(0.98);
+}
+
+.pedido-destacado--listo {
+  background: linear-gradient(135deg, #1b5e3c 0%, var(--color-cenote) 100%);
+  box-shadow: 0 6px 18px rgb(31 122 122 / 30%);
+}
+
+.pedido-destacado p {
+  margin: 0;
+}
+
+.pedido-destacado__fila {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.pedido-destacado__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: var(--radio);
+  background: rgb(250 246 240 / 18%);
+}
+
+.pedido-destacado__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.pedido-destacado__titulo {
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+}
+
+.pedido-destacado__taller {
+  overflow: hidden;
+  font-size: var(--texto-secundario);
+  opacity: 0.85;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pedido-destacado .insignia {
+  background: rgb(250 246 240 / 92%);
+}
+
+.pedido-destacado__fase {
+  font-size: var(--texto-secundario);
+  opacity: 0.95;
+}
+
+.pedido-destacado__accion {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-end;
+  gap: 4px;
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pedido-destacado {
+    transition: none;
+  }
+}
+
 .categorias {
   display: grid;
   grid-template-columns: 1fr 1fr;

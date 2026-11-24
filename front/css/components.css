@@ -698,6 +698,47 @@ a.boton-texto {
   min-width: 200px;
 }
 
+/* Pasos del pedido: 4 segmentos (hecho, actual, pendiente). */
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.pasos__segmento {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-arena);
+}
+
+.pasos__segmento--hecho {
+  background: var(--color-cenote);
+}
+
+.pasos__segmento--actual {
+  background: linear-gradient(90deg, var(--color-cenote) 50%, var(--color-arena) 50%);
+}
+
+.pasos--listo .pasos__segmento {
+  background: var(--color-exito);
+}
+
+.pasos--claro .pasos__segmento {
+  background: rgb(250 246 240 / 25%);
+}
+
+.pasos--claro .pasos__segmento--hecho {
+  background: var(--color-hueso);
+}
+
+.pasos--claro .pasos__segmento--actual {
+  background: linear-gradient(90deg, var(--color-hueso) 50%, rgb(250 246 240 / 25%) 50%);
+}
+
+.pasos--claro.pasos--listo .pasos__segmento {
+  background: var(--color-miel);
+}
+
 /* Esqueleto de carga con brillo. */
 .esqueleto {
   display: flex;

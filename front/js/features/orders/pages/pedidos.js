@@ -7,12 +7,16 @@ import { formatearFecha } from "../../../lib/fechas.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
-import { crearEstrellas, crearInsignia, crearPantalla, crearProgreso } from "../../../ui/layout.js";
+import { icono } from "../../../ui/iconos.js";
+import { crearEstrellas, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { ESTADO_ORDEN, ESTADO_SOLICITUD } from "../fases.js";
+import { crearPasos, textoDeAvance } from "../pasos.js";
 import { api } from "../index.js";
 
 /**
- * @typedef {{ id: string, ruta: string, titulo: string, taller: string, insignia: { texto: string, tono: any }, progreso: number | null, fecha: string, activo: boolean, foto: string | null, pendienteCalificar: boolean, rating: number | null }} Elemento
+ * @typedef {{ id: string, ruta: string, titulo: string, folio: string, taller: string, insignia: { texto: string, tono: any }, progreso: number | null, fecha: string, activo: boolean, foto: string | null, pendienteCalificar: boolean, rating: number | null, pedido: { phase: number, status: string } | null, aviso: string | null }} Elemento
+ *   `pedido`: fase y estado para la barra de pasos (solo pedidos en proceso o listos).
+ *   `aviso`: qué sigue en una solicitud ("Revisa la cotización", "Esperando cotización").
  */
 
 /**
@@ -34,15 +38,19 @@ export function elementosDePedidos(pedidos, solicitudes, pendientes, nombres) {
     return {
       id: p.id,
       ruta: pendientes.has(p.id) ? `/pedido/${p.id}/calificar` : p.status === "ready" ? `/pedido/${p.id}/recoger` : `/pedido/${p.id}`,
-      titulo: `${servicio} ${folio(p.id)}`,
+      titulo: servicio,
+      folio: folio(p.id),
       taller: nombres.get(p.workshop_id) ?? "Taller",
-      insignia: p.status === "in_progress" ? { texto: servicio, tono: s?.service_type === "cleaning" ? "miel" : "cuero" } : ESTADO_ORDEN[p.status],
+      // El servicio ya va en el título: la etiqueta dice el estado.
+      insignia: ESTADO_ORDEN[p.status],
       progreso: p.status === "in_progress" ? p.phase / 4 : p.status === "ready" ? 1 : null,
       fecha: p.delivered_at ?? p.updated_at ?? p.created_at,
       activo,
       foto: null,
       pendienteCalificar: pendientes.has(p.id),
       rating: null,
+      pedido: activo ? { phase: p.phase, status: p.status } : null,
+      aviso: null,
     };
   });
   for (const s of solicitudes) {
@@ -52,7 +60,8 @@ export function elementosDePedidos(pedidos, solicitudes, pendientes, nombres) {
     elementos.push({
       id: s.id,
       ruta: s.status === "draft" ? `/solicitar/${s.workshop_id}` : `/chat/${s.id}`,
-      titulo: `${NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (s.service_type)]} ${folio(s.id)}`,
+      titulo: NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (s.service_type)],
+      folio: folio(s.id),
       taller: nombres.get(s.workshop_id) ?? "Taller",
       insignia,
       progreso: s.status === "quoted" ? 0.1 : null,
@@ -61,6 +70,8 @@ export function elementosDePedidos(pedidos, solicitudes, pendientes, nombres) {
       foto: null,
       pendienteCalificar: false,
       rating: null,
+      pedido: null,
+      aviso: s.status === "quoted" ? "Tienes una cotización por revisar" : s.status === "open" ? "Esperando la cotización del taller" : s.status === "draft" ? "Termina de enviar tu solicitud" : null,
     });
   }
   return elementos.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
@@ -68,16 +79,21 @@ export function elementosDePedidos(pedidos, solicitudes, pendientes, nombres) {
 
 /** @param {Elemento} e */
 function crearTarjeta(e) {
+  const listo = e.pedido?.status === "ready";
   return crear("li", {}, [
-    enlace(e.ruta, { clase: "tarjeta tarjeta--enlace pedido-tarjeta" }, [
-      crearFoto(e.foto, ""),
+    enlace(e.ruta, { clase: `tarjeta tarjeta--enlace pedido-tarjeta${listo ? " pedido-tarjeta--listo" : ""}` }, [
+      crearFoto(e.foto, "", undefined, e.taller),
       crear("div", { clase: "tarjeta__cuerpo" }, [
         crear("div", { clase: "fila-entre" }, [crear("p", { clase: "tarjeta__titulo", texto: e.titulo }), crearInsignia(e.insignia.texto, e.insignia.tono)]),
-        crear("p", { clase: "tarjeta__detalle", texto: e.activo ? e.taller : `${e.taller} · ${formatearFecha(e.fecha)}` }),
-        e.progreso !== null ? crearProgreso(e.progreso, "Avance") : null,
-        e.pendienteCalificar ? crear("p", { clase: "pedido-tarjeta__calificar", texto: "Califica este pedido" }) : null,
+        crear("p", { clase: "tarjeta__detalle pedido-tarjeta__detalle", texto: e.activo ? `${e.taller} · ${e.folio}` : `${e.taller} · ${formatearFecha(e.fecha)} · ${e.folio}` }),
+        e.pedido
+          ? crear("div", { clase: "pedido-tarjeta__avance" }, [crear("p", { clase: "pedido-tarjeta__fase", texto: textoDeAvance(e.pedido, { corto: true }) }), crearPasos(e.pedido)])
+          : null,
+        e.aviso ? crear("p", { clase: `pedido-tarjeta__aviso${e.insignia.tono === "cenote" ? " pedido-tarjeta__aviso--cenote" : ""}`, texto: e.aviso }) : null,
+        e.pendienteCalificar ? crear("p", { clase: "pedido-tarjeta__calificar" }, [icono("estrella", { tam: 14 }), crear("span", { texto: "Califica este pedido" })]) : null,
         e.rating !== null ? crearEstrellas(e.rating) : null,
       ]),
+      icono("adelante", { clase: "tarjeta__flecha" }),
     ]),
   ]);
 }

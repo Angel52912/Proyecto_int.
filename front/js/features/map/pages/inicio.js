@@ -6,20 +6,32 @@ import { crearCampana } from "../../requests/avisos.js";
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace, ir } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
-import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearInsignia, crearPantalla, crearProgreso } from "../../../ui/layout.js";
+import { crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
 import { NOMBRE_SERVICIO, buscarTalleres, crearMapaLeaflet, obtenerUbicacion, pintarPines } from "../componentes.js";
-import { NOMBRE_FASE } from "../../orders/fases.js";
+import { api as apiMapa } from "../index.js";
+import { crearPasos, textoDeAvance } from "../../orders/pasos.js";
 
 /** @returns {Promise<string>} */
 async function nombreDelCliente() {
   try {
     const perfil = await apiAuth.getMyProfile();
-    return perfil.full_name.split(/\s+/)[0] ?? "";
+    return perfil.full_name.trim();
   } catch {
     return "";
   }
+}
+
+/**
+ * Saludo según la hora: mañana (5–11), tarde (12–18) y noche.
+ * @param {Date} [ahora]
+ * @returns {string}
+ */
+export function saludoPorHora(ahora = new Date()) {
+  const hora = ahora.getHours();
+  if (hora >= 5 && hora < 12) return "Buenos días";
+  if (hora >= 12 && hora < 19) return "Buenas tardes";
+  return "Buenas noches";
 }
 
 /** @returns {HTMLElement} */
@@ -57,30 +69,38 @@ function crearCategoria(servicio, detalle) {
 }
 
 /**
- * Tarjeta del pedido activo más reciente.
+ * Tarjeta destacada del pedido activo más reciente: servicio, taller, fase y pasos, y la acción que toca
+ * (Ver seguimiento o, si está listo, Recoger pedido).
  * @param {any} pedido
  * @param {any | undefined} solicitud
+ * @param {string | null} taller Nombre del taller.
  */
-function crearPedidoEnCurso(pedido, solicitud) {
+function crearPedidoEnCurso(pedido, solicitud, taller) {
   const listo = pedido.status === "ready";
-  return enlace(`/pedido/${pedido.id}`, { clase: "tarjeta tarjeta--enlace" }, [
-    crearFoto(null, "Pedido"),
-    crear("div", { clase: "tarjeta__cuerpo" }, [
-      crear("div", { clase: "fila-entre" }, [
-        crear("p", { clase: "tarjeta__titulo", texto: `Pedido de ${NOMBRE_SERVICIO[solicitud?.service_type] ?? "servicio"}` }),
-        crearInsignia(listo ? "Listo" : NOMBRE_SERVICIO[solicitud?.service_type] ?? "En proceso", listo ? "exito" : "miel"),
+  const servicio = NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud?.service_type)] ?? "Pedido";
+  return enlace(listo ? `/pedido/${pedido.id}/recoger` : `/pedido/${pedido.id}`, { clase: `pedido-destacado${listo ? " pedido-destacado--listo" : ""}` }, [
+    crear("div", { clase: "pedido-destacado__fila" }, [
+      crear("span", { clase: "pedido-destacado__icono", attrs: { "aria-hidden": "true" } }, [icono(listo ? "check" : solicitud?.service_type === "cleaning" ? "limpieza" : "reparacion", { tam: 20 })]),
+      crear("div", { clase: "pedido-destacado__texto" }, [
+        crear("p", { clase: "pedido-destacado__titulo", texto: servicio }),
+        crear("p", { clase: "pedido-destacado__taller", texto: taller ?? "Tu taller" }),
       ]),
-      crear("p", { clase: "tarjeta__detalle", texto: listo ? "Listo para recoger" : `Fase ${pedido.phase} de 4 · ${NOMBRE_FASE[pedido.phase]}` }),
-      crearProgreso(pedido.phase / 4, "Avance del pedido"),
+      crearInsignia(listo ? "¡Listo!" : `Fase ${pedido.phase}/4`, listo ? "exito" : "miel"),
     ]),
+    crear("p", { clase: "pedido-destacado__fase", texto: listo ? "Tu pedido está listo. Pasa a recogerlo con tu código." : textoDeAvance(pedido) }),
+    crearPasos(pedido, { claro: true }),
+    crear("span", { clase: "pedido-destacado__accion" }, [crear("span", { texto: listo ? "Recoger pedido" : "Ver seguimiento" }), icono("adelante", { tam: 16 })]),
   ]);
 }
 
 /** @returns {Promise<Node>} */
 export async function renderInicio() {
-  const saludo = crear("p", { clase: "inicio__saludo texto-secundario", texto: "Hola" });
+  const saludo = crear("p", { clase: "inicio__saludo texto-secundario", texto: saludoPorHora() });
+  const avatar = enlace("/perfil", { clase: "avatar inicio__avatar", attrs: { "aria-label": "Mi perfil" } }, [icono("perfil", { tam: 20 })]);
   nombreDelCliente().then((nombre) => {
-    if (nombre) saludo.textContent = `Hola, ${nombre}`;
+    if (!nombre) return;
+    saludo.textContent = `${saludoPorHora()}, ${nombre.split(/\s+/)[0]}`;
+    avatar.replaceChildren(crear("span", { texto: iniciales(nombre), attrs: { "aria-hidden": "true" } }));
   });
 
   const campana = crearCampana("client");
@@ -106,7 +126,7 @@ export async function renderInicio() {
   const pantalla = crearPantalla({ rol: "client", activa: "inicio", clase: "inicio" }, [
     crear("header", { clase: "inicio__encabezado" }, [
       crear("div", {}, [saludo, crear("h1", { clase: "inicio__titulo", texto: "¿Qué restauramos hoy?" })]),
-      campana,
+      crear("div", { clase: "inicio__acciones" }, [campana, avatar]),
     ]),
     crearBuscador(),
     recordatorio,
@@ -137,12 +157,17 @@ export async function renderInicio() {
     pedidoEnCurso,
     async () => {
       const pedidos = await apiPedidos.listMyOrders();
-      const activo = pedidos.find((p) => p.status === "in_progress" || p.status === "ready");
-      const solicitud = activo ? await apiSolicitudes.getRequest(activo.request_id).catch(() => undefined) : undefined;
-      return { activo, solicitud };
+      // Primero el que ya está listo (hay que ir por él); si no, el más reciente en proceso.
+      const activo = pedidos.find((p) => p.status === "ready") ?? pedidos.find((p) => p.status === "in_progress");
+      if (!activo) return { activo, solicitud: undefined, taller: null };
+      const [solicitud, perfil] = await Promise.all([
+        apiSolicitudes.getRequest(activo.request_id).catch(() => undefined),
+        apiMapa.getWorkshopProfile(activo.workshop_id).catch(() => null),
+      ]);
+      return { activo, solicitud, taller: perfil?.name ?? null };
     },
-    ({ activo, solicitud }) =>
-      activo ? crearPedidoEnCurso(activo, solicitud) : crearVacio("No tienes pedidos en curso.", enlace("/talleres", { clase: "boton boton--secundario", texto: "Buscar un taller" }), { icono: "pedidos" }),
+    ({ activo, solicitud, taller }) =>
+      activo ? crearPedidoEnCurso(activo, solicitud, taller) : crearVacio("No tienes pedidos en curso.", enlace("/talleres", { clase: "boton boton--secundario", texto: "Buscar un taller" }), { icono: "pedidos" }),
   );
 
   return pantalla;

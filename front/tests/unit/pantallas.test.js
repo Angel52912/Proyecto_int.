@@ -9,6 +9,8 @@ import { conceptosDelDetalle, descripcionDelDetalle } from "../../js/features/qu
 import { validarFormularioPresupuesto } from "../../js/features/quotes/pages/enviar-presupuesto.js";
 import { esCorreccion } from "../../js/features/orders/pages/actualizar-fase.js";
 import { elementosDePedidos } from "../../js/features/orders/pages/pedidos.js";
+import { crearPasos, estadosDePasos, textoDeAvance } from "../../js/features/orders/pasos.js";
+import { saludoPorHora } from "../../js/features/map/pages/inicio.js";
 import { textoHorarioHoy, urlComoLlegar } from "../../js/features/orders/pages/recoger.js";
 import { lineaDeTiempo } from "../../js/features/orders/pages/seguimiento.js";
 import { columnasDelTablero } from "../../js/features/orders/pages/tablero.js";
@@ -150,6 +152,50 @@ describe("Mis pedidos", () => {
     const pedidos = [{ id: "o1", request_id: "r1", workshop_id: "w", phase: 4, status: "delivered", created_at: "x", updated_at: "x", delivered_at: "2026-11-14T10:00:00Z" }];
     const [e] = elementosDePedidos(pedidos, [], new Set(["o1"]), new Map());
     expect(e.ruta).toBe("/pedido/o1/calificar");
+    expect(e.pedido).toBeNull();
+  });
+  test("pedido en proceso: etiqueta de estado, pasos y folio aparte", () => {
+    const pedidos = [{ id: "00000000-0000-4000-8000-00000000a1b2", request_id: "r1", workshop_id: "w", phase: 2, status: "in_progress", created_at: "x", updated_at: "x", delivered_at: null }];
+    const solicitudes = [{ id: "r1", workshop_id: "w", service_type: "cleaning", status: "accepted", submitted_at: "x", created_at: "x" }];
+    const [e] = elementosDePedidos(pedidos, solicitudes, new Set(), new Map());
+    expect(e).toMatchObject({ titulo: "Limpieza", folio: "#A1B2", insignia: { texto: "En proceso" }, pedido: { phase: 2, status: "in_progress" }, aviso: null });
+  });
+  test("solicitudes: aviso de qué sigue", () => {
+    const solicitudes = [
+      { id: "a", workshop_id: "w", service_type: "repair", status: "quoted", submitted_at: "2", created_at: "2" },
+      { id: "b", workshop_id: "w", service_type: "repair", status: "open", submitted_at: "1", created_at: "1" },
+    ];
+    const [cotizada, abierta] = elementosDePedidos([], solicitudes, new Set(), new Map());
+    expect(cotizada.aviso).toBe("Tienes una cotización por revisar");
+    expect(abierta.aviso).toBe("Esperando la cotización del taller");
+  });
+});
+
+describe("pasos del pedido (CU-05)", () => {
+  test("segmentos hechos, actual y pendientes", () => {
+    expect(estadosDePasos({ phase: 2, status: "in_progress" })).toEqual(["hecho", "actual", "pendiente", "pendiente"]);
+    expect(estadosDePasos({ phase: 4, status: "ready" })).toEqual(["hecho", "hecho", "hecho", "hecho"]);
+  });
+  test("texto del avance, largo y corto", () => {
+    expect(textoDeAvance({ phase: 2, status: "in_progress" })).toBe("Fase 2 de 4 · Desinfección / pretratamiento");
+    expect(textoDeAvance({ phase: 2, status: "in_progress" }, { corto: true })).toBe("Fase 2 de 4 · Desinfección");
+    expect(textoDeAvance({ phase: 4, status: "ready" })).toBe("Listo para recoger");
+  });
+  test("la barra es accesible", () => {
+    const barra = crearPasos({ phase: 3, status: "in_progress" });
+    expect(barra.getAttribute("role")).toBe("progressbar");
+    expect(barra.getAttribute("aria-valuenow")).toBe("2");
+    expect(barra.getAttribute("aria-valuetext")).toBe("Fase 3 de 4 · Limpieza / reparación");
+    expect(barra.querySelectorAll(".pasos__segmento")).toHaveLength(4);
+  });
+});
+
+describe("inicio", () => {
+  test("saludo según la hora", () => {
+    expect(saludoPorHora(new Date(2026, 10, 23, 8))).toBe("Buenos días");
+    expect(saludoPorHora(new Date(2026, 10, 23, 13))).toBe("Buenas tardes");
+    expect(saludoPorHora(new Date(2026, 10, 23, 21))).toBe("Buenas noches");
+    expect(saludoPorHora(new Date(2026, 10, 23, 3))).toBe("Buenas noches");
   });
 });
 
