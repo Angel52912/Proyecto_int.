@@ -10,7 +10,7 @@ export function renderPortada() {
   return crearPantalla({ clase: "portada" }, [
     crear("div", { clase: "portada__marca" }, [crearMarca()]),
     crear("h1", { clase: "portada__eslogan", texto: "No lo tires, restáuralo." }),
-    enlace("/acceso/entrar", { clase: "boton boton--bloque portada__entrar", texto: "Iniciar sesión" }),
+    enlace("/acceso", { clase: "boton boton--bloque portada__entrar", texto: "Iniciar sesión" }),
     USAR_API_SIMULADA
       ? enlace("/simulacion", { clase: "portada__simulado", attrs: { "aria-label": "Cambiar de rol (modo simulado)" } }, [icono("ajustes", { tam: 16 }), crear("span", { texto: "Modo simulado" })])
       : null,

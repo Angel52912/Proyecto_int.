@@ -22,7 +22,7 @@ hacia `back/` y no hay servidor propio.
 ## Rutas principales
 
 - `/` o `/inicio`: pantalla de inicio pública (logo, eslogan y **Iniciar sesión**).
-- `/acceso/entrar`: inicio de sesión; el cliente entra a `/principal`.
+- `/acceso`: bienvenida (iniciar sesión, crear cuenta o Google); el cliente entra a `/principal`.
 - `/principal`: pantalla principal del cliente (antes `/inicio`).
 
 ## Cómo arrancar

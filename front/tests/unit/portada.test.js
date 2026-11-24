@@ -18,7 +18,7 @@ describe("portada pública y adaptación PC", () => {
     expect(pantalla.querySelector(".portada__eslogan")?.textContent).toBe("No lo tires, restáuralo.");
     const enlaces = [...pantalla.querySelectorAll("a")];
     expect(enlaces).toHaveLength(2);
-    expect(enlaces[0].getAttribute("href")).toBe("#/acceso/entrar");
+    expect(enlaces[0].getAttribute("href")).toBe("#/acceso");
     expect(enlaces[0].textContent).toBe("Iniciar sesión");
     expect(enlaces[1].getAttribute("href")).toBe("#/simulacion");
     expect(enlaces[1].classList.contains("portada__simulado")).toBe(true);

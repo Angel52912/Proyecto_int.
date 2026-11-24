@@ -32,7 +32,7 @@ sirva desde ahí; las librerías y los datos viven en `apis/`.
 | Ruta | Pantalla |
 | --- | --- |
 | `/`, `/inicio` | Inicio público: logo, “No lo tires, restáuralo.” y **Iniciar sesión**. |
-| `/acceso/entrar` | Inicio de sesión; al entrar, el cliente va a `/principal`. |
+| `/acceso` | Acceso: iniciar sesión, crear cuenta o continuar con Google; el cliente entra a `/principal`. |
 | `/principal` | Pantalla principal del cliente: buscador, categorías, talleres y pedido en curso. |
 
 El ancho y la navegación se adaptan a escritorio desde `css/layout.css`. El botón flotante
