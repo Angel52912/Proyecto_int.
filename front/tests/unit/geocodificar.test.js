@@ -1,4 +1,4 @@
-import { direccionDeNominatim } from "../../js/lib/geocodificar.js";
+import { direccionDeNominatim, puntoDeNominatim } from "../../js/lib/geocodificar.js";
 
 describe("geocodificación inversa del mapa", () => {
   test("convierte calle, número, colonia y código postal de Nominatim", () => {
@@ -16,5 +16,11 @@ describe("geocodificación inversa del mapa", () => {
   test("devuelve null cuando el lugar no tiene datos útiles", () => {
     expect(direccionDeNominatim({ display_name: "Mérida, Yucatán", address: { city: "Mérida" } })).toBeNull();
     expect(direccionDeNominatim({})).toBeNull();
+  });
+
+  test("convierte el primer resultado de búsqueda en un punto del mapa", () => {
+    expect(puntoDeNominatim([{ lat: "20.9674", lon: "-89.6237" }, { lat: "1", lon: "2" }])).toEqual({ lat: 20.9674, lng: -89.6237 });
+    expect(puntoDeNominatim([])).toBeNull();
+    expect(puntoDeNominatim([{ lat: "x", lon: "-89" }])).toBeNull();
   });
 });
