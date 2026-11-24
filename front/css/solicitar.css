@@ -79,7 +79,7 @@
 }
 
 .solicitar__descripcion {
-  resize: vertical;
+  resize: none;
   max-width: 100%;
   overflow-wrap: break-word;
 }
@@ -91,4 +91,19 @@
 
 .solicitar .acciones {
   padding-top: var(--espacio-3);
+}
+
+/* Escritorio: miniaturas al 50% (6 columnas en lugar de 3). Móvil conserva el tamaño actual. */
+@media (min-width: 720px) {
+  html:not([data-vista="movil"]) .solicitar__fotos {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+html[data-vista="pc"] .solicitar__fotos {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+html[data-vista="movil"] .solicitar__fotos {
+  grid-template-columns: repeat(3, 1fr);
 }

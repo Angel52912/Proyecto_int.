@@ -24,6 +24,21 @@ export function crear(etiqueta, opciones = {}, hijos = []) {
     elemento.setAttribute(nombre, valor === true ? "" : String(valor));
   }
   for (const [evento, manejador] of Object.entries(opciones.on ?? {})) elemento.addEventListener(evento, manejador);
+  if (etiqueta === "textarea") {
+    const area = /** @type {HTMLTextAreaElement} */ (elemento);
+    // Crece con el texto y vuelve a encogerse al borrar; el ancho lo fija el CSS.
+    const ajustarAltura = () => {
+      const borde = area.offsetHeight - area.clientHeight;
+      const alturaPrevia = area.style.height;
+      area.style.height = "auto";
+      if (area.scrollHeight > 0) area.style.height = `${area.scrollHeight + borde}px`;
+      else area.style.height = alturaPrevia;
+    };
+    area.addEventListener("input", ajustarAltura);
+    area.addEventListener("focus", ajustarAltura);
+    ajustarAltura();
+    queueMicrotask(ajustarAltura);
+  }
   for (const hijo of hijos) {
     if (hijo === null || hijo === undefined || hijo === false) continue;
     elemento.append(hijo);

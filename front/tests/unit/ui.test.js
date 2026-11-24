@@ -24,6 +24,16 @@ describe("dom", () => {
   test("enlace usa el router por hash", () => {
     expect(enlace("/pedido/1").getAttribute("href")).toBe("#/pedido/1");
   });
+  test("el textarea ajusta su altura al texto sin tocar el ancho", () => {
+    const area = /** @type {HTMLTextAreaElement} */ (crear("textarea", { attrs: { rows: 2 } }));
+    Object.defineProperty(area, "scrollHeight", { configurable: true, value: 140 });
+    area.dispatchEvent(new Event("input"));
+    expect(area.style.height).toBe("140px");
+    expect(area.style.width).toBe("");
+    Object.defineProperty(area, "scrollHeight", { configurable: true, value: 48 });
+    area.dispatchEvent(new Event("input"));
+    expect(area.style.height).toBe("48px");
+  });
 });
 
 describe("mensajes", () => {

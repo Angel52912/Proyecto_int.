@@ -149,14 +149,12 @@
 .chat__entrada {
   flex: 1;
   min-height: var(--tactil-min);
-  max-height: 120px;
   padding: 10px 16px;
   border: 1px solid var(--color-arena);
   border-radius: 22px;
   background: #fff;
   color: var(--color-espresso);
   font: inherit;
-  resize: none;
 }
 
 .chat__enviar {

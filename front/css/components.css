@@ -74,6 +74,11 @@ h2 {
   margin-bottom: var(--espacio-3);
 }
 
+textarea {
+  resize: none;
+  overflow: hidden;
+}
+
 .campo input,
 .campo textarea,
 .campo select {
