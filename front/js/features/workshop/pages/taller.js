@@ -273,11 +273,13 @@ function pintarFormulario(tallerInicial) {
     textoUbicacion.textContent = "Buscando la dirección en el mapa…";
     temporizadorCampos = setTimeout(async () => {
       const version = versionCampos;
-      const { punto, motivo } = await geocodificarDireccion({ direccion: direccion.value, colonia: colonia.value, codigoPostal: cp.value });
+      const { punto, motivo, categoria } = await geocodificarDireccion({ direccion: direccion.value, colonia: colonia.value, codigoPostal: cp.value });
       if (version !== versionCampos) return;
       if (punto) {
         colocar(punto);
-        textoUbicacion.textContent = "Ubicación actualizada desde la dirección. Puedes mover el punto en el mapa.";
+        textoUbicacion.textContent = ["house", "building"].includes(categoria)
+          ? "Ubicación actualizada desde la dirección. Puedes mover el punto en el mapa."
+          : "Ubicamos la calle. Ajusta el punto en el mapa si hace falta.";
         return;
       }
       textoUbicacion.textContent = "No se pudo actualizar el punto desde la dirección.";

@@ -7,11 +7,15 @@
 /** @typedef {{ lat: number, lng: number }} Punto */
 /** @typedef {"encontrado" | "no_encontrado" | "incompleto" | "error"} Motivo */
 /** @typedef {{ valor: any, motivo: Motivo }} Resultado */
+/** @typedef {{ punto: Punto | null, categoria: string, tipo: string, nombre: string, cp: string }} DetalleLugar */
+/** @typedef {{ punto: Punto, cp: string, fuerte: boolean }} CentroColonia */
 
 /** @type {Map<string, Promise<Resultado>>} */
 const cacheInversa = new Map();
 /** @type {Map<string, Promise<Resultado>>} */
 const cacheDirecta = new Map();
+/** @type {Map<string, Promise<Resultado>>} */
+const cacheColonia = new Map();
 /** @type {Promise<unknown>} */
 let cola = Promise.resolve();
 let ultimaPeticion = 0;
@@ -25,7 +29,7 @@ const TIEMPO_ESPERA_MS = 12000;
 const texto = (valor) => (typeof valor === "string" ? valor.trim() : "");
 
 /**
- * Quita los caracteres que Nominatim no entiende en una búsqueda (#, "C.P.", espacios dobles).
+ * Quita lo que Nominatim no entiende en una búsqueda (#, "C.P.", espacios dobles).
  * @param {unknown} valor
  * @returns {string}
  */
@@ -36,6 +40,9 @@ function limpiar(valor) {
     .replace(/\s+/g, " ")
     .trim();
 }
+
+/** @param {Punto} a @param {Punto} b @returns {number} */
+const distancia = (a, b) => Math.hypot((a.lat - b.lat) * 111, (a.lng - b.lng) * 96);
 
 /**
  * Convierte la respuesta de Nominatim a los campos del formulario. No inventa datos: si un campo
@@ -61,14 +68,29 @@ export function direccionDeNominatim(datos) {
  * @returns {Punto | null}
  */
 export function puntoDeNominatim(datos) {
+  return detalleDeNominatim(datos).punto;
+}
+
+/**
+ * Datos del mejor resultado: punto, tipo (calle, casa, colonia…) y C.P. cuando viene en el nombre.
+ * @param {any} datos
+ * @returns {DetalleLugar}
+ */
+export function detalleDeNominatim(datos) {
   const primero = Array.isArray(datos) ? datos[0] : datos;
-  if (!primero) return null;
+  if (!primero) return { punto: null, categoria: "", tipo: "", nombre: "", cp: "" };
   const latTexto = typeof primero.lat === "number" ? String(primero.lat) : texto(primero.lat);
   const lngTexto = typeof primero.lon === "number" ? String(primero.lon) : texto(primero.lon ?? primero.longitude);
-  if (!latTexto || !lngTexto) return null;
   const lat = Number(latTexto);
   const lng = Number(lngTexto);
-  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+  const nombre = texto(primero.display_name);
+  return {
+    punto: latTexto && lngTexto && Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null,
+    categoria: texto(primero.category),
+    tipo: texto(primero.type),
+    nombre,
+    cp: /\b(\d{5})\b/.exec(nombre)?.[1] ?? "",
+  };
 }
 
 /** @param {string} url @returns {Promise<any>} */
@@ -114,14 +136,34 @@ function enCola(clave, cache, url, convertir) {
 }
 
 /** @param {string} consulta @returns {string} */
-function urlDeBusqueda(consulta) {
+function urlDeConsulta(consulta) {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "jsonv2");
-  url.searchParams.set("limit", "1");
+  url.searchParams.set("limit", "5");
   url.searchParams.set("accept-language", "es");
   url.searchParams.set("countrycodes", "mx");
-  // Nominatim rechaza mezclar `q` con parámetros estructurados como `postalcode`.
   url.searchParams.set("q", consulta);
+  return url.toString();
+}
+
+/**
+ * Búsqueda estructurada: respeta el nombre de la calle y el número aunque la colonia no esté en OSM.
+ * No se mezcla `q` con parámetros estructurados porque Nominatim lo rechaza con HTTP 400.
+ * @param {string} calle @param {string} numero @param {string} cp
+ * @returns {string}
+ */
+function urlEstructurada(calle, numero, cp) {
+  const url = new URL("https://nominatim.openstreetmap.org/search");
+  url.searchParams.set("format", "jsonv2");
+  url.searchParams.set("limit", "10");
+  url.searchParams.set("accept-language", "es");
+  url.searchParams.set("countrycodes", "mx");
+  url.searchParams.set("street", calle);
+  if (numero) url.searchParams.set("housenumber", numero);
+  url.searchParams.set("city", "Mérida");
+  url.searchParams.set("state", "Yucatán");
+  url.searchParams.set("country", "México");
+  if (cp) url.searchParams.set("postalcode", cp);
   return url.toString();
 }
 
@@ -155,8 +197,20 @@ export async function reverseGeocode(punto) {
 }
 
 /**
- * Consulta limpia que se envía a Nominatim. Sin `#` ni `C.P.`: esos caracteres hacen que la
- * búsqueda no devuelva resultados aunque la dirección exista.
+ * Separa "C. 62 #512" en calle "C. 62" y número "512" para la búsqueda estructurada.
+ * @param {DireccionMapa} campos
+ * @returns {{ calle: string, numero: string }}
+ */
+export function partesDeDireccion(campos) {
+  const completa = limpiar(campos.direccion).split(",")[0].trim();
+  const coincidencia = /^(.*?)\s+(\d+[A-Za-z]?)$/.exec(completa);
+  return coincidencia
+    ? { calle: coincidencia[1].trim(), numero: coincidencia[2] }
+    : { calle: completa, numero: "" };
+}
+
+/**
+ * Consulta de texto limpia, sin `#` ni `C.P.` (último recurso si la búsqueda estructurada falla).
  * @param {DireccionMapa} campos
  * @returns {string}
  */
@@ -167,27 +221,70 @@ export function consultaDeDireccion(campos) {
 }
 
 /**
+ * Entre varios tramos de la misma calle elige el más cercano al centro de la colonia cuando
+ * Nominatim la reconoce; si no la conoce, conserva el orden de Nominatim.
+ * @param {any[]} resultados @param {CentroColonia | null} centro
+ * @returns {DetalleLugar | null}
+ */
+export function elegirResultado(resultados, centro) {
+  if (!resultados.length) return null;
+  const lugares = resultados.map(detalleDeNominatim).filter((l) => l.punto !== null);
+  if (!lugares.length) return null;
+  if (!centro?.fuerte) return lugares[0];
+  return lugares.slice().sort((a, b) => distancia(a.punto, centro.punto) - distancia(b.punto, centro.punto))[0];
+}
+
+/**
+ * Obtiene el centro de la colonia. Si Nominatim la reconoce (como división administrativa, parque
+ * o cementerio) sirve para elegir el tramo de calle más cercano; si es administrativa además aporta
+ * su C.P. real (p. ej. "Fraccionamiento Altabrisa" es 97133).
+ * @param {string} colonia
+ * @returns {Promise<CentroColonia | null>}
+ */
+async function centroDeColonia(colonia) {
+  if (colonia.length < 3) return null;
+  const url = urlDeConsulta(`${colonia}, Mérida, Yucatán`);
+  const { valor } = await enCola(`col:${colonia.toLowerCase()}`, cacheColonia, url, detalleDeNominatim);
+  if (!valor?.punto) return null;
+  return { punto: valor.punto, cp: valor.cp, fuerte: true };
+}
+
+/**
  * Devuelve el punto de una dirección escrita por el artesano. Si Nominatim no encuentra el lugar,
  * devuelve el motivo para que la pantalla pueda avisar. El mapa se deja como estaba.
  * @param {DireccionMapa} campos
- * @returns {Promise<{ punto: Punto | null, motivo: Motivo }>}
+ * @returns {Promise<{ punto: Punto | null, motivo: Motivo, categoria: string, tipo: string }>}
  */
 export async function geocodificarDireccion(campos) {
-  const calle = limpiar(campos.direccion);
+  const { calle, numero } = partesDeDireccion(campos);
   const colonia = limpiar(campos.colonia);
-  const codigoPostal = /(\d{5})/.exec(limpiar(campos.codigoPostal))?.[1] ?? "";
-  if (calle.length < 5 || (!codigoPostal && colonia.length < 3)) {
-    return { punto: null, motivo: /** @type {Motivo} */ ("incompleto") };
+  const cpUsuario = /(\d{5})/.exec(limpiar(campos.codigoPostal))?.[1] ?? "";
+  if (calle.length < 5 || (!cpUsuario && colonia.length < 3)) {
+    return { punto: null, motivo: /** @type {Motivo} */ ("incompleto"), categoria: "", tipo: "" };
   }
-  const consulta = consultaDeDireccion(campos);
-  let resultado = await enCola(`dir:${consulta.toLowerCase()}`, cacheDirecta, urlDeBusqueda(consulta), puntoDeNominatim);
-  if (resultado.motivo !== "no_encontrado") return { punto: resultado.valor, motivo: resultado.motivo };
 
-  // Si el número de casa no está en OSM, se reintenta con la calle y la colonia.
-  const calleBase = calle.replace(/\s+\d+[A-Za-z]?\s*$/, "").trim();
-  if (calleBase && calleBase !== calle) {
-    const consultaBase = [calleBase, colonia, codigoPostal, "Mérida", "Yucatán"].filter(Boolean).join(", ");
-    resultado = await enCola(`dir:${consultaBase.toLowerCase()}`, cacheDirecta, urlDeBusqueda(consultaBase), puntoDeNominatim);
+  const centro = await centroDeColonia(colonia);
+  const cp = (centro?.fuerte && centro.cp) || cpUsuario;
+  const buscarCalle = (/** @type {string} */ codigoPostal) => {
+    const clave = `calle:${calle.toLowerCase()}|${numero}|${codigoPostal}|${centro?.fuerte ? "cerca" : "plano"}`;
+    return enCola(clave, cacheDirecta, urlEstructurada(calle, numero, codigoPostal), (datos) =>
+      elegirResultado(Array.isArray(datos) ? datos : [], centro),
+    );
+  };
+
+  let resultado = await buscarCalle(cp);
+  if (!resultado.valor && cp !== cpUsuario && cpUsuario) resultado = await buscarCalle(cpUsuario);
+
+  if (!resultado.valor) {
+    const consulta = consultaDeDireccion(campos);
+    resultado = await enCola(`dir:${consulta.toLowerCase()}`, cacheDirecta, urlDeConsulta(consulta), detalleDeNominatim);
   }
-  return { punto: resultado.valor, motivo: resultado.motivo };
+
+  const lugar = resultado.valor;
+  return {
+    punto: lugar?.punto ?? null,
+    motivo: lugar?.punto && resultado.motivo === "encontrado" ? "encontrado" : resultado.motivo === "error" ? "error" : "no_encontrado",
+    categoria: lugar?.categoria ?? "",
+    tipo: lugar?.tipo ?? "",
+  };
 }
