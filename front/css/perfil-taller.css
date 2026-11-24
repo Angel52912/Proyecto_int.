@@ -33,6 +33,11 @@
   height: 48px;
 }
 
+.perfil-taller__portada .foto__inicial {
+  font-size: 64px;
+  opacity: 0.9;
+}
+
 .perfil-taller__hoja {
   display: flex;
   flex-direction: column;

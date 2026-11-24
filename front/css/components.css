@@ -610,3 +610,166 @@ a.boton-texto {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--espacio-2);
 }
+
+/* ── Acabado moderno compartido: profundidad, respuesta al toque, respaldos y estados ── */
+
+.tarjeta {
+  border-color: rgb(231 222 211 / 70%);
+  box-shadow: var(--sombra-1);
+}
+
+.tarjeta--enlace,
+.boton,
+.chip,
+.boton-circular {
+  transition:
+    transform var(--transicion),
+    box-shadow var(--transicion),
+    background-color var(--transicion);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tarjeta--enlace:active,
+.boton:active:not(:disabled),
+.chip:active,
+.boton-circular:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .tarjeta--enlace:hover {
+    box-shadow: var(--sombra-2);
+  }
+}
+
+.boton:not(.boton--secundario) {
+  box-shadow: 0 2px 6px rgb(122 74 42 / 25%);
+}
+
+.boton-circular {
+  box-shadow: var(--sombra-1);
+}
+
+/* Respaldo de foto: degradado suave con ícono, o degradado de marca con iniciales si se conoce el nombre. */
+.foto--vacia {
+  background: linear-gradient(135deg, var(--color-cuero-suave), #fbefd8);
+}
+
+.foto--inicial {
+  background: var(--degradado-marca);
+  color: var(--color-hueso);
+}
+
+.foto__inicial {
+  font-family: var(--fuente-titulo);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.foto--chica .foto__inicial {
+  font-size: 14px;
+}
+
+/* Estado vacío: ícono en círculo, texto amable y acción destacada. */
+.estado-vacio {
+  gap: var(--espacio-3);
+  padding: var(--espacio-4) var(--espacio-3);
+}
+
+.estado-vacio__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero);
+}
+
+.estado-vacio p {
+  max-width: 28ch;
+  color: var(--color-gris);
+}
+
+.estado-vacio .boton {
+  min-width: 200px;
+}
+
+/* Esqueleto de carga con brillo. */
+.esqueleto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.esqueleto__tarjeta {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3);
+  border-radius: var(--radio-tarjeta);
+  background: #fff;
+  box-shadow: var(--sombra-1);
+}
+
+.esqueleto__lineas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.esqueleto__bloque {
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--color-arena) 25%, #f3ece4 50%, var(--color-arena) 75%);
+  background-size: 200% 100%;
+  animation: esqueleto-brillo 1.3s ease-in-out infinite;
+}
+
+.esqueleto__foto {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: var(--radio);
+}
+
+.esqueleto__linea {
+  height: 12px;
+}
+
+.esqueleto__linea--corta {
+  width: 55%;
+}
+
+@keyframes esqueleto-brillo {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto__bloque {
+    animation: none;
+  }
+
+  .tarjeta--enlace,
+  .boton,
+  .chip,
+  .boton-circular {
+    transition: none;
+  }
+
+  .tarjeta--enlace:active,
+  .boton:active:not(:disabled),
+  .chip:active,
+  .boton-circular:active {
+    transform: none;
+  }
+}

@@ -102,7 +102,7 @@ export function crearLineaCalificacion(taller) {
  */
 export function crearTarjetaTaller(taller, opciones = {}) {
   return enlace(`/taller/${taller.id}`, { clase: "tarjeta tarjeta--enlace tarjeta-taller" }, [
-    crearFoto(taller.profile_photo_url, `Foto de ${taller.name}`),
+    crearFoto(taller.profile_photo_url, `Foto de ${taller.name}`, undefined, taller.name),
     crear("div", { clase: "tarjeta__cuerpo" }, [
       crear("p", { clase: "tarjeta__titulo", texto: taller.name }),
       crear("p", { clase: "tarjeta__detalle", texto: `${textoServicios(taller.services)} · desde ${formatearMxn(taller.price_from)}` }),

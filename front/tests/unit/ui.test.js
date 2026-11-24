@@ -2,7 +2,7 @@ import { createRequire } from "node:module";
 import { diasHasta, formatearFecha, formatearHace, formatearHora } from "../../js/lib/fechas.js";
 import { ApiError } from "../../../apis/lib/apiError.js";
 import { crear, enlace } from "../../js/ui/dom.js";
-import { cargarEn, crearError, crearVacio } from "../../js/ui/estados.js";
+import { cargarEn, crearError, crearEsqueleto, crearVacio } from "../../js/ui/estados.js";
 import { crearFoto } from "../../js/ui/foto.js";
 import { crearEstrellas, crearPantalla, crearProgreso, iniciales } from "../../js/ui/layout.js";
 import { mensajeDeError } from "../../js/ui/mensajes.js";
@@ -86,6 +86,34 @@ describe("layout", () => {
   test("foto sin URL muestra respaldo", () => {
     expect(crearFoto(null, "x").classList.contains("foto--vacia")).toBe(true);
     expect(crearFoto("https://a/b.png", "alt").getAttribute("alt")).toBe("alt");
+  });
+  test("foto sin URL con nombre muestra iniciales y etiqueta accesible", () => {
+    const foto = crearFoto(null, "Foto de Taller Sol", "extra", "Taller Sol");
+    expect(foto.classList.contains("foto--inicial")).toBe(true);
+    expect(foto.classList.contains("extra")).toBe(true);
+    expect(foto.textContent).toBe("TS");
+    expect(foto.getAttribute("aria-label")).toBe("Sin foto de Taller Sol");
+  });
+  test("foto que no carga cae al respaldo con iniciales", () => {
+    const padre = document.createElement("div");
+    const imagen = crearFoto("https://a/rota.png", "alt", undefined, "Zapatería Montejo");
+    padre.append(imagen);
+    imagen.dispatchEvent(new Event("error"));
+    expect(padre.querySelector(".foto--inicial")?.textContent).toBe("ZM");
+  });
+});
+
+describe("esqueleto y vacío", () => {
+  test("el esqueleto anuncia la carga solo a lectores de pantalla", () => {
+    const esqueleto = crearEsqueleto(2);
+    expect(esqueleto.getAttribute("role")).toBe("status");
+    expect(esqueleto.textContent).toBe("Cargando…");
+    expect(esqueleto.querySelectorAll(".esqueleto__tarjeta")).toHaveLength(2);
+  });
+  test("el vacío lleva ícono decorativo en círculo y la acción", () => {
+    const vacio = crearVacio("nada", crear("a", { texto: "Ir" }), { icono: "pedidos" });
+    expect(vacio.querySelector(".estado-vacio__icono")?.getAttribute("aria-hidden")).toBe("true");
+    expect(vacio.textContent).toBe("nadaIr");
   });
 });
 

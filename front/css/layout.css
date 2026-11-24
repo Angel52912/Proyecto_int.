@@ -41,15 +41,31 @@
   background: inherit;
 }
 
+/* Volver: el mismo círculo blanco con sombra en todas las pantallas. */
 .barra__volver {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--tactil-min);
-  height: var(--tactil-min);
-  margin-left: calc(-1 * var(--espacio-2));
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border: 1px solid rgb(231 222 211 / 70%);
   border-radius: 50%;
-  color: inherit;
+  background: #fff;
+  color: var(--color-espresso);
+  box-shadow: var(--sombra-1);
+  transition: transform var(--transicion);
+}
+
+.barra__volver:active {
+  transform: scale(0.94);
+}
+
+.pantalla--oscura .barra__volver {
+  border-color: transparent;
+  background: rgb(250 246 240 / 12%);
+  color: var(--color-hueso);
+  box-shadow: none;
 }
 
 .barra__titulo {
@@ -65,8 +81,10 @@
   right: 0;
   bottom: 0;
   z-index: 20;
-  background: #fff;
-  border-top: 1px solid var(--color-arena);
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgb(231 222 211 / 70%);
+  box-shadow: 0 -4px 16px rgb(43 33 27 / 5%);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -91,9 +109,21 @@
   text-decoration: none;
 }
 
+/* Pastilla detrás del ícono: misma caja en todas las pestañas para que nada salte al cambiar. */
+.nav-inferior__enlace .icono {
+  box-sizing: content-box;
+  padding: 4px 18px;
+  border-radius: 999px;
+  transition: background-color var(--transicion);
+}
+
 .nav-inferior__enlace[aria-current="page"] {
   color: var(--color-cuero);
   font-weight: 600;
+}
+
+.nav-inferior__enlace[aria-current="page"] .icono {
+  background: var(--color-cuero-suave);
 }
 
 @media (min-width: 720px) {

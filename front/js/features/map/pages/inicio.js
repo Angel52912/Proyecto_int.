@@ -142,7 +142,7 @@ export async function renderInicio() {
       return { activo, solicitud };
     },
     ({ activo, solicitud }) =>
-      activo ? crearPedidoEnCurso(activo, solicitud) : crearVacio("No tienes pedidos en curso.", enlace("/talleres", { clase: "boton-texto", texto: "Buscar un taller" })),
+      activo ? crearPedidoEnCurso(activo, solicitud) : crearVacio("No tienes pedidos en curso.", enlace("/talleres", { clase: "boton boton--secundario", texto: "Buscar un taller" }), { icono: "pedidos" }),
   );
 
   return pantalla;

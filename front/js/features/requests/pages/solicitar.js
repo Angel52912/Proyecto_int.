@@ -170,7 +170,7 @@ function crearFormulario(taller) {
 
   return crear("form", { clase: "solicitar__formulario", attrs: { novalidate: true }, on: { submit: /** @type {EventListener} */ (alEnviar) } }, [
     crear("div", { clase: "tarjeta tarjeta--enlace solicitar__para" }, [
-      crearFoto(taller.photos.find((/** @type {any} */ f) => f.kind === "profile")?.url, `Foto de ${taller.name}`, "foto--chica"),
+      crearFoto(taller.photos.find((/** @type {any} */ f) => f.kind === "profile")?.url, `Foto de ${taller.name}`, "foto--chica", taller.name),
       crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__detalle", texto: "Para" }), crear("p", { clase: "tarjeta__titulo", texto: taller.name })]),
     ]),
     crear("fieldset", { clase: "campo" }, [crear("legend", { texto: "Fotos del calzado" }), entradaArchivo, rejilla, errorFotos]),

@@ -60,4 +60,11 @@
   --color-gris: #7d6f66;
   --radio-tarjeta: 14px;
   --alto-nav: 60px;
+
+  /* Profundidad y movimiento (componentes compartidos). */
+  --sombra-1: 0 1px 2px rgb(43 33 27 / 6%), 0 2px 8px rgb(43 33 27 / 6%);
+  --sombra-2: 0 2px 4px rgb(43 33 27 / 8%), 0 8px 24px rgb(43 33 27 / 10%);
+  --color-cuero-suave: #f1e6dd;
+  --degradado-marca: linear-gradient(135deg, var(--color-cuero) 0%, #a8683a 55%, var(--color-miel) 100%);
+  --transicion: 160ms ease;
 }

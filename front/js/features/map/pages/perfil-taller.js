@@ -51,7 +51,7 @@ function pintarPerfil(taller) {
     .catch(() => {});
 
   return [
-    crear("div", { clase: "perfil-taller__portada" }, [crearFoto(portada?.url, `Foto de ${taller.name}`, "perfil-taller__foto")]),
+    crear("div", { clase: "perfil-taller__portada" }, [crearFoto(portada?.url, `Foto de ${taller.name}`, "perfil-taller__foto", taller.name)]),
     crear("article", { clase: "perfil-taller__hoja" }, [
       crear("h1", { clase: "perfil-taller__nombre", texto: taller.name }),
       crear("p", { clase: "tarjeta__detalle linea-calificacion" }, [

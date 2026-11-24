@@ -86,7 +86,7 @@ function crearTarjeta(e) {
  * @param {Elemento[]} lista
  * @param {string} vacio
  */
-const crearLista = (lista, vacio) => (lista.length === 0 ? crearVacio(vacio, enlace("/talleres", { clase: "boton-texto", texto: "Buscar un taller" })) : crear("ul", { clase: "lista" }, lista.map(crearTarjeta)));
+const crearLista = (lista, vacio) => (lista.length === 0 ? crearVacio(vacio, enlace("/talleres", { clase: "boton", texto: "Buscar un taller" }), { icono: "pedidos" }) : crear("ul", { clase: "lista" }, lista.map(crearTarjeta)));
 
 /** @param {Elemento[]} elementos */
 function pintarPedidos(elementos) {
