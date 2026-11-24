@@ -583,7 +583,7 @@ fieldset.campo {
 
 .campo--error .chips,
 .campo--error .taller__mapa,
-.campo--error .horario-fila {
+.campo--error .horario__dia {
   outline: 2px solid var(--color-error);
   outline-offset: 2px;
   border-radius: var(--radio);
