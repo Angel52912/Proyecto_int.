@@ -1,6 +1,7 @@
 // 17 · Datos del taller (Artesano, CU-07): nombre, fotos, dirección, ubicación en el mapa, servicios, horario,
 // precio "desde", Guardar y Publicar taller. A1: resalta los campos obligatorios que faltan.
 import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet } from "../../map/componentes.js";
+import { reverseGeocode } from "../../../lib/geocodificar.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
@@ -215,14 +216,29 @@ function pintarFormulario(tallerInicial) {
       return;
     }
     alSalir(() => mapa.remove());
-    const fijar = (/** @type {{ lat: number, lng: number }} */ punto) => {
+    const colocar = (/** @type {{ lat: number, lng: number }} */ punto) => {
       ubicacion = { lat: Number(punto.lat.toFixed(6)), lng: Number(punto.lng.toFixed(6)) };
       if (marcador) marcador.setLatLng([ubicacion.lat, ubicacion.lng]);
       else marcador = L.marker([ubicacion.lat, ubicacion.lng], { icon: L.divIcon({ html: crear("span", { clase: "pin" }, [icono("reparacion", { tam: 16 })]), className: "pin-contenedor", iconSize: [36, 36], iconAnchor: [18, 36] }) }).addTo(mapa);
-      textoUbicacion.textContent = "Ubicación marcada. Puedes tocar otro punto para moverla.";
     };
-    if (ubicacion) fijar(ubicacion);
-    mapa.on("click", (/** @type {any} */ e) => fijar(e.latlng));
+    /** @param {{ lat: number, lng: number }} punto */
+    const completarCampos = async (punto) => {
+      textoUbicacion.textContent = "Ubicación marcada. Buscando dirección…";
+      const datos = await reverseGeocode(punto);
+      // Si el artesano movió el pin mientras llegaba la respuesta, se descarta la consulta vieja.
+      if (!ubicacion || ubicacion.lat !== punto.lat || ubicacion.lng !== punto.lng) return;
+      if (datos?.direccion) direccion.value = datos.direccion;
+      if (datos?.colonia) colonia.value = datos.colonia;
+      if (datos?.codigoPostal) cp.value = datos.codigoPostal;
+      textoUbicacion.textContent = datos
+        ? "Ubicación marcada. Dirección, colonia y C.P. completados. Puedes mover el punto."
+        : "Ubicación marcada. No se encontró la dirección; puedes escribirla.";
+    };
+    if (ubicacion) colocar(ubicacion);
+    mapa.on("click", (/** @type {any} */ e) => {
+      colocar(e.latlng);
+      completarCampos(ubicacion);
+    });
   }, 0);
 
   // Servicios
