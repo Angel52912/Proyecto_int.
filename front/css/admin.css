@@ -20,26 +20,44 @@
 .admin-cifras {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--espacio-2) var(--espacio-3);
-  margin: var(--espacio-2) 0 0;
+  gap: var(--espacio-2);
+  margin: var(--espacio-3) 0 0;
 }
 
-/* Cada cifra: número arriba y etiqueta abajo. */
+/* Cada cifra: mosaico de tablero con el número grande arriba y la etiqueta abajo. */
 .admin-cifra {
   display: flex;
   flex-direction: column-reverse;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie-suave);
 }
 
 .admin-cifra dt {
-  color: var(--color-gris);
+  color: var(--color-texto-suave);
   font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .admin-cifra dd {
   margin: 0;
   font-family: var(--fuente-titulo);
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* La primera cifra de cada sección (el total) resalta con el color de marca. */
+.admin-cifra:first-child {
+  border-color: rgb(122 74 42 / 20%);
+  background: var(--color-cuero-suave);
+}
+
+.admin-cifra:first-child dd {
+  color: var(--color-cuero);
 }
 
 .admin-conteo {
@@ -116,8 +134,10 @@
 .admin-confirmacion {
   width: 100%;
   padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-left: 4px solid var(--color-miel);
   border-radius: var(--radio);
-  background: var(--color-hueso);
+  background: var(--color-superficie-suave);
 }
 
 .admin-confirmacion[hidden] {
@@ -135,4 +155,107 @@
 
 .admin-confirmacion textarea {
   resize: none;
+}
+
+/* ── Escritorio (≥1024px o vista PC): panel en dos columnas y listas como filas de tabla ── */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .admin-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  html:not([data-vista="movil"]) .admin-panel__calificacion {
+    grid-column: 1 / -1;
+  }
+
+  html:not([data-vista="movil"]) .admin .buscador {
+    max-width: 520px;
+  }
+
+  html:not([data-vista="movil"]) .admin-lista {
+    gap: 6px;
+  }
+
+  /* Fila: nombre a la izquierda, estado al centro, acción a la derecha; lo largo (comentario, fechas,
+     confirmación abierta) baja a su propia línea a todo el ancho. */
+  html:not([data-vista="movil"]) .admin-fila {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--espacio-4);
+    padding: 12px var(--espacio-3);
+  }
+
+  html:not([data-vista="movil"]) .admin-fila__cabecera {
+    flex: 1 1 300px;
+    min-width: 0;
+  }
+
+  html:not([data-vista="movil"]) .admin-fila > .chips {
+    flex: 0 1 auto;
+  }
+
+  html:not([data-vista="movil"]) .admin-fila > .admin-accion {
+    margin-left: auto;
+  }
+
+  html:not([data-vista="movil"]) .admin-fila > :is(.admin-fila__comentario, .admin-fechas),
+  html:not([data-vista="movil"]) .admin-fila > .admin-accion:has(.admin-confirmacion:not([hidden])) {
+    flex-basis: 100%;
+  }
+
+  html:not([data-vista="movil"]) .admin-confirmacion {
+    max-width: 640px;
+    margin-left: auto;
+  }
+}
+
+html[data-vista="pc"] .admin-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+html[data-vista="pc"] .admin-panel__calificacion {
+  grid-column: 1 / -1;
+}
+
+html[data-vista="pc"] .admin .buscador {
+  max-width: 520px;
+}
+
+html[data-vista="pc"] .admin-lista {
+  gap: 6px;
+}
+
+html[data-vista="pc"] .admin-fila {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--espacio-4);
+  padding: 12px var(--espacio-3);
+}
+
+html[data-vista="pc"] .admin-fila__cabecera {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+html[data-vista="pc"] .admin-fila > .chips {
+  flex: 0 1 auto;
+}
+
+html[data-vista="pc"] .admin-fila > .admin-accion {
+  margin-left: auto;
+}
+
+html[data-vista="pc"] .admin-fila > :is(.admin-fila__comentario, .admin-fechas),
+html[data-vista="pc"] .admin-fila > .admin-accion:has(.admin-confirmacion:not([hidden])) {
+  flex-basis: 100%;
+}
+
+html[data-vista="pc"] .admin-confirmacion {
+  max-width: 640px;
+  margin-left: auto;
 }
