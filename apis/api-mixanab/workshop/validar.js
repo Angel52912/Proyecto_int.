@@ -14,13 +14,14 @@ export const CAMPOS_TALLER = /** @type {ReadonlyArray<string>} */ ([
   "services",
   "hours",
   "price_from",
+  "description",
 ]);
 const HORA = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
 /**
  * @typedef {{ open: string, close: string }} RangoHorario
  * @typedef {Partial<Record<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun", RangoHorario[]>>} Horario
- * @typedef {{ name?: string, address?: string, colonia?: string, postal_code?: string | null, lat?: number, lng?: number, services?: string[], hours?: Horario, price_from?: number }} DatosTaller
+ * @typedef {{ name?: string, address?: string, colonia?: string, postal_code?: string | null, lat?: number, lng?: number, services?: string[], hours?: Horario, price_from?: number, description?: string | null }} DatosTaller
  */
 
 /**
@@ -101,6 +102,12 @@ export function validarDatosTaller(datos) {
     const precio = datos.price_from;
     if (typeof precio !== "number" || !Number.isFinite(precio) || precio <= 0 || precio >= 100000000) throw new ApiError("invalid_input");
     fila.price_from = Math.round(precio * 100) / 100;
+  }
+  if (datos.description !== undefined) {
+    // Opcional: hasta 500 caracteres; vacío o null la borra.
+    const texto = datos.description;
+    if (texto !== null && (typeof texto !== "string" || texto.trim().length > 500)) throw new ApiError("invalid_input");
+    fila.description = texto === null || texto.trim() === "" ? null : texto.trim();
   }
   return fila;
 }

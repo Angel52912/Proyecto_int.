@@ -115,14 +115,15 @@ Código nuevo en errores comunes: `limit_reached` (se superó un límite de nego
 Tipos:
 - `Horario = { mon?: Rango[], tue?: Rango[], wed?: Rango[], thu?: Rango[], fri?: Rango[], sat?: Rango[], sun?: Rango[] }` con `Rango = { open: "HH:MM", close: "HH:MM" }`. Formato propuesto para la duda 5: hasta 2 rangos por día, `open < close`, 24 h; día ausente o `[]` = cerrado.
 - `FotoTaller = { id, path, kind: 'profile' | 'work', sort: number, url: string }` (url pública).
-- `Taller = { id, owner_id, name, address, colonia, postal_code, lat, lng, services: ('repair' | 'cleaning')[], hours: Horario | null, price_from: number | null, published, suspended, rating_avg: number | null, rating_count, photos: FotoTaller[] }`. Los campos de texto, `lat`, `lng`, `hours` y `price_from` son `null` hasta que se capturan.
+- `Taller = { id, owner_id, name, address, colonia, postal_code, lat, lng, services: ('repair' | 'cleaning')[], hours: Horario | null, price_from: number | null, description: string | null, published, suspended, rating_avg: number | null, rating_count, photos: FotoTaller[] }`. Los campos de texto, `lat`, `lng`, `hours`, `price_from` y `description` son `null` hasta que se capturan.
+- **Pendiente de backend (Angel):** `description` ya está en `validar.js`, `api.mock.js` y la interfaz, pero falta una migración nueva con la columna `workshops.description text check (char_length(description) <= 500)`, el `grant update (description)` para `authenticated` y agregarla a `COLUMNAS_TALLER` de `api.js`. Hasta entonces solo funciona en modo simulado.
 
 ### `getMyWorkshop()`
 - **Respuesta:** `Taller | null` (`null` si aún no lo crea o si el usuario no es artesano).
 - **Errores:** `not_authenticated`. **Roles permitidos:** `craftsman` (los demás reciben `null`).
 
 ### `saveMyWorkshop(datos)`
-- **Parámetros:** `datos: { name?, address?, colonia?, postal_code?, lat?, lng?, services?, hours?, price_from? }`, al menos un campo. `name` 1 a 100, `address` 1 a 300, `colonia` 1 a 100, `postal_code` 5 dígitos o `null`, `lat` y `lng` siempre juntas, `services` sin repetidos, `price_from` > 0 (MXN, 2 decimales).
+- **Parámetros:** `datos: { name?, address?, colonia?, postal_code?, lat?, lng?, services?, hours?, price_from?, description? }`, al menos un campo. `name` 1 a 100, `address` 1 a 300, `colonia` 1 a 100, `postal_code` 5 dígitos o `null`, `lat` y `lng` siempre juntas, `services` sin repetidos, `price_from` > 0 (MXN, 2 decimales). `description` opcional, hasta 500 caracteres; vacía o `null` la borra.
 - **Respuesta:** `Taller`. Crea el taller propio si no existe; si existe, actualiza solo los campos enviados. Se puede guardar incompleto (borrador).
 - **Errores:** `not_authenticated`, `invalid_input` (también si deja incompleto un taller ya publicado), `forbidden` (no es artesano activo), `inactive_user` (solo mock).
 - **Roles permitidos:** `craftsman` activo. No puede tocar `published`, `suspended` ni `rating_*`.

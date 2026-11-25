@@ -65,3 +65,93 @@
 .estadistica--exito {
   color: var(--color-exito);
 }
+
+/* Tarjeta principal: foto grande, nombre como subtítulo y descripción del taller debajo. */
+.mi-taller__perfil {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--espacio-3);
+  padding: var(--espacio-4);
+}
+
+.mi-taller__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+.mi-taller__perfil .mi-taller__foto {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-1);
+}
+
+.mi-taller__perfil .foto__inicial {
+  font-size: 34px;
+}
+
+.mi-taller__perfil .tarjeta__cuerpo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mi-taller__nombre {
+  font-size: var(--texto-subtitulo);
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.mi-taller__ubicacion {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+}
+
+.mi-taller__ubicacion .icono {
+  flex: none;
+  color: var(--color-cenote);
+}
+
+.mi-taller__descripcion,
+.mi-taller__sin-descripcion {
+  margin: 0;
+  padding-top: var(--espacio-3);
+  border-top: 1px solid var(--color-borde);
+  line-height: 1.55;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.mi-taller__sin-descripcion {
+  color: var(--color-cuero);
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .mi-taller__perfil .mi-taller__foto {
+    width: 112px;
+    height: 112px;
+  }
+
+  html:not([data-vista="movil"]) .mi-taller__nombre {
+    font-size: var(--texto-titulo);
+  }
+}
+
+html[data-vista="pc"] .mi-taller__perfil .mi-taller__foto {
+  width: 112px;
+  height: 112px;
+}
+
+html[data-vista="pc"] .mi-taller__nombre {
+  font-size: var(--texto-titulo);
+}

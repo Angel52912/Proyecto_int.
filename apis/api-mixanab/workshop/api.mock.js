@@ -82,6 +82,7 @@ export async function saveMyWorkshop(datos) {
     services: [],
     hours: null,
     price_from: null,
+    description: null,
     published: false,
     suspended: false,
     rating_avg: null,

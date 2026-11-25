@@ -141,6 +141,9 @@ function pintarFormulario(tallerInicial) {
   const direccion = entrada({ maxlength: 300, placeholder: "C. 62 #512", autocomplete: "street-address" });
   const colonia = entrada({ maxlength: 100, placeholder: "Centro" });
   const cp = entrada({ inputmode: "numeric", maxlength: 5, pattern: "\\d{5}", placeholder: "97000", autocomplete: "postal-code" });
+  const descripcion = /** @type {HTMLTextAreaElement} */ (
+    crear("textarea", { attrs: { rows: 3, maxlength: 500, placeholder: "Ej. Talabartería familiar desde 1985: reparamos bolsas, cinturones, sillas de montar y calzado de piel." } })
+  );
   const precio = entrada({ type: "number", min: "1", step: "10", inputmode: "decimal", placeholder: "120" });
   /** @type {{ lat: number, lng: number } | null} */
   let ubicacion = null;
@@ -472,6 +475,7 @@ function pintarFormulario(tallerInicial) {
     colonia.value = taller.colonia ?? "";
     cp.value = taller.postal_code ?? "";
     precio.value = taller.price_from === null ? "" : String(taller.price_from);
+    descripcion.value = taller.description ?? "";
     ubicacion = taller.lat === null ? null : { lat: taller.lat, lng: taller.lng };
     for (const s of taller.services ?? []) servicios.add(s);
     chipsServicios.querySelectorAll("[data-servicio]").forEach((chip) => chip.setAttribute("aria-pressed", String(servicios.has(chip.getAttribute("data-servicio") ?? ""))));
@@ -522,6 +526,7 @@ function pintarFormulario(tallerInicial) {
     if (colonia.value.trim()) datos.colonia = colonia.value.trim();
     if (ubicacion) Object.assign(datos, ubicacion);
     if (precio.value !== "" && Number.isFinite(precioNumero) && precioNumero > 0) datos.price_from = precioNumero;
+    datos.description = descripcion.value.trim() || null;
     return datos;
   }
 
@@ -582,6 +587,7 @@ function pintarFormulario(tallerInicial) {
   raiz.append(
     estado,
     campo("nombre-taller", "Nombre del taller", nombre, "reparacion"),
+    campo("descripcion-taller", "Descripción del taller (opcional)", descripcion),
     crear("div", { clase: "campo" }, [crear("span", { clase: "campo__etiqueta", texto: "Fotos del taller" }), entradaFoto, fotos, avisoFotos]),
     campo("direccion", "Dirección", direccion, "mapa"),
     crear("div", { clase: "filtros__fila" }, [campo("colonia", "Colonia", colonia), campo("cp", "C.P.", cp)]),

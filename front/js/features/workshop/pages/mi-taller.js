@@ -92,9 +92,19 @@ function pintar({ taller, stats, resenas }) {
       : crearInsignia("Borrador: no visible", "neutra");
 
   return [
-    crear("div", { clase: "tarjeta tarjeta--enlace" }, [
-      crearFoto(taller.photos?.find((/** @type {any} */ f) => f.kind === "profile")?.url, "Foto del taller", undefined, taller.name ?? undefined),
-      crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__titulo", texto: taller.name ?? "Mi taller" }), crear("p", { clase: "tarjeta__detalle", texto: taller.colonia ? `${taller.colonia}, Mérida` : "Sin dirección" }), estado]),
+    crear("div", { clase: "tarjeta tarjeta--enlace mi-taller__perfil" }, [
+      crear("div", { clase: "mi-taller__cabecera" }, [
+        crearFoto(taller.photos?.find((/** @type {any} */ f) => f.kind === "profile")?.url, "Foto del taller", "mi-taller__foto", taller.name ?? undefined),
+        crear("div", { clase: "tarjeta__cuerpo" }, [
+          crear("h2", { clase: "tarjeta__titulo mi-taller__nombre", texto: taller.name ?? "Mi taller" }),
+          crear("p", { clase: "tarjeta__detalle mi-taller__ubicacion" }, [icono("mapa", { tam: 14 }), crear("span", { texto: taller.colonia ? `${taller.colonia}, Mérida` : "Sin dirección" })]),
+          estado,
+        ]),
+      ]),
+      // Descripción opcional del taller; si está vacía, una invitación discreta a escribirla.
+      taller.description
+        ? crear("p", { clase: "mi-taller__descripcion", texto: taller.description })
+        : enlace("/artesano/taller", { clase: "mi-taller__sin-descripcion", texto: "Agrega una breve descripción de tu taller" }),
     ]),
     crear("div", { clase: "tarjeta reputacion" }, [
       crear("div", { clase: "reputacion__promedio" }, [

@@ -56,6 +56,14 @@ describe("workshop/api.mock.js", () => {
     expect((await mock.getMyWorkshop())?.name).toBe("Mi taller");
   });
 
+  test("descripción opcional: se recorta, vacía la borra y más de 500 caracteres es invalid_input", async () => {
+    expect((await mock.saveMyWorkshop({ name: "Mi taller" })).description).toBeNull();
+    expect((await mock.saveMyWorkshop({ description: "  Reparamos calzado de piel. " })).description).toBe("Reparamos calzado de piel.");
+    expect((await mock.saveMyWorkshop({ description: "   " })).description).toBeNull();
+    expect(await codigoDe(mock.saveMyWorkshop({ description: "a".repeat(501) }))).toBe("invalid_input");
+    expect(await codigoDe(mock.saveMyWorkshop({ description: /** @type {any} */ (42) }))).toBe("invalid_input");
+  });
+
   test("A1: publicar incompleto devuelve los campos faltantes sin lanzar", async () => {
     await mock.saveMyWorkshop({ name: "Mi taller" });
     expect(await mock.publishMyWorkshop()).toEqual({
