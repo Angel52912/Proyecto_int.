@@ -10,7 +10,7 @@
   --nav-izquierda: 0;
   --nav-ancho: 100%;
   --nav-columnas: repeat(4, 1fr);
-  --nav-borde-superior: 1px solid var(--color-arena);
+  --nav-borde-superior: 1px solid var(--color-borde);
   --nav-borde-derecho: 0;
   --nav-relleno-superior: 0;
   --pantalla-margen-izquierdo: auto;
@@ -76,7 +76,7 @@
   width: 40px;
   height: 40px;
   flex: none;
-  border: 1px solid rgb(231 222 211 / 70%);
+  border: 1px solid var(--color-borde);
   border-radius: 50%;
   background: #fff;
   color: var(--color-espresso);
@@ -260,7 +260,7 @@ html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] .icono {
     --nav-ancho: 96px;
     --nav-columnas: 1fr;
     --nav-borde-superior: 0;
-    --nav-borde-derecho: 1px solid var(--color-arena);
+    --nav-borde-derecho: 1px solid var(--color-borde);
     --nav-relleno-superior: var(--espacio-4);
     --pantalla-margen-izquierdo: max(96px, calc((100vw - var(--ancho-pantalla)) / 2));
     --columnas-categorias: repeat(4, minmax(0, 1fr));
@@ -277,7 +277,7 @@ html[data-vista="pc"] {
   --nav-ancho: 96px;
   --nav-columnas: 1fr;
   --nav-borde-superior: 0;
-  --nav-borde-derecho: 1px solid var(--color-arena);
+  --nav-borde-derecho: 1px solid var(--color-borde);
   --nav-relleno-superior: var(--espacio-4);
   --pantalla-margen-izquierdo: max(96px, calc((100vw - var(--ancho-pantalla)) / 2));
   --columnas-categorias: repeat(4, minmax(0, 1fr));
@@ -293,7 +293,7 @@ html[data-vista="movil"] {
   --nav-derecha: 0;
   --nav-ancho: 100%;
   --nav-columnas: repeat(4, 1fr);
-  --nav-borde-superior: 1px solid var(--color-arena);
+  --nav-borde-superior: 1px solid var(--color-borde);
   --nav-borde-derecho: 0;
   --nav-relleno-superior: 0;
   --pantalla-margen-izquierdo: auto;
@@ -317,10 +317,20 @@ html:is([data-vista="movil"], [data-vista="pc"]) .nav-inferior__enlace {
   font-size: var(--texto-secundario);
 }
 
-/* Escritorio: pantallas de formulario o de lectura del artesano se centran con un ancho cómodo
-   (no a 1120px). Las de cuadrícula (Tablero, Solicitudes) y dos columnas usan todo el ancho. */
+/* Escritorio: anchos de contenido por tipo de pantalla (no todo a 1120px).
+   - 520px: Acceso (tarjeta de inicio de sesión y registro).
+   - 760px: formularios y lectura (chat, presupuesto, seguimiento, avisos, perfil, etc.).
+   - 880px: Mi taller (estadísticas).
+   Las de cuadrícula (Talleres, Tablero, Solicitudes, Admin) y dos columnas (Perfil del taller,
+   Enviar presupuesto) usan todo el ancho. */
 @media (min-width: 1024px) {
-  html:not([data-vista="movil"]) :is(.actualizar-fase, .verificar, .taller, .chats) .pantalla__cuerpo {
+  html:not([data-vista="movil"]) .acceso .pantalla__cuerpo {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  html:not([data-vista="movil"]) :is(.actualizar-fase, .verificar, .taller, .chats, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .pedidos, .perfil-cliente, .simulacion) .pantalla__cuerpo {
     width: 100%;
     max-width: 760px;
     margin: 0 auto;
@@ -331,9 +341,22 @@ html:is([data-vista="movil"], [data-vista="pc"]) .nav-inferior__enlace {
     max-width: 880px;
     margin: 0 auto;
   }
+
+  /* La barra superior acompaña al contenido centrado (el botón Volver no queda lejos del título). */
+  html:not([data-vista="movil"]) :is(.actualizar-fase, .verificar, .taller, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .simulacion) .barra {
+    width: 100%;
+    max-width: 792px;
+    margin: 0 auto;
+  }
 }
 
-html[data-vista="pc"] :is(.actualizar-fase, .verificar, .taller, .chats) .pantalla__cuerpo {
+html[data-vista="pc"] .acceso .pantalla__cuerpo {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+html[data-vista="pc"] :is(.actualizar-fase, .verificar, .taller, .chats, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .pedidos, .perfil-cliente, .simulacion) .pantalla__cuerpo {
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
@@ -342,6 +365,27 @@ html[data-vista="pc"] :is(.actualizar-fase, .verificar, .taller, .chats) .pantal
 html[data-vista="pc"] .mi-taller .pantalla__cuerpo {
   width: 100%;
   max-width: 880px;
+  margin: 0 auto;
+}
+
+html[data-vista="pc"] :is(.actualizar-fase, .verificar, .taller, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .simulacion) .barra {
+  width: 100%;
+  max-width: 792px;
+  margin: 0 auto;
+}
+
+/* Acceso: la barra superior mide lo mismo que su tarjeta de 520px (más el relleno). */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .acceso .barra {
+    width: 100%;
+    max-width: 552px;
+    margin: 0 auto;
+  }
+}
+
+html[data-vista="pc"] .acceso .barra {
+  width: 100%;
+  max-width: 552px;
   margin: 0 auto;
 }
 

@@ -105,6 +105,11 @@ h2 {
     text-underline-offset: 3px;
   }
 
+  /* Las acciones de peligro (Desactivar, Suspender, Ocultar) siguen en rojo al pasar el mouse. */
+  .boton-texto--peligro:hover {
+    color: #8f1e18;
+  }
+
   .chip:hover:not([aria-pressed="true"], [aria-checked="true"], .chip--activo) {
     border-color: var(--color-borde-fuerte);
     background: var(--color-superficie-suave);
@@ -245,7 +250,7 @@ a {
 
 .tarjeta {
   background: #fff;
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
   padding: var(--espacio-3);
 }
@@ -313,7 +318,7 @@ a {
   gap: var(--espacio-1);
   min-height: 36px;
   padding: 0 14px;
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: 999px;
   background: #fff;
   color: var(--color-espresso);
@@ -442,7 +447,7 @@ a {
   height: 40px;
   flex: none;
   border-radius: 50%;
-  background: #f1e6dd;
+  background: var(--color-cuero-suave);
   color: var(--color-cuero);
   font-size: var(--texto-secundario);
   font-weight: 700;
@@ -580,7 +585,7 @@ fieldset.campo {
   width: var(--tactil-min);
   height: var(--tactil-min);
   flex: none;
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: 50%;
   background: #fff;
   color: var(--color-espresso);
@@ -681,7 +686,7 @@ fieldset.campo {
 }
 
 .lista--separada > li + li {
-  border-top: 1px solid var(--color-arena);
+  border-top: 1px solid var(--color-borde);
 }
 
 .campo__etiqueta {
@@ -771,7 +776,7 @@ a.boton-texto {
 
 /* Respaldo de foto: degradado suave con ícono, o degradado de marca con iniciales si se conoce el nombre. */
 .foto--vacia {
-  background: linear-gradient(135deg, var(--color-cuero-suave), #fbefd8);
+  background: linear-gradient(135deg, var(--color-cuero-suave), var(--color-aviso-suave));
 }
 
 .foto--inicial {

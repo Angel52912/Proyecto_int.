@@ -221,7 +221,7 @@
   height: 64px;
   margin-bottom: var(--espacio-4);
   border-radius: 18px;
-  background: #dcefef;
+  background: var(--color-info-suave);
   color: var(--color-cenote);
 }
 
@@ -244,7 +244,7 @@
   width: 100%;
   min-width: 0;
   height: 60px;
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio);
   background: #fff;
   color: var(--color-espresso);
@@ -287,7 +287,7 @@
   align-items: center;
   gap: var(--espacio-3);
   padding: var(--espacio-3) 20px;
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
   background: #fff;
   cursor: pointer;
@@ -340,7 +340,7 @@
   height: 56px;
   flex: none;
   border-radius: 50%;
-  background: #f1e6dd;
+  background: var(--color-cuero-suave);
   color: var(--color-cuero);
 }
 

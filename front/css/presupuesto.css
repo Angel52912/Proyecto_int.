@@ -9,7 +9,7 @@
 .presupuesto__tarjeta hr {
   margin: var(--espacio-3) 0;
   border: 0;
-  border-top: 1px solid var(--color-arena);
+  border-top: 1px solid var(--color-borde);
 }
 
 .presupuesto__titulo {
@@ -44,7 +44,7 @@
   justify-content: space-between;
   margin-top: var(--espacio-3);
   padding-top: var(--espacio-3);
-  border-top: 1px solid var(--color-arena);
+  border-top: 1px solid var(--color-borde);
 }
 
 .presupuesto__total strong {
