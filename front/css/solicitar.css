@@ -66,6 +66,24 @@
   outline: 3px solid var(--color-miel);
 }
 
+.solicitar__servicios {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.solicitar__servicios .chip {
+  flex: 1 1 calc(50% - var(--espacio-2));
+  justify-content: flex-start;
+  min-width: 120px;
+  border-radius: var(--radio);
+}
+
+.solicitar__descripcion {
+  resize: none;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
 .contador {
   align-self: flex-end;
   color: var(--color-gris);
@@ -167,4 +185,19 @@
   .solicitar__agregar {
     transition: none;
   }
+}
+
+/* Escritorio: miniaturas al 50% (6 columnas en lugar de 3). Móvil conserva el tamaño actual. */
+@media (min-width: 720px) {
+  html:not([data-vista="movil"]) .solicitar__fotos {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+html[data-vista="pc"] .solicitar__fotos {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+html[data-vista="movil"] .solicitar__fotos {
+  grid-template-columns: repeat(3, 1fr);
 }

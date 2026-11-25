@@ -134,5 +134,5 @@
 }
 
 .admin-confirmacion textarea {
-  resize: vertical;
+  resize: none;
 }

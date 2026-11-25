@@ -17,7 +17,7 @@ import { lineaDeTiempo } from "../../js/features/orders/pages/seguimiento.js";
 import { columnasDelTablero } from "../../js/features/orders/pages/tablero.js";
 import { mensajeResultadoPin } from "../../js/features/orders/pages/verificar-entrega.js";
 import { distribucionDeResenas, textoATiempo } from "../../js/features/workshop/pages/mi-taller.js";
-import { horarioDeFilas } from "../../js/features/workshop/pages/taller.js";
+import { horarioDeFilas, opcionesHora, sugerirApertura, sugerirCierre } from "../../js/features/workshop/pages/taller.js";
 
 describe("búsqueda de talleres (CU-02)", () => {
   const ubicacion = { lat: 20.97, lng: -89.62 };
@@ -197,6 +197,11 @@ describe("solicitar cotización (CU-03)", () => {
     expect(textoFaltante({ fotos: 2, texto: "  " })).toBe("Falta describir el problema.");
     expect(textoFaltante({ fotos: 0, texto: "Suela" })).toBe("Falta agregar una foto.");
     expect(textoFaltante({ fotos: 1, texto: "Suela" })).toBe("");
+    // Varios servicios (cambio de José): si no hay ninguno, también lo dice.
+    expect(textoFaltante({ fotos: 0, servicios: 0, texto: "" })).toBe("Falta agregar una foto, elegir un servicio y describir el problema.");
+    expect(textoFaltante({ fotos: 1, servicios: 0, texto: "Suela" })).toBe("Falta elegir un servicio.");
+    // Menos de 5 letras todavía no cuenta como descripción.
+    expect(textoFaltante({ fotos: 1, texto: "Sue" })).toBe("Falta describir el problema.");
   });
 });
 
@@ -210,13 +215,30 @@ describe("inicio", () => {
 });
 
 describe("artesano", () => {
-  test("horario desde los controles", () => {
+  test("horario desde los controles (compatible con filas de un solo turno)", () => {
     const ok = horarioDeFilas([
       { dia: "mon", abierto: true, abre: "09:00", cierra: "18:00" },
       { dia: "sun", abierto: false, abre: "09:00", cierra: "18:00" },
     ]);
     expect(ok).toEqual({ horario: { mon: [{ open: "09:00", close: "18:00" }], sun: [] }, error: null });
     expect(horarioDeFilas([{ dia: "mon", abierto: true, abre: "18:00", cierra: "09:00" }]).error).not.toBeNull();
+  });
+  test("horario partido: dos turnos ordenados y sin solape", () => {
+    const dia = { dia: "mon", abierto: true, turnos: [{ open: "09:00", close: "14:00" }, { open: "16:00", close: "20:00" }] };
+    expect(horarioDeFilas([dia])).toEqual({ horario: { mon: dia.turnos }, error: null });
+    const solape = horarioDeFilas([{ dia: "mon", abierto: true, turnos: [{ open: "09:00", close: "14:00" }, { open: "13:30", close: "20:00" }] }]);
+    expect(solape.error).toMatch(/segundo horario/);
+    expect(horarioDeFilas([{ dia: "mon", abierto: true, turnos: [] }]).error).toMatch(/uno o dos/);
+  });
+  test("desplegables cada 30 minutos y sugerencia del segundo turno", () => {
+    expect(opcionesHora("09:00")).toContain("09:00");
+    expect(opcionesHora("09:00")).toContain("09:30");
+    expect(opcionesHora("09:00")).not.toContain("09:07");
+    expect(opcionesHora("23:15", true)).toContain("23:15");
+    expect(sugerirApertura("14:00")).toBe("15:00");
+    expect(sugerirCierre("15:00")).toBe("18:00");
+    expect(sugerirApertura("23:00")).toBe("23:30");
+    expect(sugerirCierre("23:30")).toBe("23:59");
   });
   test("reputación: estrellas por reseña y porcentaje a tiempo", () => {
     expect(distribucionDeResenas([{ rating: 5 }, { rating: 4 }, { rating: 5 }, { rating: 9 }])).toEqual({ 1: 0, 2: 0, 3: 0, 4: 1, 5: 2 });

@@ -167,7 +167,7 @@ export async function renderTalleres({ consulta }) {
   }
 
   const titulo = servicio === "all" ? (textoInicial ? `“${textoInicial}”` : "Talleres") : NOMBRE_SERVICIO[servicio];
-  const pantalla = crearPantalla({ rol: "client", activa: "mapa", titulo, volver: "/inicio", accion: botonFiltros, clase: "talleres" }, [
+  const pantalla = crearPantalla({ rol: "client", activa: "mapa", titulo, volver: "/principal", accion: botonFiltros, clase: "talleres" }, [
     crear("div", { clase: "chips", attrs: { role: "group", "aria-label": "Ordenar por" } }, [
       chipOrden("Más cercanos", "cercanos"),
       chipOrden("Mejor valorados", "valorados"),

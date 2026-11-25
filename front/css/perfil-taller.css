@@ -3,8 +3,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  max-width: 480px;
-  margin: 0 auto;
+  max-width: var(--ancho-pantalla);
+  margin-left: var(--pantalla-margen-izquierdo);
+  margin-right: auto;
   background: none;
 }
 
@@ -24,7 +25,7 @@
 
 .perfil-taller__portada .foto {
   width: 100%;
-  height: 220px;
+  height: var(--alto-portada);
   border-radius: 0;
 }
 
@@ -272,8 +273,9 @@
   left: 0;
   right: 0;
   bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom));
-  max-width: 480px;
-  margin: 0 auto;
+  max-width: var(--ancho-pantalla);
+  margin-left: var(--pantalla-margen-izquierdo);
+  margin-right: auto;
   padding: var(--espacio-3);
   background: linear-gradient(transparent, var(--color-hueso) 30%);
 }
