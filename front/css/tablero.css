@@ -160,12 +160,12 @@
 }
 
 .kanban__entrega--atrasado {
-  background: #f9e1df;
+  background: var(--color-error-suave);
   color: var(--color-error);
 }
 
 .kanban__accion {
-  background: #e1f1e7;
+  background: var(--color-exito-suave);
   color: var(--color-exito);
 }
 
@@ -186,4 +186,37 @@
   .kanban__tarjeta {
     transition: none;
   }
+}
+
+/* Escritorio: las 5 columnas caben a la vez; sin deslizar ni pastillas de resumen. */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .kanban {
+    grid-auto-columns: minmax(0, 1fr);
+    margin: 0;
+    padding: 2px 0 var(--espacio-2);
+    overflow: visible;
+  }
+
+  html:not([data-vista="movil"]) .kanban__resumen {
+    display: none;
+  }
+
+  html:not([data-vista="movil"]) .kanban__columna {
+    min-height: 320px;
+  }
+}
+
+html[data-vista="pc"] .kanban {
+  grid-auto-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 2px 0 var(--espacio-2);
+  overflow: visible;
+}
+
+html[data-vista="pc"] .kanban__resumen {
+  display: none;
+}
+
+html[data-vista="pc"] .kanban__columna {
+  min-height: 320px;
 }

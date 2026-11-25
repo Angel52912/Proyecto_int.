@@ -21,3 +21,61 @@
 .enviar-presupuesto__formulario textarea {
   min-height: 96px;
 }
+
+/* Escritorio: la solicitud del cliente a la izquierda y el presupuesto a la derecha. */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .enviar-presupuesto__contenido {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--espacio-3) 40px;
+  }
+
+  /* Izquierda: fotos y datos del cliente. Derecha: el formulario (o, si ya no admite presupuesto, el aviso y el chat). */
+  html:not([data-vista="movil"]) .enviar-presupuesto__contenido > :is(.galeria, .tarjeta) {
+    grid-column: 1;
+  }
+
+  html:not([data-vista="movil"]) .enviar-presupuesto__contenido > :not(.galeria, .tarjeta) {
+    grid-column: 2;
+  }
+
+  html:not([data-vista="movil"]) .enviar-presupuesto__formulario {
+    grid-row: 1 / span 2;
+  }
+
+  html:not([data-vista="movil"]) .enviar-presupuesto__formulario {
+    padding: var(--espacio-4);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-grande);
+    background: var(--color-superficie);
+    box-shadow: var(--sombra-1);
+  }
+}
+
+html[data-vista="pc"] .enviar-presupuesto__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--espacio-3) 40px;
+}
+
+html[data-vista="pc"] .enviar-presupuesto__contenido > :is(.galeria, .tarjeta) {
+  grid-column: 1;
+}
+
+html[data-vista="pc"] .enviar-presupuesto__contenido > :not(.galeria, .tarjeta) {
+  grid-column: 2;
+}
+
+html[data-vista="pc"] .enviar-presupuesto__formulario {
+  grid-row: 1 / span 2;
+}
+
+html[data-vista="pc"] .enviar-presupuesto__formulario {
+  padding: var(--espacio-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-1);
+}

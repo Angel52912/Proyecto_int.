@@ -8,15 +8,15 @@
 .resumen {
   padding: var(--espacio-2) var(--espacio-3);
   border-radius: var(--radio);
-  background: #f1e6dd;
+  background: var(--color-cuero-suave);
 }
 
 .resumen--cenote {
-  background: #dcefef;
+  background: var(--color-info-suave);
 }
 
 .resumen--miel {
-  background: #fbefd8;
+  background: var(--color-aviso-suave);
 }
 
 .resumen p {
@@ -58,4 +58,19 @@
 
 .solicitud-artesano__cabeza .insignia {
   flex: none;
+}
+
+/* Escritorio: solicitudes en cuadrícula de tarjetas. */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .solicitudes-artesano .lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--espacio-3);
+  }
+}
+
+html[data-vista="pc"] .solicitudes-artesano .lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--espacio-3);
 }

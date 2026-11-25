@@ -317,6 +317,34 @@ html:is([data-vista="movil"], [data-vista="pc"]) .nav-inferior__enlace {
   font-size: var(--texto-secundario);
 }
 
+/* Escritorio: pantallas de formulario o de lectura del artesano se centran con un ancho cómodo
+   (no a 1120px). Las de cuadrícula (Tablero, Solicitudes) y dos columnas usan todo el ancho. */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) :is(.actualizar-fase, .verificar, .taller, .chats) .pantalla__cuerpo {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  html:not([data-vista="movil"]) .mi-taller .pantalla__cuerpo {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+}
+
+html[data-vista="pc"] :is(.actualizar-fase, .verificar, .taller, .chats) .pantalla__cuerpo {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+html[data-vista="pc"] .mi-taller .pantalla__cuerpo {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
 /* Fase 4: control flotante de escritorio; en Android se eleva sobre la navegación inferior. */
 .alternador-vista {
   position: fixed;

@@ -60,7 +60,7 @@ html[data-vista="movil"] .taller__fotos {
   flex-direction: column;
   gap: var(--espacio-2);
   padding: var(--espacio-2);
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio);
   background: #fff;
 }
@@ -164,7 +164,7 @@ html[data-vista="movil"] .taller__fotos {
   width: 100%;
   min-height: 40px;
   padding: 0 var(--espacio-1);
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: 10px;
   background: #fff;
   color: var(--color-espresso);
