@@ -49,6 +49,7 @@
   color: var(--color-hueso);
 }
 
+/* Barra superior fija: fondo translúcido con desenfoque, para que el contenido se lea al pasar por debajo. */
 .barra {
   position: sticky;
   top: 0;
@@ -56,9 +57,15 @@
   display: flex;
   align-items: center;
   gap: var(--espacio-2);
-  min-height: 52px;
+  min-height: 56px;
   padding: var(--espacio-1) var(--espacio-3);
-  background: inherit;
+  background: rgb(250 246 240 / 88%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+}
+
+.pantalla--oscura .barra {
+  background: rgb(43 33 27 / 88%);
 }
 
 /* Volver: el mismo círculo blanco con sombra en todas las pantallas. */
@@ -144,6 +151,92 @@
 .nav-inferior__enlace[aria-current="page"] {
   color: var(--color-cuero);
   font-weight: 600;
+}
+
+@media (hover: hover) {
+  .nav-inferior__enlace:hover:not([aria-current="page"]) {
+    color: var(--color-texto);
+  }
+
+  .nav-inferior__enlace:hover:not([aria-current="page"]) .icono {
+    background: #f3ede6;
+  }
+}
+
+.nav-inferior__enlace:focus-visible {
+  outline: none;
+}
+
+.nav-inferior__enlace:focus-visible .icono {
+  box-shadow: var(--anillo-foco);
+}
+
+/* Logo: oculto en el celular; aparece arriba de la barra lateral en escritorio. */
+.nav-inferior__marca {
+  display: none;
+}
+
+/* Barra lateral de escritorio (ancho natural ≥1024px o vista PC forzada por el admin). */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .nav-inferior {
+    background: var(--color-superficie);
+    backdrop-filter: none;
+    box-shadow: 1px 0 0 var(--color-borde), 4px 0 16px rgb(43 33 27 / 4%);
+  }
+
+  html:not([data-vista="movil"]) .nav-inferior__marca {
+    display: flex;
+  }
+
+  html:not([data-vista="movil"]) .nav-inferior__enlace {
+    min-height: 64px;
+    margin: 0 10px;
+    border-radius: var(--radio);
+  }
+
+  html:not([data-vista="movil"]) .nav-inferior__enlace[aria-current="page"] {
+    background: var(--color-cuero-suave);
+  }
+
+  html:not([data-vista="movil"]) .nav-inferior__enlace[aria-current="page"] .icono {
+    background: transparent;
+  }
+}
+
+html[data-vista="pc"] .nav-inferior {
+  background: var(--color-superficie);
+  backdrop-filter: none;
+  box-shadow: 1px 0 0 var(--color-borde), 4px 0 16px rgb(43 33 27 / 4%);
+}
+
+html[data-vista="pc"] .nav-inferior__marca {
+  display: flex;
+}
+
+html[data-vista="pc"] .nav-inferior__enlace {
+  min-height: 64px;
+  margin: 0 10px;
+  border-radius: var(--radio);
+}
+
+html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] {
+  background: var(--color-cuero-suave);
+}
+
+html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] .icono {
+  background: transparent;
+}
+
+.nav-inferior__marca {
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--espacio-4);
+  border-radius: 14px;
+  background: var(--color-cuero);
+  box-shadow: 0 4px 12px rgb(122 74 42 / 30%);
+  color: var(--color-hueso);
 }
 
 .nav-inferior__enlace[aria-current="page"] .icono {

@@ -8,10 +8,19 @@
 body {
   margin: 0;
   background: var(--color-hueso);
-  color: var(--color-espresso);
+  color: var(--color-texto);
   font-family: var(--fuente-texto);
   font-size: var(--texto-base);
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2 {
+  letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 
 #app {
@@ -47,24 +56,63 @@ h2 {
 
 .boton {
   min-height: var(--tactil-min);
-  padding: 0 var(--espacio-3);
-  border: 2px solid var(--color-cuero);
+  padding: 0 var(--espacio-4);
+  border: 1.5px solid var(--color-cuero);
   border-radius: var(--radio);
   background: var(--color-cuero);
   color: var(--color-hueso);
   font: inherit;
   font-weight: 600;
+  letter-spacing: 0.01em;
   cursor: pointer;
 }
 
 .boton--secundario {
-  background: transparent;
+  background: var(--color-superficie);
   color: var(--color-cuero);
 }
 
 .boton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Hover solo con puntero (en el celular no se queda "pegado"). */
+@media (hover: hover) {
+  .boton:hover:not(:disabled) {
+    background: var(--color-cuero-oscuro);
+    border-color: var(--color-cuero-oscuro);
+  }
+
+  .boton--secundario:hover:not(:disabled) {
+    background: var(--color-cuero-suave);
+    border-color: var(--color-cuero);
+  }
+
+  .boton--cenote:hover:not(:disabled) {
+    background: var(--color-cenote-oscuro);
+    border-color: var(--color-cenote-oscuro);
+  }
+
+  .boton--miel:hover:not(:disabled) {
+    background: #c98d26;
+    border-color: #c98d26;
+  }
+
+  .boton-texto:hover {
+    color: var(--color-cuero-oscuro);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .chip:hover:not([aria-pressed="true"], [aria-checked="true"], .chip--activo) {
+    border-color: var(--color-borde-fuerte);
+    background: var(--color-superficie-suave);
+  }
+
+  .boton-circular:hover {
+    background: var(--color-superficie-suave);
+  }
 }
 
 .campo {
@@ -84,17 +132,48 @@ textarea {
 .campo select {
   min-height: var(--tactil-min);
   padding: var(--espacio-2) var(--espacio-3);
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde-fuerte);
   border-radius: var(--radio);
-  background: #fff;
-  color: var(--color-espresso);
+  background: var(--color-superficie);
+  color: var(--color-texto);
   font: inherit;
+  transition:
+    border-color var(--transicion),
+    box-shadow var(--transicion);
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: #a3968c;
+}
+
+@media (hover: hover) {
+  .campo input:hover:not(:focus),
+  .campo textarea:hover:not(:focus),
+  .campo select:hover:not(:focus) {
+    border-color: #c3b5a6;
+  }
+}
+
+/* Foco de campos: borde de marca y anillo suave, en lugar del contorno grueso. */
+.campo input:focus,
+.campo textarea:focus,
+.campo select:focus {
+  border-color: var(--color-cuero);
+  box-shadow: var(--anillo-foco);
+  outline: none;
 }
 
 .campo--error input,
 .campo--error textarea,
 .campo--error select {
   border-color: var(--color-error);
+}
+
+.campo--error input:focus,
+.campo--error textarea:focus,
+.campo--error select:focus {
+  box-shadow: 0 0 0 3px rgb(179 38 30 / 22%);
 }
 
 .campo__error {
@@ -254,40 +333,48 @@ a {
 .insignia {
   display: inline-block;
   padding: 2px 10px;
+  border: 1px solid transparent;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
 .insignia--miel {
-  background: #fbefd8;
-  color: #8a5a08;
+  background: var(--color-aviso-suave);
+  border-color: rgb(138 90 8 / 15%);
+  color: var(--color-aviso);
 }
 
 .insignia--cenote {
-  background: #dcefef;
+  background: var(--color-info-suave);
+  border-color: rgb(31 122 122 / 15%);
   color: var(--color-cenote);
 }
 
 .insignia--exito {
-  background: #e1f1e7;
+  background: var(--color-exito-suave);
+  border-color: rgb(46 125 79 / 15%);
   color: var(--color-exito);
 }
 
 .insignia--cuero {
-  background: #f1e6dd;
+  background: var(--color-cuero-suave);
+  border-color: rgb(122 74 42 / 15%);
   color: var(--color-cuero);
 }
 
 .insignia--error {
-  background: #f9e1df;
+  background: var(--color-error-suave);
+  border-color: rgb(179 38 30 / 15%);
   color: var(--color-error);
 }
 
 .insignia--neutra {
-  background: var(--color-arena);
-  color: var(--color-espresso);
+  background: #f1ebe3;
+  border-color: var(--color-borde);
+  color: var(--color-texto-suave);
 }
 
 .progreso {
@@ -383,25 +470,45 @@ div.estado-error {
   gap: var(--espacio-2);
 }
 
+/* Alertas: fondo suave del estado y barra de color a la izquierda (info por omisión). */
 .aviso {
   display: flex;
   align-items: flex-start;
   gap: var(--espacio-2);
-  padding: var(--espacio-3);
+  padding: 12px var(--espacio-3);
+  border: 1px solid rgb(31 122 122 / 18%);
+  border-left: 4px solid var(--color-cenote);
   border-radius: var(--radio);
-  background: #dcefef;
-  color: var(--color-cenote);
+  background: var(--color-info-suave);
+  color: var(--color-cenote-oscuro);
   font-size: var(--texto-secundario);
+  line-height: 1.45;
+}
+
+.aviso .icono {
+  flex: none;
+  margin-top: 1px;
 }
 
 .aviso--miel {
-  background: #fbefd8;
-  color: #8a5a08;
+  border-color: rgb(138 90 8 / 18%);
+  border-left-color: var(--color-miel);
+  background: var(--color-aviso-suave);
+  color: var(--color-aviso);
 }
 
 .aviso--error {
-  background: #f9e1df;
+  border-color: rgb(179 38 30 / 18%);
+  border-left-color: var(--color-error);
+  background: var(--color-error-suave);
   color: var(--color-error);
+}
+
+.aviso--exito {
+  border-color: rgb(46 125 79 / 18%);
+  border-left-color: var(--color-exito);
+  background: var(--color-exito-suave);
+  color: var(--color-exito);
 }
 
 .aviso p {
@@ -625,7 +732,8 @@ a.boton-texto {
 /* ── Acabado moderno compartido: profundidad, respuesta al toque, respaldos y estados ── */
 
 .tarjeta {
-  border-color: rgb(231 222 211 / 70%);
+  border-color: var(--color-borde);
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
 }
 
@@ -804,6 +912,16 @@ a.boton-texto {
   to {
     background-position: -100% 0;
   }
+}
+
+/* Foco con teclado: anillo de marca. Va al final y con !important porque varias pantallas dan sombra propia
+   a botones y chips, y esa sombra no debe tapar dónde está el foco. */
+.boton:focus-visible,
+.chip:focus-visible,
+.boton-circular:focus-visible,
+.barra__volver:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

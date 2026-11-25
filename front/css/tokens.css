@@ -35,9 +35,9 @@
   --color-hueso: #faf6f0;
   --color-arena: #e7ded3;
 
-  /* Estados: por definir en Figma (valores provisionales). */
+  /* Estados: Entregado / Abierto (verde), En proceso / Atención (ámbar), Urgente / Error (rojo). */
   --color-exito: #2e7d4f;
-  --color-aviso: #b26a00;
+  --color-aviso: #8a5a08;
   --color-error: #b3261e;
   --color-info: #1f7a7a;
 
@@ -67,4 +67,27 @@
   --color-cuero-suave: #f1e6dd;
   --degradado-marca: linear-gradient(135deg, var(--color-cuero) 0%, #a8683a 55%, var(--color-miel) 100%);
   --transicion: 160ms ease;
+
+  /* ── Sistema base (rediseño UI): neutros cálidos, interacción y estados ──
+     Se conserva la paleta aprobada (docs/diseno.md); estos tokens ordenan superficies, bordes y estados. */
+  --color-superficie: #fff;
+  --color-superficie-suave: #fdfaf6;
+  --color-borde: #ece4da;
+  --color-borde-fuerte: #d9cdbf;
+  --color-texto: var(--color-espresso);
+  --color-texto-suave: #6e6259; /* contraste 5.3:1 sobre Hueso */
+
+  /* Interacción de la marca: hover más oscuro y fondo suave para lo activo. */
+  --color-cuero-oscuro: #5f381f;
+  --color-cenote-oscuro: #175e5e;
+  --anillo-foco: 0 0 0 3px rgb(224 163 58 / 55%);
+
+  /* Estados: texto oscuro legible (≥4.5:1 sobre blanco) y fondo suave para etiquetas y avisos. */
+  --color-exito-suave: #e3f2e9;
+  --color-aviso-suave: #fcf0da;
+  --color-error-suave: #fbe4e2;
+  --color-info-suave: #dcefef;
+
+  --radio-chico: 8px;
+  --radio-grande: 18px;
 }
