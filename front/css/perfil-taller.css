@@ -326,7 +326,7 @@
   }
 
   html:not([data-vista="movil"]) .perfil-taller__acciones .boton {
-    box-shadow: 0 8px 24px rgb(217 93 30 / 30%);
+    box-shadow: 0 8px 24px rgb(122 74 42 / 30%);
   }
 }
 
@@ -372,5 +372,5 @@ html[data-vista="pc"] .perfil-taller__acciones {
 }
 
 html[data-vista="pc"] .perfil-taller__acciones .boton {
-  box-shadow: 0 8px 24px rgb(217 93 30 / 30%);
+  box-shadow: 0 8px 24px rgb(122 74 42 / 30%);
 }

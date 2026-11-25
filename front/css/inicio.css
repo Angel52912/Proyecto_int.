@@ -40,8 +40,8 @@
   padding: var(--espacio-3);
   border-radius: 18px;
   /* Más oscuro que --degradado-marca: el texto claro necesita contraste en toda la tarjeta. */
-  background: linear-gradient(135deg, #8f390d 0%, var(--color-cuero) 60%, #b54912 100%);
-  box-shadow: 0 6px 18px rgb(217 93 30 / 30%);
+  background: linear-gradient(135deg, #6a3f22 0%, var(--color-cuero) 60%, #95592f 100%);
+  box-shadow: 0 6px 18px rgb(122 74 42 / 30%);
   color: var(--color-hueso);
   text-decoration: none;
   transition: transform var(--transicion);

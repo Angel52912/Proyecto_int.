@@ -52,7 +52,7 @@
 
 /* La primera cifra de cada sección (el total) resalta con el color de marca. */
 .admin-cifra:first-child {
-  border-color: rgb(217 93 30 / 20%);
+  border-color: rgb(122 74 42 / 20%);
   background: var(--color-cuero-suave);
 }
 

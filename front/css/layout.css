@@ -234,9 +234,9 @@ html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] .icono {
   height: 48px;
   margin: 0 auto var(--espacio-4);
   border-radius: 14px;
-  background: var(--color-marca);
-  box-shadow: 0 4px 12px rgb(217 93 30 / 30%);
-  color: #fff;
+  background: var(--color-cuero);
+  box-shadow: 0 4px 12px rgb(122 74 42 / 30%);
+  color: var(--color-hueso);
 }
 
 .nav-inferior__enlace[aria-current="page"] .icono {
