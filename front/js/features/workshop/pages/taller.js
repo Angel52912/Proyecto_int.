@@ -431,7 +431,7 @@ function pintarFormulario(tallerInicial) {
     });
     const puedeAgregar = estado.rangos.length < 2 && estado.rangos[0].close < "23:30";
     const agregar = puedeAgregar
-      ? crear("button", { clase: "boton-texto horario__agregar", attrs: { type: "button" }, on: { click: () => { const apertura = sugerirApertura(estado.rangos[0].close); estado.rangos.push({ open: apertura, close: sugerirCierre(apertura) }); pintarDia(estado); } } }, [crear("span", { texto: "+ Agregar horario" })])
+      ? crear("button", { clase: "boton boton--miel horario__agregar", attrs: { type: "button" }, on: { click: () => { const apertura = sugerirApertura(estado.rangos[0].close); estado.rangos.push({ open: apertura, close: sugerirCierre(apertura) }); pintarDia(estado); } } }, [icono("mas", { tam: 16 }), crear("span", { texto: "Agregar horario" })])
       : null;
     estado.contenedor.replaceChildren(cabecera, ...bloques, ...(agregar ? [agregar] : []));
   }
@@ -450,8 +450,8 @@ function pintarFormulario(tallerInicial) {
     avisoHorario.textContent = mensaje;
   }
 
-  const copiarLaborables = crear("button", { clase: "boton-texto", attrs: { type: "button" }, on: { click: () => copiarHorario(["mon", "tue", "wed", "thu", "fri"], "Horario copiado de lunes a viernes.") } }, [crear("span", { texto: "Copiar a lunes–viernes" })]);
-  const copiarSemana = crear("button", { clase: "boton-texto", attrs: { type: "button" }, on: { click: () => copiarHorario(DIAS.map(([dia]) => dia), "Horario copiado a todos los días.") } }, [crear("span", { texto: "Copiar horario a todos los días" })]);
+  const copiarLaborables = crear("button", { clase: "boton boton--cenote horario__copiar", attrs: { type: "button" }, on: { click: () => copiarHorario(["mon", "tue", "wed", "thu", "fri"], "Horario copiado de lunes a viernes.") } }, [crear("span", { texto: "Copiar a lunes–viernes" })]);
+  const copiarSemana = crear("button", { clase: "boton boton--cenote horario__copiar", attrs: { type: "button" }, on: { click: () => copiarHorario(DIAS.map(([dia]) => dia), "Horario copiado a todos los días.") } }, [crear("span", { texto: "Copiar horario a todos los días" })]);
 
   function actualizarCopiar() {
     const lunes = estadoDe("mon");

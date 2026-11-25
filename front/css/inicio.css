@@ -95,8 +95,10 @@
   white-space: nowrap;
 }
 
-.pedido-destacado .insignia {
-  background: rgb(250 246 240 / 92%);
+/* Sobre la tarjeta verde de "listo", una insignia verde se perdería: va en Hueso con texto verde (4.8:1). */
+.pedido-destacado--listo .insignia {
+  background: var(--color-hueso);
+  color: var(--color-exito);
 }
 
 .pedido-destacado__fase {

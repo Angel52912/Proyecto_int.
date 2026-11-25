@@ -160,13 +160,13 @@
 }
 
 .kanban__entrega--atrasado {
-  background: var(--color-error-suave);
-  color: var(--color-error);
+  background: var(--color-error);
+  color: #fff;
 }
 
 .kanban__accion {
-  background: var(--color-exito-suave);
-  color: var(--color-exito);
+  background: var(--color-exito);
+  color: #fff;
 }
 
 .kanban__vacia {

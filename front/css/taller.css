@@ -71,21 +71,29 @@ html[data-vista="movil"] .taller__fotos {
   gap: var(--espacio-2);
 }
 
+/* Nombre del día con tamaño de subtítulo (Poppins 20). */
 .horario__nombre {
   flex: 1;
-  font-weight: 600;
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-subtitulo);
+  font-weight: 700;
+  line-height: 1.25;
 }
 
+/* Estado del día: recuadro de su color con texto blanco (Abierto verde 5.1:1, Cerrado gris 5.9:1). */
 .horario__estado {
-  min-width: 58px;
-  color: var(--color-exito);
+  min-width: 84px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--color-exito);
+  color: #fff;
   font-size: var(--texto-secundario);
   font-weight: 600;
-  text-align: right;
+  text-align: center;
 }
 
 .horario__estado--cerrado {
-  color: var(--color-gris);
+  background: var(--color-texto-suave);
 }
 
 .interruptor {
@@ -128,9 +136,10 @@ html[data-vista="movil"] .taller__fotos {
   transform: translateX(20px);
 }
 
+/* El estado ya se muestra en el recuadro de al lado ("Abierto Abierto" se repetía). El interruptor conserva su
+   aria-label ("Cerrar el lunes" / "Abrir el lunes"), así que los lectores de pantalla no pierden nada. */
 .interruptor__texto {
-  font-size: var(--texto-secundario);
-  font-weight: 600;
+  display: none;
 }
 
 .horario__bloque {
@@ -189,8 +198,19 @@ html[data-vista="movil"] .taller__fotos {
   cursor: pointer;
 }
 
+/* Agregar horario: botón miel con texto espresso (el blanco sobre miel solo da 2.1:1; espresso da 7.1:1). */
 .horario__agregar {
   align-self: flex-start;
+  min-height: 40px;
+  padding: 0 var(--espacio-3);
+  font-size: var(--texto-secundario);
+}
+
+/* Atajos de copiado: botones cenote compactos. */
+.horario__copiar {
+  min-height: 40px;
+  padding: 0 var(--espacio-3);
+  font-size: var(--texto-secundario);
 }
 
 .horario__aviso:empty {

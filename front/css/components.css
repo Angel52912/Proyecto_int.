@@ -335,9 +335,12 @@ a {
   color: var(--color-hueso);
 }
 
+/* Insignias de estado: recuadro sólido del color del estado con texto blanco, para que se lean de un vistazo.
+   Contraste con blanco: éxito 5.1:1, cenote 5.1:1, cuero 7.4:1, error 6.6:1, neutra 5.9:1. La de miel usa texto
+   espresso (7.1:1) porque el blanco sobre miel solo da 2.1:1. */
 .insignia {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 3px 10px;
   border: 1px solid transparent;
   border-radius: 999px;
   font-size: 11px;
@@ -347,39 +350,33 @@ a {
 }
 
 .insignia--miel {
-  background: var(--color-aviso-suave);
-  border-color: rgb(138 90 8 / 15%);
-  color: var(--color-aviso);
+  background: var(--color-miel);
+  color: var(--color-espresso);
 }
 
 .insignia--cenote {
-  background: var(--color-info-suave);
-  border-color: rgb(31 122 122 / 15%);
-  color: var(--color-cenote);
+  background: var(--color-cenote);
+  color: #fff;
 }
 
 .insignia--exito {
-  background: var(--color-exito-suave);
-  border-color: rgb(46 125 79 / 15%);
-  color: var(--color-exito);
+  background: var(--color-exito);
+  color: #fff;
 }
 
 .insignia--cuero {
-  background: var(--color-cuero-suave);
-  border-color: rgb(122 74 42 / 15%);
-  color: var(--color-cuero);
+  background: var(--color-cuero);
+  color: #fff;
 }
 
 .insignia--error {
-  background: var(--color-error-suave);
-  border-color: rgb(179 38 30 / 15%);
-  color: var(--color-error);
+  background: var(--color-error);
+  color: #fff;
 }
 
 .insignia--neutra {
-  background: #f1ebe3;
-  border-color: var(--color-borde);
-  color: var(--color-texto-suave);
+  background: var(--color-texto-suave);
+  color: #fff;
 }
 
 .progreso {
