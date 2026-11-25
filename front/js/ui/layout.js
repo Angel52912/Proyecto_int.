@@ -7,7 +7,7 @@ import { icono } from "./iconos.js";
 /** Navegación inferior según docs/diseno.md. */
 export const NAVEGACION = Object.freeze({
   client: [
-    { id: "inicio", ruta: "/inicio", texto: "Inicio", icono: "inicio" },
+    { id: "principal", ruta: "/principal", texto: "Principal", icono: "inicio" },
     { id: "mapa", ruta: "/mapa", texto: "Mapa", icono: "mapa" },
     { id: "pedidos", ruta: "/pedidos", texto: "Pedidos", icono: "pedidos" },
     { id: "perfil", ruta: "/perfil", texto: "Perfil", icono: "perfil" },

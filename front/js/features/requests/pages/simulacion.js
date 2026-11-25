@@ -7,7 +7,7 @@ import { crear, ir } from "../../../ui/dom.js";
 import { crearBoton, crearPantalla } from "../../../ui/layout.js";
 
 /** Pantalla de entrada de cada rol en el modo simulado. */
-const ENTRADA = Object.freeze({ client: "/inicio", craftsman: "/artesano/solicitudes", admin: "/admin" });
+const ENTRADA = Object.freeze({ client: "/principal", craftsman: "/artesano/solicitudes", admin: "/admin" });
 
 /**
  * @param {"client" | "craftsman" | "admin"} rol

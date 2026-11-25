@@ -10,7 +10,7 @@ import { api } from "./index.js";
 
 /** Pantalla de inicio de cada rol. */
 export const INICIO_POR_ROL = Object.freeze({
-  client: "/",
+  client: "/principal",
   craftsman: "/artesano/tablero",
   admin: "/admin",
 });

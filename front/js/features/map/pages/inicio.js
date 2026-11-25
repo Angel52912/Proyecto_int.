@@ -1,4 +1,4 @@
-// 06 · Inicio (Cliente): saludo, buscador, categorías, talleres cercanos y pedido en curso (CU-02, CU-05, CU-06 A2).
+// 06 · Pantalla principal (Cliente): saludo, buscador, categorías, talleres cercanos y pedido en curso (CU-02, CU-05, CU-06 A2).
 import { api as apiAuth } from "../../auth/index.js";
 import { api as apiPedidos } from "../../orders/index.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
@@ -94,7 +94,7 @@ function crearPedidoEnCurso(pedido, solicitud, taller) {
 }
 
 /** @returns {Promise<Node>} */
-export async function renderInicio() {
+export async function renderPrincipal() {
   const saludo = crear("p", { clase: "inicio__saludo texto-secundario", texto: saludoPorHora() });
   const avatar = enlace("/perfil", { clase: "avatar inicio__avatar", attrs: { "aria-label": "Mi perfil" } }, [icono("perfil", { tam: 20 })]);
   nombreDelCliente().then((nombre) => {

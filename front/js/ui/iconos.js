@@ -37,6 +37,8 @@ const TRAZOS = {
   subir: ["M12 16V4", "M7 9l5-5 5 5", "M4 20h16"],
   dinero: ["M3 6h18v12H3z", circulo(12, 12, 2.5), "M6 9v.01", "M18 15v.01"],
   correo: ["M3 6h18v12H3z", "M3 7l9 6 9-6"],
+  escritorio: ["M3 5h18v11H3z", "M8 20h8", "M12 16v4"],
+  movil: ["M7 2h10v20H7z", "M11 18h2"],
 };
 
 /**

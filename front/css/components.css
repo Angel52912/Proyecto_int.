@@ -74,6 +74,11 @@ h2 {
   margin-bottom: var(--espacio-3);
 }
 
+textarea {
+  resize: none;
+  overflow: hidden;
+}
+
 .campo input,
 .campo textarea,
 .campo select {
@@ -584,7 +589,7 @@ fieldset.campo {
 
 .campo--error .chips,
 .campo--error .taller__mapa,
-.campo--error .horario-fila {
+.campo--error .horario__dia {
   outline: 2px solid var(--color-error);
   outline-offset: 2px;
   border-radius: var(--radio);

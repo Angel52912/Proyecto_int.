@@ -19,6 +19,12 @@ La interfaz (`front/`) importa `apis/`, nunca `back/`. El back responde a travé
 Supabase (RLS y funciones SQL) y de la capa `apis/`; no hay importaciones de `front/`
 hacia `back/` y no hay servidor propio.
 
+## Rutas principales
+
+- `/` o `/inicio`: pantalla de inicio pública (logo, eslogan y **Iniciar sesión**).
+- `/acceso`: bienvenida (iniciar sesión, crear cuenta o Google); el cliente entra a `/principal`.
+- `/principal`: pantalla principal del cliente (antes `/inicio`).
+
 ## Cómo arrancar
 
 ```bash

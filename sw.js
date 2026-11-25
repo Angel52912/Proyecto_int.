@@ -1,6 +1,6 @@
 // Service worker: solo cachea la interfaz (HTML, CSS, JS, íconos).
 // Nunca cachea Supabase, tiles del mapa ni fotos. Ignora todo lo que no sea GET del mismo origen.
-const CACHE_VERSION = "mixanab-ui-v15";
+const CACHE_VERSION = "mixanab-ui-v17";
 
 // Toda la interfaz: los módulos ES se cargan por import, así que cada archivo debe estar aquí para funcionar sin red.
 const INTERFAZ = [
@@ -23,6 +23,7 @@ const INTERFAZ = [
   "./front/css/mapa.css",
   "./front/css/mi-taller.css",
   "./front/css/pedidos.css",
+  "./front/css/portada.css",
   "./front/css/perfil-taller.css",
   "./front/css/perfil-cliente.css",
   "./front/css/presupuesto.css",
@@ -63,6 +64,7 @@ const INTERFAZ = [
   "./front/js/features/auth/pages/completar-perfil.js",
   "./front/js/features/auth/pages/correo.js",
   "./front/js/features/auth/pages/perfil-cliente.js",
+  "./front/js/features/auth/pages/portada.js",
   "./front/js/features/auth/pages/rol.js",
   "./front/js/features/auth/routes.js",
   "./apis/api-inicio-sesion/validar.js",
@@ -126,6 +128,7 @@ const INTERFAZ = [
   "./apis/lib/apiError.js",
   "./front/js/lib/escape.js",
   "./front/js/lib/fechas.js",
+  "./front/js/lib/geocodificar.js",
   "./front/js/lib/imagen.js",
   "./front/js/lib/money.js",
   "./apis/lib/validate.js",
@@ -139,6 +142,7 @@ const INTERFAZ = [
   "./front/js/ui/layout.js",
   "./front/js/ui/mensajes.js",
   "./front/js/ui/qr.js",
+  "./front/js/ui/vista.js",
   "./front/js/ui/sesion.js",
   "./front/js/vendor/supabase.js",
   "./front/js/vendor/leaflet.js",

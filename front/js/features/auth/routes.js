@@ -5,10 +5,13 @@ import { renderCodigo } from "./pages/codigo.js";
 import { renderCompletarPerfil } from "./pages/completar-perfil.js";
 import { renderCorreo } from "./pages/correo.js";
 import { renderPerfilCliente } from "./pages/perfil-cliente.js";
+import { renderPortada } from "./pages/portada.js";
 import { renderRol } from "./pages/rol.js";
 
 /** @type {ReadonlyArray<import("../../router.js").Ruta>} */
 export const rutas = [
+  { path: "/", render: renderPortada },
+  { path: "/inicio", render: renderPortada },
   // 01–05 · Acceso (CU-01). `/acceso` es RUTA_ACCESO del router.
   { path: "/acceso", render: renderBienvenida },
   { path: "/acceso/entrar", render: renderCorreo("entrar") },

@@ -1,6 +1,7 @@
 // 17 · Datos del taller (Artesano, CU-07): nombre, fotos, dirección, ubicación en el mapa, servicios, horario,
 // precio "desde", Guardar y Publicar taller. A1: resalta los campos obligatorios que faltan.
 import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet } from "../../map/componentes.js";
+import { geocodificarDireccion, reverseGeocodeDetallado } from "../../../lib/geocodificar.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
@@ -13,14 +14,66 @@ import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
 
 const DIAS = /** @type {const} */ ([
-  ["mon", "Lun"],
-  ["tue", "Mar"],
-  ["wed", "Mié"],
-  ["thu", "Jue"],
-  ["fri", "Vie"],
-  ["sat", "Sáb"],
-  ["sun", "Dom"],
+  ["mon", "Lunes"],
+  ["tue", "Martes"],
+  ["wed", "Miércoles"],
+  ["thu", "Jueves"],
+  ["fri", "Viernes"],
+  ["sat", "Sábado"],
+  ["sun", "Domingo"],
 ]);
+
+/** @typedef {{ open: string, close: string }} RangoHorario */
+/** @typedef {{ dia: string, abierto: boolean, abre?: string, cierra?: string, turnos?: RangoHorario[] }} FilaHorario */
+
+const MINUTO_MAXIMO = 23 * 60 + 30;
+
+/** @param {number} minutos @returns {string} */
+const aHora = (minutos) => `${String(Math.floor(minutos / 60)).padStart(2, "0")}:${String(minutos % 60).padStart(2, "0")}`;
+
+/** @param {string} hora @returns {number | null} */
+const aMinutos = (hora) => {
+  const coincidencia = /^(\d{2}):(\d{2})$/.exec(hora);
+  if (!coincidencia) return null;
+  const horas = Number(coincidencia[1]);
+  const minutos = Number(coincidencia[2]);
+  return horas < 24 && minutos < 60 ? horas * 60 + minutos : null;
+};
+
+/** Horas de apertura cada 30 minutos; el cierre incluye 23:59 para quien termina a medianoche. */
+const HORAS_APERTURA = Object.freeze(
+  Array.from({ length: MINUTO_MAXIMO / 30 + 1 }, (_, i) => aHora(i * 30)),
+);
+const HORAS_CIERRE = Object.freeze([...HORAS_APERTURA, "23:59"]);
+
+/**
+ * Opciones del desplegable. Si llega una hora heredada fuera de la rejilla, la conserva.
+ * @param {string} valor
+ * @param {boolean} esCierre
+ * @returns {string[]}
+ */
+export function opcionesHora(valor, esCierre = false) {
+  const base = esCierre ? HORAS_CIERRE : HORAS_APERTURA;
+  return base.includes(valor) ? [...base] : [...base, valor].sort();
+}
+
+/**
+ * Sugiere la reapertura del segundo turno: una hora después del cierre, redondeada al siguiente cuarto de hora.
+ * @param {string} cierre
+ * @returns {string}
+ */
+export function sugerirApertura(cierre) {
+  const minutos = aMinutos(cierre);
+  if (minutos === null) return "09:00";
+  return aHora(Math.min(Math.ceil((minutos + 60) / 30) * 30, MINUTO_MAXIMO));
+}
+
+/** @param {string} apertura @returns {string} */
+export function sugerirCierre(apertura) {
+  const minutos = aMinutos(apertura);
+  if (minutos === null) return "18:00";
+  return minutos + 180 > 23 * 60 + 59 ? "23:59" : aHora(minutos + 180);
+}
 
 /** Etiqueta de cada campo que puede faltar al publicar (`missing` de publishMyWorkshop). */
 export const CAMPO_FALTANTE = Object.freeze({
@@ -34,22 +87,35 @@ export const CAMPO_FALTANTE = Object.freeze({
 });
 
 /**
- * Convierte los controles del horario (un rango por día) al formato `hours` del contrato.
- * @param {{ dia: string, abierto: boolean, abre: string, cierra: string }[]} filas
- * @returns {{ horario: Record<string, { open: string, close: string }[]>, error: string | null }}
+ * Convierte los controles del horario (hasta dos rangos por día) al formato `hours` del contrato.
+ * Acepta filas antiguas con `abre`/`cierra` y filas nuevas con `turnos`.
+ * @param {FilaHorario[]} filas
+ * @returns {{ horario: Record<string, RangoHorario[]>, error: string | null }}
  */
 export function horarioDeFilas(filas) {
-  /** @type {Record<string, { open: string, close: string }[]>} */
+  /** @type {Record<string, RangoHorario[]>} */
   const horario = {};
   for (const fila of filas) {
     if (!fila.abierto) {
       horario[fila.dia] = [];
       continue;
     }
-    if (!/^\d{2}:\d{2}$/.test(fila.abre) || !/^\d{2}:\d{2}$/.test(fila.cierra) || fila.abre >= fila.cierra) {
-      return { horario, error: "En cada día abierto, la hora de apertura debe ser antes que la de cierre." };
+    const rangos = fila.turnos ?? [{ open: fila.abre ?? "", close: fila.cierra ?? "" }];
+    if (rangos.length === 0 || rangos.length > 2) {
+      return { horario, error: "Cada día abierto admite uno o dos horarios." };
     }
-    horario[fila.dia] = [{ open: fila.abre, close: fila.cierra }];
+    /** @type {RangoHorario[]} */
+    const validos = [];
+    for (const [indice, rango] of rangos.entries()) {
+      if (!/^\d{2}:\d{2}$/.test(rango.open) || !/^\d{2}:\d{2}$/.test(rango.close) || rango.open >= rango.close) {
+        return { horario, error: "En cada horario, la apertura debe ser antes que el cierre." };
+      }
+      if (indice > 0 && rango.open <= validos[indice - 1].close) {
+        return { horario, error: "El segundo horario debe empezar después de que cierre el primero." };
+      }
+      validos.push({ open: rango.open, close: rango.close });
+    }
+    horario[fila.dia] = validos;
   }
   return { horario, error: null };
 }
@@ -138,26 +204,106 @@ function pintarFormulario(tallerInicial) {
     }
   });
 
-  // Mapa: tocar para fijar la ubicación del taller.
+  // Mapa: al tocarlo se fija el punto y se completa la dirección; al escribir la dirección se mueve el punto.
   const mapaContenedor = crear("div", { clase: "taller__mapa", attrs: { role: "application", "aria-label": "Toca el mapa para marcar la ubicación del taller" } });
-  const textoUbicacion = crear("p", { clase: "texto-secundario", texto: "Toca el mapa para marcar tu taller." });
+  const textoUbicacion = crear("p", { clase: "texto-secundario", texto: "Toca el mapa para marcar tu taller o escribe la dirección." });
+  const avisoUbicacion = crear("p", { clase: "campo__error", attrs: { role: "alert", "aria-live": "assertive" } });
+  avisoUbicacion.hidden = true;
+  /** @type {any} */
+  let mapaTaller = null;
   /** @type {any} */
   let marcador = null;
-  setTimeout(() => {
-    const mapa = crearMapaLeaflet(mapaContenedor, { centro: ubicacion ?? CENTRO_MERIDA, zoom: ubicacion ? 16 : 13 });
-    if (mapa === null) {
-      textoUbicacion.textContent = "No se pudo cargar el mapa.";
+  let versionCampos = 0;
+  /** @type {ReturnType<typeof setTimeout> | null} */
+  let temporizadorCampos = null;
+
+  const limpiarAviso = () => {
+    avisoUbicacion.textContent = "";
+    avisoUbicacion.hidden = true;
+  };
+  /** @param {string} mensaje */
+  const mostrarAviso = (mensaje) => {
+    avisoUbicacion.textContent = mensaje;
+    avisoUbicacion.hidden = false;
+  };
+  /** @param {string} motivo */
+  const mensajeDeUbicacion = (motivo) =>
+    ({
+      no_encontrado: "No encontramos esa dirección en el mapa. Revisa la calle, el número, la colonia y el C.P.",
+      incompleto: "Para ubicar el taller escribe la calle y el número, además de la colonia o el C.P.",
+      error: "No se pudo consultar la dirección. Revisa tu conexión e inténtalo de nuevo.",
+    })[motivo] ?? "No se pudo consultar la dirección. Inténtalo de nuevo.";
+
+  /** @param {{ lat: number, lng: number }} punto */
+  const colocar = (punto) => {
+    ubicacion = { lat: Number(punto.lat.toFixed(6)), lng: Number(punto.lng.toFixed(6)) };
+    if (!mapaTaller) return;
+    if (marcador) marcador.setLatLng([ubicacion.lat, ubicacion.lng]);
+    else marcador = L.marker([ubicacion.lat, ubicacion.lng], { icon: L.divIcon({ html: crear("span", { clase: "pin" }, [icono("reparacion", { tam: 16 })]), className: "pin-contenedor", iconSize: [36, 36], iconAnchor: [18, 36] }) }).addTo(mapaTaller);
+    mapaTaller.setView([ubicacion.lat, ubicacion.lng], Math.max(mapaTaller.getZoom(), 16));
+  };
+
+  /** @param {{ lat: number, lng: number }} punto */
+  const completarCampos = async (punto) => {
+    const version = versionCampos;
+    limpiarAviso();
+    textoUbicacion.textContent = "Ubicación marcada. Buscando dirección…";
+    const { direccion: datos, motivo } = await reverseGeocodeDetallado(punto);
+    // Descarta la respuesta si el artesano movió el pin o editó los campos mientras llegaba.
+    if (versionCampos !== version || !ubicacion || ubicacion.lat !== punto.lat || ubicacion.lng !== punto.lng) return;
+    if (datos) {
+      direccion.value = datos.direccion;
+      colonia.value = datos.colonia;
+      cp.value = datos.codigoPostal;
+      textoUbicacion.textContent = "Ubicación marcada. Dirección, colonia y C.P. completados. Puedes mover el punto.";
       return;
     }
-    alSalir(() => mapa.remove());
-    const fijar = (/** @type {{ lat: number, lng: number }} */ punto) => {
-      ubicacion = { lat: Number(punto.lat.toFixed(6)), lng: Number(punto.lng.toFixed(6)) };
-      if (marcador) marcador.setLatLng([ubicacion.lat, ubicacion.lng]);
-      else marcador = L.marker([ubicacion.lat, ubicacion.lng], { icon: L.divIcon({ html: crear("span", { clase: "pin" }, [icono("reparacion", { tam: 16 })]), className: "pin-contenedor", iconSize: [36, 36], iconAnchor: [18, 36] }) }).addTo(mapa);
-      textoUbicacion.textContent = "Ubicación marcada. Puedes tocar otro punto para moverla.";
-    };
-    if (ubicacion) fijar(ubicacion);
-    mapa.on("click", (/** @type {any} */ e) => fijar(e.latlng));
+    textoUbicacion.textContent = "Ubicación marcada, pero no se pudo completar la dirección.";
+    mostrarAviso(mensajeDeUbicacion(motivo));
+  };
+
+  const moverDesdeCampos = () => {
+    versionCampos += 1;
+    if (temporizadorCampos) clearTimeout(temporizadorCampos);
+    limpiarAviso();
+    if (![direccion.value, colonia.value, cp.value].some((valor) => valor.trim())) {
+      textoUbicacion.textContent = "Toca el mapa para marcar tu taller o escribe la dirección.";
+      return;
+    }
+    textoUbicacion.textContent = "Buscando la dirección en el mapa…";
+    temporizadorCampos = setTimeout(async () => {
+      const version = versionCampos;
+      const { punto, motivo, categoria } = await geocodificarDireccion({ direccion: direccion.value, colonia: colonia.value, codigoPostal: cp.value });
+      if (version !== versionCampos) return;
+      if (punto) {
+        colocar(punto);
+        textoUbicacion.textContent = ["house", "building"].includes(categoria)
+          ? "Ubicación actualizada desde la dirección. Puedes mover el punto en el mapa."
+          : "Ubicamos la calle. Ajusta el punto en el mapa si hace falta.";
+        return;
+      }
+      textoUbicacion.textContent = "No se pudo actualizar el punto desde la dirección.";
+      mostrarAviso(mensajeDeUbicacion(motivo));
+    }, 600);
+  };
+  for (const campo of [direccion, colonia, cp]) campo.addEventListener("input", moverDesdeCampos);
+  alSalir(() => {
+    if (temporizadorCampos) clearTimeout(temporizadorCampos);
+  });
+
+  setTimeout(() => {
+    mapaTaller = crearMapaLeaflet(mapaContenedor, { centro: ubicacion ?? CENTRO_MERIDA, zoom: ubicacion ? 16 : 13 });
+    if (mapaTaller === null) {
+      textoUbicacion.textContent = "No se pudo cargar el mapa.";
+      mostrarAviso("No se pudo cargar el mapa. Revisa tu conexión e inténtalo de nuevo.");
+      return;
+    }
+    alSalir(() => mapaTaller?.remove());
+    if (ubicacion) colocar(ubicacion);
+    mapaTaller.on("click", (/** @type {any} */ e) => {
+      colocar(e.latlng);
+      completarCampos(ubicacion);
+    });
   }, 0);
 
   // Servicios
@@ -181,20 +327,129 @@ function pintarFormulario(tallerInicial) {
     ),
   );
 
-  // Horario: un rango por día.
-  const filasHorario = DIAS.map(([dia, etiqueta]) => {
-    const abierto = /** @type {HTMLInputElement} */ (crear("input", { attrs: { type: "checkbox", "aria-label": `Abre el ${etiqueta}` } }));
-    const abre = entrada({ type: "time", value: "09:00", "aria-label": `${etiqueta}: abre` });
-    const cierra = entrada({ type: "time", value: "18:00", "aria-label": `${etiqueta}: cierra` });
-    abierto.checked = !["sun"].includes(dia);
-    const actualizar = () => {
-      abre.disabled = !abierto.checked;
-      cierra.disabled = !abierto.checked;
-    };
-    abierto.addEventListener("change", actualizar);
-    actualizar();
-    return { dia, abierto, abre, cierra, fila: crear("div", { clase: "horario-fila" }, [crear("label", { clase: "casilla" }, [abierto, crear("span", { texto: etiqueta })]), abre, crear("span", { texto: "a" }), cierra]) };
-  });
+  // Horario: switch por día, hasta dos turnos y copiado rápido desde el lunes.
+  const avisoHorario = crear("p", { clase: "horario__aviso", attrs: { "aria-live": "polite" } });
+  /** @type {Map<string, { dia: string, etiqueta: string, abierto: boolean, rangos: RangoHorario[], contenedor: HTMLElement }>} */
+  const estadosHorario = new Map(
+    DIAS.map(([dia, etiqueta]) => [
+      dia,
+      { dia, etiqueta, abierto: dia !== "sun", rangos: [{ open: "09:00", close: "18:00" }], contenedor: crear("div", { clase: "horario__dia", attrs: { "data-dia": dia } }) },
+    ]),
+  );
+
+  /** @param {string} dia */
+  const estadoDe = (dia) => estadosHorario.get(dia);
+
+  /**
+   * @param {any} estado
+   * @param {"open" | "close"} tipo
+   * @param {number} indice
+   * @param {string} valor
+   */
+  function selectorHora(estado, tipo, indice, valor) {
+    const esCierre = tipo === "close";
+    const minAnterior = !esCierre && indice === 1 ? estado.rangos[0].close : null;
+    const minActual = esCierre ? estado.rangos[indice].open : null;
+    const opciones = opcionesHora(valor, esCierre).map((hora) => {
+      const bloqueada = (minAnterior !== null && hora <= minAnterior) || (minActual !== null && hora <= minActual);
+      return crear("option", { attrs: { value: hora, disabled: bloqueada, selected: hora === valor }, texto: hora });
+    });
+    const select = /** @type {HTMLSelectElement} */ (
+      crear("select", { attrs: { "aria-label": `${estado.etiqueta}: ${esCierre ? "cierra a las" : "abre a las"} (turno ${indice + 1})` } }, opciones)
+    );
+    select.addEventListener("change", () => {
+      estado.rangos[indice][tipo] = select.value;
+      if (esCierre && indice === 0 && estado.rangos[1] && estado.rangos[1].open <= estado.rangos[0].close) {
+        estado.rangos[1].open = sugerirApertura(estado.rangos[0].close);
+      }
+      if (esCierre && estado.rangos[indice].close <= estado.rangos[indice].open) {
+        estado.rangos[indice].close = sugerirCierre(estado.rangos[indice].open);
+      }
+      avisoHorario.textContent = "";
+      pintarDia(estado);
+      actualizarCopiar();
+    });
+    return select;
+  }
+
+  /** @param {any} estado */
+  function interruptor(estado) {
+    return crear(
+      "button",
+      {
+        clase: "interruptor",
+        attrs: { type: "button", role: "switch", "aria-checked": String(estado.abierto), "aria-label": `${estado.abierto ? "Cerrar" : "Abrir"} el ${estado.etiqueta}` },
+        on: {
+          click: () => {
+            estado.abierto = !estado.abierto;
+            avisoHorario.textContent = "";
+            pintarDia(estado);
+            actualizarCopiar();
+          },
+        },
+      },
+      [crear("span", { clase: "interruptor__pista" }, [crear("span", { clase: "interruptor__peloton" })]), crear("span", { clase: "interruptor__texto", texto: estado.abierto ? "Abierto" : "Cerrado" })],
+    );
+  }
+
+  /** @param {any} estado */
+  function pintarDia(estado) {
+    const cabecera = crear("div", { clase: "horario__cabecera" }, [
+      crear("span", { clase: "horario__nombre", texto: estado.etiqueta }),
+      interruptor(estado),
+      crear("span", { clase: `horario__estado${estado.abierto ? "" : " horario__estado--cerrado"}`, texto: estado.abierto ? "Abierto" : "Cerrado" }),
+    ]);
+    if (!estado.abierto) {
+      estado.contenedor.replaceChildren(cabecera);
+      return;
+    }
+    const bloques = estado.rangos.map((rango, indice) => {
+      const abrir = crear("label", { clase: "horario__selector" }, [crear("span", { texto: "Abre a las" }), selectorHora(estado, "open", indice, rango.open)]);
+      const cerrar = crear("label", { clase: "horario__selector" }, [crear("span", { texto: "Cierra a las" }), selectorHora(estado, "close", indice, rango.close)]);
+      const quitar = indice === 1
+        ? crear("button", { clase: "horario__quitar", attrs: { type: "button", "aria-label": `Quitar el segundo horario del ${estado.etiqueta}` }, on: { click: () => { estado.rangos.pop(); pintarDia(estado); } } }, [icono("cerrar", { tam: 16 })])
+        : null;
+      return crear("div", { clase: "horario__bloque" }, [
+        estado.rangos.length > 1 ? crear("span", { clase: "horario__numero", texto: `Horario ${indice + 1}` }) : null,
+        crear("div", { clase: "horario__rango" }, [abrir, cerrar]),
+        quitar,
+      ]);
+    });
+    const puedeAgregar = estado.rangos.length < 2 && estado.rangos[0].close < "23:30";
+    const agregar = puedeAgregar
+      ? crear("button", { clase: "boton-texto horario__agregar", attrs: { type: "button" }, on: { click: () => { const apertura = sugerirApertura(estado.rangos[0].close); estado.rangos.push({ open: apertura, close: sugerirCierre(apertura) }); pintarDia(estado); } } }, [crear("span", { texto: "+ Agregar horario" })])
+      : null;
+    estado.contenedor.replaceChildren(cabecera, ...bloques, ...(agregar ? [agregar] : []));
+  }
+
+  /** @param {string[]} destinos @param {string} mensaje */
+  function copiarHorario(destinos, mensaje) {
+    const lunes = estadoDe("mon");
+    const { error } = horarioDeFilas([{ dia: "mon", abierto: lunes.abierto, turnos: lunes.rangos }]);
+    if (!lunes.abierto || error) return;
+    for (const clave of destinos) {
+      const estado = estadoDe(clave);
+      estado.abierto = true;
+      estado.rangos = lunes.rangos.map((r) => ({ ...r }));
+      pintarDia(estado);
+    }
+    avisoHorario.textContent = mensaje;
+  }
+
+  const copiarLaborables = crear("button", { clase: "boton-texto", attrs: { type: "button" }, on: { click: () => copiarHorario(["mon", "tue", "wed", "thu", "fri"], "Horario copiado de lunes a viernes.") } }, [crear("span", { texto: "Copiar a lunes–viernes" })]);
+  const copiarSemana = crear("button", { clase: "boton-texto", attrs: { type: "button" }, on: { click: () => copiarHorario(DIAS.map(([dia]) => dia), "Horario copiado a todos los días.") } }, [crear("span", { texto: "Copiar horario a todos los días" })]);
+
+  function actualizarCopiar() {
+    const lunes = estadoDe("mon");
+    const { error } = horarioDeFilas([{ dia: "mon", abierto: lunes.abierto, turnos: lunes.rangos }]);
+    const habilitado = lunes.abierto && error === null;
+    copiarLaborables.disabled = !habilitado;
+    copiarSemana.disabled = !habilitado;
+  }
+
+  const listaDias = crear("div", { clase: "horario__dias" }, DIAS.map(([dia]) => estadoDe(dia).contenedor));
+  for (const [, estado] of estadosHorario) pintarDia(estado);
+  actualizarCopiar();
 
   // Valores iniciales
   if (taller) {
@@ -206,18 +461,16 @@ function pintarFormulario(tallerInicial) {
     ubicacion = taller.lat === null ? null : { lat: taller.lat, lng: taller.lng };
     for (const s of taller.services ?? []) servicios.add(s);
     chipsServicios.querySelectorAll("[data-servicio]").forEach((chip) => chip.setAttribute("aria-pressed", String(servicios.has(chip.getAttribute("data-servicio") ?? ""))));
-    if (taller.hours) {
-      for (const f of filasHorario) {
-        const rango = taller.hours[f.dia]?.[0];
-        f.abierto.checked = rango !== undefined;
-        if (rango) {
-          f.abre.value = rango.open;
-          f.cierra.value = rango.close;
-        }
-        f.abre.disabled = !f.abierto.checked;
-        f.cierra.disabled = !f.abierto.checked;
-      }
+    for (const [dia] of DIAS) {
+      const estado = estadoDe(dia);
+      const rangos = taller.hours?.[dia] ?? [];
+      estado.abierto = rangos.length > 0;
+      estado.rangos = estado.abierto
+        ? rangos.slice(0, 2).map((/** @type {any} */ r) => ({ open: r.open, close: r.close }))
+        : [{ open: "09:00", close: "18:00" }];
+      pintarDia(estado);
     }
+    actualizarCopiar();
   }
   pintarFotos();
 
@@ -233,7 +486,12 @@ function pintarFormulario(tallerInicial) {
 
   /** @returns {Record<string, unknown> | null} */
   function datosDelFormulario() {
-    const { horario, error } = horarioDeFilas(filasHorario.map((f) => ({ dia: f.dia, abierto: f.abierto.checked, abre: f.abre.value, cierra: f.cierra.value })));
+    const { horario, error } = horarioDeFilas(
+      DIAS.map(([dia]) => {
+        const estado = estadoDe(dia);
+        return { dia, abierto: estado.abierto, turnos: estado.rangos };
+      }),
+    );
     if (error) {
       aviso.replaceChildren(crear("p", { clase: "aviso aviso--error", texto: error }));
       return null;
@@ -313,9 +571,14 @@ function pintarFormulario(tallerInicial) {
     crear("div", { clase: "campo" }, [crear("span", { clase: "campo__etiqueta", texto: "Fotos del taller" }), entradaFoto, fotos, avisoFotos]),
     campo("direccion", "Dirección", direccion, "mapa"),
     crear("div", { clase: "filtros__fila" }, [campo("colonia", "Colonia", colonia), campo("cp", "C.P.", cp)]),
-    crear("div", { clase: "campo", attrs: { "data-campo": "ubicacion" } }, [crear("span", { clase: "campo__etiqueta", texto: "Ubicación en el mapa" }), mapaContenedor, textoUbicacion]),
+    crear("div", { clase: "campo", attrs: { "data-campo": "ubicacion" } }, [crear("span", { clase: "campo__etiqueta", texto: "Ubicación en el mapa" }), mapaContenedor, textoUbicacion, avisoUbicacion]),
     crear("div", { clase: "campo", attrs: { "data-campo": "servicios" } }, [crear("span", { clase: "campo__etiqueta", texto: "Servicios" }), chipsServicios]),
-    crear("div", { clase: "campo", attrs: { "data-campo": "horario" } }, [crear("span", { clase: "campo__etiqueta", texto: "Horario" }), ...filasHorario.map((f) => f.fila)]),
+    crear("section", { clase: "campo taller__horario", attrs: { "data-campo": "horario" } }, [
+      crear("span", { clase: "campo__etiqueta", texto: "Horario" }),
+      crear("div", { clase: "horario__atajos" }, [copiarLaborables, copiarSemana]),
+      listaDias,
+      avisoHorario,
+    ]),
     campo("precio", "Precio desde (MXN)", precio, "dinero"),
     aviso,
     crear("div", { clase: "acciones" }, [botonGuardar, botonPublicar]),
