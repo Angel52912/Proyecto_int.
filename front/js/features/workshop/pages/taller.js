@@ -306,24 +306,38 @@ function pintarFormulario(tallerInicial) {
     });
   }, 0);
 
-  // Servicios
+  // Servicios: tarjetas de color como las categorías de la pantalla principal (Reparación cuero, Limpieza cenote).
+  // Siguen siendo botones con aria-pressed y data-servicio; la clase "chips" del grupo se conserva para el borde de error.
+  /** @type {Record<"repair" | "cleaning", { icono: string, detalle: string }>} */
+  const TARJETA_SERVICIO = {
+    repair: { icono: "reparacion", detalle: "Suelas, costuras, tacones" },
+    cleaning: { icono: "limpieza", detalle: "Lavado, desinfección, tinte" },
+  };
   const chipsServicios = crear(
     "div",
-    { clase: "chips", attrs: { role: "group", "aria-label": "Servicios" } },
+    { clase: "chips servicios-opciones", attrs: { role: "group", "aria-label": "Servicios" } },
     /** @type {("repair" | "cleaning")[]} */ (["repair", "cleaning"]).map((s) =>
-      crear("button", {
-        clase: "chip",
-        texto: NOMBRE_SERVICIO[s],
-        attrs: { type: "button", "aria-pressed": "false", "data-servicio": s },
-        on: {
-          click: (evento) => {
-            const chip = /** @type {HTMLElement} */ (evento.currentTarget);
-            if (servicios.has(s)) servicios.delete(s);
-            else servicios.add(s);
-            chip.setAttribute("aria-pressed", String(servicios.has(s)));
+      crear(
+        "button",
+        {
+          clase: `servicio-opcion servicio-opcion--${s}`,
+          attrs: { type: "button", "aria-pressed": "false", "data-servicio": s },
+          on: {
+            click: (evento) => {
+              const chip = /** @type {HTMLElement} */ (evento.currentTarget);
+              if (servicios.has(s)) servicios.delete(s);
+              else servicios.add(s);
+              chip.setAttribute("aria-pressed", String(servicios.has(s)));
+            },
           },
         },
-      }),
+        [
+          crear("span", { clase: "servicio-opcion__icono", attrs: { "aria-hidden": "true" } }, [icono(TARJETA_SERVICIO[s].icono)]),
+          crear("span", { clase: "servicio-opcion__marca", attrs: { "aria-hidden": "true" } }, [icono("check", { tam: 14 })]),
+          crear("strong", { clase: "servicio-opcion__nombre", texto: NOMBRE_SERVICIO[s] }),
+          crear("span", { clase: "servicio-opcion__detalle", texto: TARJETA_SERVICIO[s].detalle }),
+        ],
+      ),
     ),
   );
 

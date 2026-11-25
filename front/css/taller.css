@@ -206,3 +206,134 @@ html[data-vista="movil"] .taller__fotos {
     gap: var(--espacio-3);
   }
 }
+
+/* Servicios del taller: tarjetas como las categorías de la pantalla principal (Reparación cuero suave, Limpieza
+   cenote suave), del mismo alto (110px), a dos columnas que llenan el ancho. Elegida: borde de su color y círculo
+   con palomita; sin elegir: el círculo vacío. */
+.servicios-opciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espacio-2);
+  padding: 0;
+  overflow: visible;
+}
+
+.servicio-opcion {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espacio-1);
+  min-height: 110px;
+  padding: var(--espacio-3);
+  border: 2px solid transparent;
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-cuero-suave);
+  color: var(--color-espresso);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--transicion),
+    box-shadow var(--transicion),
+    transform var(--transicion);
+}
+
+.servicio-opcion--cleaning {
+  background: var(--color-info-suave);
+}
+
+.servicio-opcion:active {
+  transform: scale(0.98);
+}
+
+.servicio-opcion:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.servicio-opcion__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: auto;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--color-cuero);
+}
+
+.servicio-opcion--cleaning .servicio-opcion__icono {
+  color: var(--color-cenote);
+}
+
+.servicio-opcion__nombre {
+  font-weight: 600;
+}
+
+.servicio-opcion__detalle {
+  color: var(--color-gris);
+  font-size: var(--texto-secundario);
+}
+
+/* Indicador de elegido: círculo arriba a la derecha. */
+.servicio-opcion__marca {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-borde-fuerte);
+  border-radius: 50%;
+  background: #fff;
+  color: #fff;
+}
+
+.servicio-opcion__marca .icono {
+  opacity: 0;
+}
+
+.servicio-opcion[aria-pressed="true"] {
+  border-color: var(--color-cuero);
+  box-shadow: 0 4px 14px rgb(122 74 42 / 18%);
+}
+
+.servicio-opcion--cleaning[aria-pressed="true"] {
+  border-color: var(--color-cenote);
+  box-shadow: 0 4px 14px rgb(31 122 122 / 18%);
+}
+
+.servicio-opcion[aria-pressed="true"] .servicio-opcion__marca {
+  border-color: var(--color-cuero);
+  background: var(--color-cuero);
+}
+
+.servicio-opcion--cleaning[aria-pressed="true"] .servicio-opcion__marca {
+  border-color: var(--color-cenote);
+  background: var(--color-cenote);
+}
+
+.servicio-opcion[aria-pressed="true"] .servicio-opcion__marca .icono {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .servicio-opcion:hover {
+    box-shadow: var(--sombra-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .servicio-opcion {
+    transition: none;
+  }
+
+  .servicio-opcion:active {
+    transform: none;
+  }
+}
