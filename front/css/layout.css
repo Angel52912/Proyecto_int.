@@ -263,7 +263,7 @@ html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] .icono {
     --nav-borde-derecho: 1px solid var(--color-borde);
     --nav-relleno-superior: var(--espacio-4);
     --pantalla-margen-izquierdo: max(96px, calc((100vw - var(--ancho-pantalla)) / 2));
-    --columnas-categorias: repeat(4, minmax(0, 1fr));
+    --columnas-categorias: repeat(2, minmax(0, 1fr)); /* Reparación y Limpieza llenan el ancho */
     --alto-portada: 320px;
   }
 }
@@ -280,7 +280,7 @@ html[data-vista="pc"] {
   --nav-borde-derecho: 1px solid var(--color-borde);
   --nav-relleno-superior: var(--espacio-4);
   --pantalla-margen-izquierdo: max(96px, calc((100vw - var(--ancho-pantalla)) / 2));
-  --columnas-categorias: repeat(4, minmax(0, 1fr));
+  --columnas-categorias: repeat(2, minmax(0, 1fr)); /* Reparación y Limpieza llenan el ancho */
   --alto-portada: 320px;
 }
 
