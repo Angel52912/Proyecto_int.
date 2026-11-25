@@ -7,14 +7,22 @@ Prototipo: "MiXanab · Mockups" en Figma. Wireframes: enlace de Canva en el tabl
 
 | Color | Nombre | Hex |
 |---|---|---|
-| Principal | Cuero | `#7A4A2A` |
+| Principal (marca) | Naranja terracota | `#D95D1E` |
+| Principal (botones, enlaces y texto) | Cuero quemado | `#BC4C18` (hover `#A3410F`) |
+| Fondo activo y etiquetas suaves | Naranja suave | `#FFF3EC` |
 | Secundario | Cenote | `#1F7A7A` |
 | Acento | Miel | `#E0A33A` |
 | Texto | Espresso | `#2B211B` |
 | Fondo | Hueso | `#FAF6F0` |
 | Superficie | Arena | `#E7DED3` |
 
-Estados de la guía: Éxito, Aviso, Error e Info (colores por definir en Figma).
+La marca cambió de Cuero (`#7A4A2A`) a naranja terracota (rediseño, rama `feat/rediseno-ui`).
+`#D95D1E` es el naranja de la identidad (logo, pines, degradados): con blanco da 3.8:1, válido para íconos y
+texto grande pero no para texto normal. Por eso botones, enlaces y texto usan `#BC4C18` (4.6:1 con Hueso).
+En el código, `--color-cuero` guarda ese tono de texto y `--color-marca` el de la identidad (`front/css/tokens.css`).
+
+Estados: Éxito `#2E7D4F` (entregado, abierto), Aviso `#8A5A08` (en proceso, atención), Error `#B3261E`
+(urgente, error), Info `#1F7A7A`; cada uno con su fondo suave en `tokens.css`.
 
 | Uso | Fuente |
 |---|---|

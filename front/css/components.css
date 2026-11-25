@@ -366,7 +366,7 @@ a {
 
 .insignia--cuero {
   background: var(--color-cuero-suave);
-  border-color: rgb(122 74 42 / 15%);
+  border-color: rgb(217 93 30 / 15%);
   color: var(--color-cuero);
 }
 
@@ -654,8 +654,8 @@ fieldset.campo {
   height: 36px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: var(--color-cuero);
-  color: var(--color-hueso);
+  background: var(--color-marca);
+  color: #fff;
   box-shadow: 0 2px 6px rgb(43 33 27 / 30%);
 }
 
@@ -767,7 +767,7 @@ a.boton-texto {
 }
 
 .boton:not(.boton--secundario) {
-  box-shadow: 0 2px 6px rgb(122 74 42 / 25%);
+  box-shadow: 0 2px 6px rgb(217 93 30 / 25%);
 }
 
 .boton-circular {

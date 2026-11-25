@@ -48,8 +48,8 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radio);
-  background: var(--color-cuero);
-  color: var(--color-hueso);
+  background: var(--color-marca);
+  color: #fff;
 }
 
 .acceso__ilustracion {
@@ -65,7 +65,7 @@
     radial-gradient(circle at 85% 15%, rgb(250 246 240 / 22%) 0 60px, transparent 61px),
     radial-gradient(circle at 10% 95%, rgb(250 246 240 / 14%) 0 80px, transparent 81px),
     var(--degradado-marca);
-  box-shadow: 0 10px 28px rgb(122 74 42 / 30%);
+  box-shadow: 0 10px 28px rgb(217 93 30 / 30%);
 }
 
 .acceso__circulo {
@@ -308,8 +308,8 @@
 /* Elegida: fondo de color, borde grueso, ícono relleno y sombra cálida (no solo el color del borde). */
 .rol-opcion:has(input:checked) {
   border: 2px solid var(--color-cuero);
-  background: #fdf6ef;
-  box-shadow: 0 4px 14px rgb(122 74 42 / 18%);
+  background: #fff7f2;
+  box-shadow: 0 4px 14px rgb(217 93 30 / 18%);
 }
 
 .rol-opcion:has(input:checked) .rol-opcion__icono {

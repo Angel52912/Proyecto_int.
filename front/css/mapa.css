@@ -84,7 +84,7 @@
 }
 
 .mapa__superior .chip[aria-pressed="true"] {
-  box-shadow: 0 2px 8px rgb(122 74 42 / 35%);
+  box-shadow: 0 2px 8px rgb(217 93 30 / 35%);
 }
 
 .mapa__tarjeta .tarjeta-taller {

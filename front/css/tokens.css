@@ -28,7 +28,11 @@
 }
 
 :root {
-  --color-cuero: #7a4a2a;
+  /* Marca: naranja terracota. `--color-cuero` conserva su nombre (lo usan todas las hojas) y es el tono de
+     botones, enlaces y texto: #BC4C18 tiene 4.6:1 con Hueso y 5:1 con blanco. `--color-marca` (#D95D1E) es el
+     naranja de la identidad para rellenos decorativos, degradados e íconos (3.8:1, no apto para texto chico). */
+  --color-cuero: #bc4c18;
+  --color-marca: #d95d1e;
   --color-cenote: #1f7a7a;
   --color-miel: #e0a33a;
   --color-espresso: #2b211b;
@@ -64,8 +68,8 @@
   /* Profundidad y movimiento (componentes compartidos). */
   --sombra-1: 0 1px 2px rgb(43 33 27 / 6%), 0 2px 8px rgb(43 33 27 / 6%);
   --sombra-2: 0 2px 4px rgb(43 33 27 / 8%), 0 8px 24px rgb(43 33 27 / 10%);
-  --color-cuero-suave: #f1e6dd;
-  --degradado-marca: linear-gradient(135deg, var(--color-cuero) 0%, #a8683a 55%, var(--color-miel) 100%);
+  --color-cuero-suave: #fff3ec;
+  --degradado-marca: linear-gradient(135deg, var(--color-cuero) 0%, var(--color-marca) 55%, var(--color-miel) 100%);
   --transicion: 160ms ease;
 
   /* ── Sistema base (rediseño UI): neutros cálidos, interacción y estados ──
@@ -78,7 +82,7 @@
   --color-texto-suave: #6e6259; /* contraste 5.3:1 sobre Hueso */
 
   /* Interacción de la marca: hover más oscuro y fondo suave para lo activo. */
-  --color-cuero-oscuro: #5f381f;
+  --color-cuero-oscuro: #a3410f;
   --color-cenote-oscuro: #175e5e;
   --anillo-foco: 0 0 0 3px rgb(224 163 58 / 55%);
 
