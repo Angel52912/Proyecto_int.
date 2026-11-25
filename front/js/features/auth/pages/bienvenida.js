@@ -83,7 +83,7 @@ export function renderBienvenida() {
       crear("span", { clase: "acceso__flotante acceso__flotante--limpieza" }, [icono("limpieza", { tam: 22 })]),
       crear("span", { clase: "acceso__flotante acceso__flotante--estrella" }, [icono("estrella", { tam: 18, relleno: true })]),
       crear("span", { clase: "acceso__flotante acceso__flotante--check" }, [icono("check", { tam: 18 })]),
-      crear("span", { clase: "acceso__circulo" }, [icono("reparacion", { tam: 72 })]),
+      crear("span", { clase: "acceso__circulo" }, [icono("zapato", { tam: 88 })]),
     ]),
     crear("h1", { clase: "acceso__titulo", texto: "No lo tires, restáuralo." }),
     crear("p", { clase: "acceso__texto", texto: "Encuentra talleres de calzado y talabartería cerca de ti y sigue tu pedido paso a paso." }),

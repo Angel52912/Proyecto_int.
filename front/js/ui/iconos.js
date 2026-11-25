@@ -37,6 +37,14 @@ const TRAZOS = {
   subir: ["M12 16V4", "M7 9l5-5 5 5", "M4 20h16"],
   dinero: ["M3 6h18v12H3z", circulo(12, 12, 2.5), "M6 9v.01", "M18 15v.01"],
   correo: ["M3 6h18v12H3z", "M3 7l9 6 9-6"],
+  // Zapato de trazo único (ilustración de Bienvenida): cuello curvo, puntera a la derecha, dos agujetas y sombra.
+  zapato: [
+    "M6.2 7.6c.4-2 2.6-3 4.2-1.8",
+    "M4 16.4v-4.6c0-2 1.2-3.6 2.9-3.9 1.4-.2 2.3.7 2.9 1.9.7 1.5 2 2.6 3.7 3.1l4.2 1.2c1.7.5 2.8 1.6 2.8 2.9v.4H4.5a.5.5 0 0 1-.5-.5z",
+    "M12.3 11.6h.01",
+    "M14.1 12.6h.01",
+    "M3.5 20h12.5",
+  ],
   // Logo de la marca (guía de Estilo en Figma): destello de 4 puntas con lados curvos.
   destello: ["M12 3c.8 4.6 3.4 7.2 9 9-5.6 1.8-8.2 4.4-9 9-.8-4.6-3.4-7.2-9-9 5.6-1.8 8.2-4.4 9-9z"],
   escritorio: ["M3 5h18v11H3z", "M8 20h8", "M12 16v4"],
