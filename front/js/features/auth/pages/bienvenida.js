@@ -30,7 +30,11 @@ export function crearPasosRegistro(actual) {
 
 /** @returns {HTMLElement} */
 export function crearMarca() {
-  return crear("p", { clase: "acceso__marca" }, [crear("span", { clase: "acceso__logo", attrs: { "aria-hidden": "true" } }, [icono("reparacion", { tam: 24 })]), "MiXanab"]);
+  // Como en la guía de Estilo: destello en el cuadro cuero y el nombre en dos colores ("Mi" cuero, "Xanab" cenote).
+  return crear("p", { clase: "acceso__marca" }, [
+    crear("span", { clase: "acceso__logo", attrs: { "aria-hidden": "true" } }, [icono("destello", { tam: 24 })]),
+    crear("span", { clase: "acceso__nombre" }, [crear("span", { texto: "Mi" }), crear("span", { clase: "acceso__nombre-xanab", texto: "Xanab" })]),
+  ]);
 }
 
 /** @returns {Node} */

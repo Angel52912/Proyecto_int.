@@ -42,7 +42,7 @@ export function crearNavegacion(rol, activa) {
     ]),
   );
   // Logo de la marca: solo se ve en la barra lateral de escritorio (layout.css); decorativo.
-  const marca = crear("span", { clase: "nav-inferior__marca", attrs: { "aria-hidden": "true" } }, [icono("reparacion", { tam: 22 })]);
+  const marca = crear("span", { clase: "nav-inferior__marca", attrs: { "aria-hidden": "true" } }, [icono("destello", { tam: 22 })]);
   return crear("nav", { clase: "nav-inferior", attrs: { "aria-label": "Navegación principal" } }, [marca, crear("ul", {}, elementos)]);
 }
 

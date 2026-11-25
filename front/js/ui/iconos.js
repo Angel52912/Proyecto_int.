@@ -37,6 +37,8 @@ const TRAZOS = {
   subir: ["M12 16V4", "M7 9l5-5 5 5", "M4 20h16"],
   dinero: ["M3 6h18v12H3z", circulo(12, 12, 2.5), "M6 9v.01", "M18 15v.01"],
   correo: ["M3 6h18v12H3z", "M3 7l9 6 9-6"],
+  // Logo de la marca (guía de Estilo en Figma): destello de 4 puntas con lados curvos.
+  destello: ["M12 3c.8 4.6 3.4 7.2 9 9-5.6 1.8-8.2 4.4-9 9-.8-4.6-3.4-7.2-9-9 5.6-1.8 8.2-4.4 9-9z"],
   escritorio: ["M3 5h18v11H3z", "M8 20h8", "M12 16v4"],
   movil: ["M7 2h10v20H7z", "M11 18h2"],
 };

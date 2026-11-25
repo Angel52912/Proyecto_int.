@@ -52,6 +52,15 @@
   color: var(--color-hueso);
 }
 
+/* Nombre en dos colores, como en la guía de Estilo: "Mi" en cuero y "Xanab" en cenote. */
+.acceso__nombre {
+  letter-spacing: -0.01em;
+}
+
+.acceso__nombre-xanab {
+  color: var(--color-cenote);
+}
+
 .acceso__ilustracion {
   position: relative;
   display: flex;
