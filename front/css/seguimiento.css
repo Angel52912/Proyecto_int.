@@ -52,7 +52,7 @@
 .linea-tiempo__paso--actual .linea-tiempo__marca {
   border-color: var(--color-miel);
   background: var(--color-miel);
-  box-shadow: 0 0 0 4px #fbefd8;
+  box-shadow: 0 0 0 4px var(--color-aviso-suave);
 }
 
 .linea-tiempo__nombre {

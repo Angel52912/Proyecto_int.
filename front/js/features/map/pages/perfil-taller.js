@@ -132,7 +132,7 @@ function pintarPerfil(taller) {
         crear("div", { clase: "perfil-taller__estado" }, [crearInsignia(estado.texto, estado.tono)]),
       ]),
       crearAccionesRapidas(taller),
-      crear("section", { clase: "seccion perfil-taller__seccion" }, [
+      crear("section", { clase: "seccion perfil-taller__seccion perfil-taller__servicios" }, [
         crear("h2", { clase: "seccion__titulo", texto: "Servicios" }),
         crear("ul", { clase: "lista servicios" }, taller.services.map(crearServicio)),
         crear("div", { clase: "precio-desde" }, [
@@ -140,7 +140,7 @@ function pintarPerfil(taller) {
           crear("p", { clase: "precio-desde__nota", texto: "El precio final viene en el presupuesto. Pagas al recoger." }),
         ]),
       ]),
-      crear("section", { clase: "seccion perfil-taller__seccion" }, [
+      crear("section", { clase: "seccion perfil-taller__seccion perfil-taller__trabajos" }, [
         crear("div", { clase: "seccion__encabezado" }, [
           crear("h2", { clase: "seccion__titulo", texto: "Trabajos recientes" }),
           trabajos.length > 0 ? crear("span", { clase: "tarjeta__detalle", texto: trabajos.length === 1 ? "1 foto" : `${trabajos.length} fotos` }) : null,

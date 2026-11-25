@@ -29,7 +29,7 @@
 .recoger__qr {
   width: min(220px, 70vw);
   padding: var(--espacio-2);
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
   background: #fff;
 }
@@ -57,7 +57,7 @@
   justify-content: center;
   width: 44px;
   height: 52px;
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: 10px;
   background: #fff;
   font-family: var(--fuente-titulo);

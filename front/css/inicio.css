@@ -132,13 +132,13 @@
   min-height: 110px;
   padding: var(--espacio-3);
   border-radius: var(--radio-tarjeta);
-  background: #f1e6dd;
+  background: var(--color-cuero-suave);
   color: var(--color-espresso);
   text-decoration: none;
 }
 
 .categoria--cleaning {
-  background: #dcefef;
+  background: var(--color-info-suave);
 }
 
 .categoria__icono {
@@ -177,4 +177,23 @@
   height: 140px;
   background: #e3ece2;
   pointer-events: none;
+}
+
+/* Escritorio: mapa más alto (hay espacio) y el pedido en curso con un ancho que no se estire de más. */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .mini-mapa {
+    height: 260px;
+  }
+
+  html:not([data-vista="movil"]) .pedido-destacado {
+    max-width: 640px;
+  }
+}
+
+html[data-vista="pc"] .mini-mapa {
+  height: 260px;
+}
+
+html[data-vista="pc"] .pedido-destacado {
+  max-width: 640px;
 }

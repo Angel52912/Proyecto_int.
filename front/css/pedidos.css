@@ -114,14 +114,14 @@
   padding: 4px 10px;
   width: fit-content;
   border-radius: 8px;
-  background: #fbefd8;
-  color: #8a5a08;
+  background: var(--color-aviso-suave);
+  color: var(--color-aviso);
   font-size: 12px;
   font-weight: 600;
 }
 
 .pedido-tarjeta__aviso--cenote {
-  background: #dcefef;
+  background: var(--color-info-suave);
   color: var(--color-cenote);
 }
 

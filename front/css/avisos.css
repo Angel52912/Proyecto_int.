@@ -72,7 +72,7 @@
   width: 100%;
   padding: var(--espacio-3);
   overflow: hidden;
-  border: 1px solid rgb(231 222 211 / 70%);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
   background: #fff;
   box-shadow: var(--sombra-1);
@@ -116,27 +116,27 @@
   height: 40px;
   flex: none;
   border-radius: 50%;
-  background: #f1e6dd;
+  background: var(--color-cuero-suave);
   color: var(--color-cuero);
 }
 
 .aviso-fila__icono--cenote {
-  background: #dcefef;
+  background: var(--color-info-suave);
   color: var(--color-cenote);
 }
 
 .aviso-fila__icono--miel {
-  background: #fbefd8;
-  color: #8a5a08;
+  background: var(--color-aviso-suave);
+  color: var(--color-aviso);
 }
 
 .aviso-fila__icono--exito {
-  background: #e1f1e7;
+  background: var(--color-exito-suave);
   color: var(--color-exito);
 }
 
 .aviso-fila__icono--error {
-  background: #f9e1df;
+  background: var(--color-error-suave);
   color: var(--color-error);
 }
 

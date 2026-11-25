@@ -176,6 +176,21 @@
   }
 }
 
+/* Escritorio: el formulario se centra con un ancho cómodo de lectura (no a 1100px). */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .solicitar .pantalla__cuerpo {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+}
+
+html[data-vista="pc"] .solicitar .pantalla__cuerpo {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
 /* Escritorio: miniaturas al 50% (6 columnas en lugar de 3). Móvil conserva el tamaño actual. */
 @media (min-width: 720px) {
   html:not([data-vista="movil"]) .solicitar__fotos {

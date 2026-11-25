@@ -21,7 +21,7 @@
   height: 72px;
   margin-top: var(--espacio-3);
   border-radius: 50%;
-  background: #e1f1e7;
+  background: var(--color-exito-suave);
   color: var(--color-exito);
 }
 
@@ -73,7 +73,7 @@
   width: 100%;
   min-height: 96px;
   padding: var(--espacio-2) var(--espacio-3);
-  border: 1px solid var(--color-arena);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio);
   background: #fff;
   font: inherit;

@@ -90,7 +90,7 @@
   justify-content: center;
   gap: var(--espacio-2);
   min-height: var(--tactil-min);
-  border: 1px solid rgb(231 222 211 / 70%);
+  border: 1px solid var(--color-borde);
   border-radius: 999px;
   background: #fff;
   box-shadow: var(--sombra-1);
@@ -135,7 +135,7 @@
 }
 
 .servicio--cleaning .servicio__icono {
-  background: #dcefef;
+  background: var(--color-info-suave);
   color: var(--color-cenote);
 }
 
@@ -278,4 +278,99 @@
   margin-right: auto;
   padding: var(--espacio-3);
   background: linear-gradient(transparent, var(--color-hueso) 30%);
+}
+
+/* ── Escritorio (≥1024px o vista PC del admin): dos columnas y botón dentro del flujo ──
+   Izquierda: encabezado y servicios. Derecha: acciones rápidas y horario. Abajo: trabajos a todo el ancho.
+   El botón "Solicitar cotización" deja de ser fijo (en PC no hay barra inferior) y queda pegado al pie al bajar. */
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .perfil-taller .pantalla__cuerpo {
+    padding-bottom: var(--espacio-4);
+  }
+
+  html:not([data-vista="movil"]) .perfil-taller__hoja {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+    grid-template-areas:
+      "encabezado rapidas"
+      "servicios horario"
+      "trabajos trabajos";
+    align-items: start;
+    gap: var(--espacio-4) 40px;
+    margin-top: -40px;
+    padding: 36px 40px var(--espacio-4);
+    border-radius: 28px 28px 0 0;
+  }
+
+  html:not([data-vista="movil"]) .perfil-taller__encabezado { grid-area: encabezado; }
+  html:not([data-vista="movil"]) .perfil-taller .acciones-rapidas { grid-area: rapidas; align-self: end; }
+  html:not([data-vista="movil"]) .perfil-taller__servicios { grid-area: servicios; }
+  html:not([data-vista="movil"]) .perfil-taller__horario { grid-area: horario; }
+  html:not([data-vista="movil"]) .perfil-taller__trabajos { grid-area: trabajos; }
+
+  html:not([data-vista="movil"]) .perfil-taller .carrusel {
+    margin: 0;
+    padding: 2px 0 var(--espacio-2);
+  }
+
+  html:not([data-vista="movil"]) .perfil-taller__acciones {
+    position: sticky;
+    bottom: var(--espacio-3);
+    left: auto;
+    right: auto;
+    width: min(420px, 100%);
+    max-width: none;
+    margin: 0 40px 0 auto;
+    padding: 0;
+    background: none;
+  }
+
+  html:not([data-vista="movil"]) .perfil-taller__acciones .boton {
+    box-shadow: 0 8px 24px rgb(122 74 42 / 30%);
+  }
+}
+
+html[data-vista="pc"] .perfil-taller .pantalla__cuerpo {
+  padding-bottom: var(--espacio-4);
+}
+
+html[data-vista="pc"] .perfil-taller__hoja {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+  grid-template-areas:
+    "encabezado rapidas"
+    "servicios horario"
+    "trabajos trabajos";
+  align-items: start;
+  gap: var(--espacio-4) 40px;
+  margin-top: -40px;
+  padding: 36px 40px var(--espacio-4);
+  border-radius: 28px 28px 0 0;
+}
+
+html[data-vista="pc"] .perfil-taller__encabezado { grid-area: encabezado; }
+html[data-vista="pc"] .perfil-taller .acciones-rapidas { grid-area: rapidas; align-self: end; }
+html[data-vista="pc"] .perfil-taller__servicios { grid-area: servicios; }
+html[data-vista="pc"] .perfil-taller__horario { grid-area: horario; }
+html[data-vista="pc"] .perfil-taller__trabajos { grid-area: trabajos; }
+
+html[data-vista="pc"] .perfil-taller .carrusel {
+  margin: 0;
+  padding: 2px 0 var(--espacio-2);
+}
+
+html[data-vista="pc"] .perfil-taller__acciones {
+  position: sticky;
+  bottom: var(--espacio-3);
+  left: auto;
+  right: auto;
+  width: min(420px, 100%);
+  max-width: none;
+  margin: 0 40px 0 auto;
+  padding: 0;
+  background: none;
+}
+
+html[data-vista="pc"] .perfil-taller__acciones .boton {
+  box-shadow: 0 8px 24px rgb(122 74 42 / 30%);
 }

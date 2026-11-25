@@ -67,7 +67,7 @@
 }
 
 .perfil-lista > li + li {
-  border-top: 1px solid rgb(231 222 211 / 70%);
+  border-top: 1px solid var(--color-borde);
 }
 
 .perfil-dato,
@@ -152,7 +152,7 @@
 }
 
 .perfil-salir:active {
-  background: #f9e1df;
+  background: var(--color-error-suave);
 }
 
 .perfil-cliente__simulado {
