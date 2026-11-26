@@ -8,7 +8,7 @@ import { validarDatosTaller, validarPaginaResenas } from "./validar.js";
 const BUCKET = "workshop-photos";
 const TIPOS_FOTO = /** @type {ReadonlyArray<string>} */ (["profile", "work"]);
 const COLUMNAS_TALLER =
-  "id, owner_id, name, address, colonia, postal_code, lat, lng, services, hours, price_from, published, suspended, rating_avg, rating_count";
+  "id, owner_id, name, address, colonia, postal_code, lat, lng, services, hours, price_from, description, published, suspended, rating_avg, rating_count";
 
 /**
  * @typedef {{ id: string, path: string, kind: "profile" | "work", sort: number, url: string }} FotoTaller
