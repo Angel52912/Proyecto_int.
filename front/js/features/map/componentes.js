@@ -140,6 +140,7 @@ function crearPin(taller, seleccionado) {
  */
 export function crearMapaLeaflet(contenedor, opciones = {}) {
   if (typeof L === "undefined") return null;
+  const estilos = cargarEstilosLeaflet();
   const interactivo = opciones.interactivo !== false;
   const centro = opciones.centro ?? CENTRO_MERIDA;
   const mapa = L.map(contenedor, {
@@ -160,7 +161,28 @@ export function crearMapaLeaflet(contenedor, opciones = {}) {
   // El contenedor puede cambiar de tamaño al terminar de pintarse la pantalla (fuentes, tarjetas):
   // se recalcula para que los mosaicos llenen todo el recuadro.
   requestAnimationFrame(() => mapa.invalidateSize());
+  void estilos.then(() => mapa.invalidateSize());
   return mapa;
+}
+
+/** @type {Promise<void> | null} */
+let estilosLeaflet = null;
+
+/**
+ * Carga leaflet.css la primera vez que se abre un mapa (no en el arranque: así no retrasa la primera
+ * pantalla). Va al final de <head>, el mismo lugar que tenía antes en index.html.
+ * @returns {Promise<void>} se resuelve al cargar (o al fallar: el mapa funciona igual, solo sin estilos).
+ */
+export function cargarEstilosLeaflet() {
+  estilosLeaflet ??= new Promise((resolver) => {
+    const enlace = document.createElement("link");
+    enlace.rel = "stylesheet";
+    enlace.href = "front/js/vendor/leaflet.css";
+    enlace.addEventListener("load", () => resolver(), { once: true });
+    enlace.addEventListener("error", () => resolver(), { once: true });
+    document.head.append(enlace);
+  });
+  return estilosLeaflet;
 }
 
 /**

@@ -1,5 +1,5 @@
 // Lógica pura de las pantallas de cliente y artesano (sin DOM de la página completa).
-import { buscarTalleres, parametrosDeBusqueda, textoServicios } from "../../js/features/map/componentes.js";
+import { buscarTalleres, cargarEstilosLeaflet, parametrosDeBusqueda, textoServicios } from "../../js/features/map/componentes.js";
 import { filtroDeTexto } from "../../js/features/map/pages/mapa.js";
 import { estadoDeHoy, filasHorario, indiceDeHoy } from "../../js/features/map/pages/perfil-taller.js";
 import { filtroDeLugar } from "../../js/features/map/pages/talleres.js";
@@ -272,5 +272,16 @@ describe("erroresDeTaller (validación mientras se escribe)", () => {
     expect(erroresDeTaller({ cp: "", precio: "" })).toEqual({});
     expect(erroresDeTaller({ cp: "97000", precio: "120" })).toEqual({});
     expect(erroresDeTaller({ cp: "970", precio: "0" })).toEqual({ cp: "El código postal debe tener 5 dígitos.", precio: "Escribe un precio mayor a 0." });
+  });
+});
+
+describe("estilos de Leaflet bajo demanda", () => {
+  test("se agregan una sola vez al final de <head> al abrir el primer mapa", () => {
+    const antes = document.head.querySelectorAll('link[href$="leaflet.css"]').length;
+    const primera = cargarEstilosLeaflet();
+    expect(cargarEstilosLeaflet()).toBe(primera);
+    const enlaces = document.head.querySelectorAll('link[href$="leaflet.css"]');
+    expect(enlaces.length).toBe(antes + 1);
+    expect(document.head.lastElementChild).toBe(enlaces[enlaces.length - 1]);
   });
 });

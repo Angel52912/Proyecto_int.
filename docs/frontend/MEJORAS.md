@@ -26,13 +26,30 @@ con el commit que lo hizo; lo pendiente queda `[ ]`, en el orden en que se va a 
 - [x] ~~Contraste del modo oscuro revisado en chat, presupuesto, solicitud, seguimiento, actualizar fase, recoger, verificar entrega, calificar y las 6 pantallas de admin: todo ≥4.5:1, sin cambios necesarios~~ (revisión)
 - [x] ~~Reglas de escritorio sin duplicar: 47 reglas repetidas pasan a una sola con `html[data-escritorio]`~~ (`fcb8df7`)
 - [x] ~~Versión del caché calculada del contenido (`npm run cache:version`) y prueba que avisa si se olvida o falta un archivo en `INTERFAZ`~~ (`0005fda`)
-- [x] ~~Prueba de punta a punta por las pantallas (solicitud → chat → presupuesto → fases → entrega → calificación) con el router real; encontró y corrigió el aviso de "Fase actualizada" mal ubicado~~ (este commit)
+- [x] ~~Prueba de punta a punta por las pantallas (solicitud → chat → presupuesto → fases → entrega → calificación) con el router real; encontró y corrigió el aviso de "Fase actualizada" mal ubicado~~ (`33c5d46`)
+- [x] ~~Medición con Lighthouse y mejoras de carga: librerías con `defer` y `leaflet.css` solo al abrir un mapa~~ (este commit)
 
 ## Pendiente (en orden)
 
-- [ ] Medir con Lighthouse: carga en 3G/4G (meta < 2 s) y puntaje de accesibilidad; anotar en el reporte.
+- [ ] Inicio: el elemento más grande es un mosaico del mapa de OpenStreetMap; Lighthouse lo simula en 11.1 s (real: 1.1 s). Opción: mostrar el minimapa hasta que la pantalla ya cargó.
 
 ## Dependen de otra persona
 
 - [ ] Columna `workshops.description` en la base de datos, su permiso y `COLUMNAS_TALLER` en `api.js` (Angel).
 - [ ] Atajo "Entrar como cliente" del modo simulado no inicia la sesión en la autenticación simulada (Angel).
+
+## Mediciones con Lighthouse
+
+Lighthouse 13.6.0, celular, 4G lento simulado (150 ms, 1.6 Mbps), servidor local sin compresión (`npm run dev`).
+En producción, con gzip o brotli, la carga sería menor.
+
+| Pantalla | Rendimiento | Accesibilidad | Buenas prácticas | Primer contenido (FCP) | Contenido principal (LCP) |
+|---|---|---|---|---|---|
+| Bienvenida (`#/acceso`), antes | 78 | 100 | 100 | 4.0 s | 4.0 s |
+| Bienvenida (`#/acceso`), después | 98 | 100 | 100 | 2.0 s | 2.0 s |
+| Inicio (`#/principal`), después | 73 | 100 | 96 | 2.0 s | 11.1 s simulado (1.1 s real) |
+
+Qué se cambió: `supabase.js`, `leaflet.js` y `qrcode.js` se cargan con `defer` (antes bloqueaban la primera pantalla 2.3 s)
+y `leaflet.css` se carga al abrir el primer mapa. Se probó precargar los 110 módulos (`modulepreload`) y no mejoró, así que
+no se dejó.
+
