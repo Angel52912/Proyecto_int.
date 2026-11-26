@@ -116,7 +116,7 @@ Tipos:
 - `Horario = { mon?: Rango[], tue?: Rango[], wed?: Rango[], thu?: Rango[], fri?: Rango[], sat?: Rango[], sun?: Rango[] }` con `Rango = { open: "HH:MM", close: "HH:MM" }`. Formato propuesto para la duda 5: hasta 2 rangos por día, `open < close`, 24 h; día ausente o `[]` = cerrado.
 - `FotoTaller = { id, path, kind: 'profile' | 'work', sort: number, url: string }` (url pública).
 - `Taller = { id, owner_id, name, address, colonia, postal_code, lat, lng, services: ('repair' | 'cleaning')[], hours: Horario | null, price_from: number | null, description: string | null, published, suspended, rating_avg: number | null, rating_count, photos: FotoTaller[] }`. Los campos de texto, `lat`, `lng`, `hours`, `price_from` y `description` son `null` hasta que se capturan.
-- **Pendiente de backend (Angel):** `description` ya está en `validar.js`, `api.mock.js` y la interfaz, pero falta una migración nueva con la columna `workshops.description text check (char_length(description) <= 500)`, el `grant update (description)` para `authenticated` y agregarla a `COLUMNAS_TALLER` de `api.js`. Hasta entonces solo funciona en modo simulado.
+- **Resuelto en la migración `0023_workshop_description.sql`:** `workshops.description text check (char_length(description) <= 500)`, con `grant insert (description), update (description)` a `authenticated` (RLS de `0004` deniega el resto) y `description` incluida en `COLUMNAS_TALLER` de `api.js`. Queda pendiente de que Angel aplique la migración `0023` al proyecto de desarrollo; sin eso el backend sigue devolviendo `PGRST204`.
 
 ### `getMyWorkshop()`
 - **Respuesta:** `Taller | null` (`null` si aún no lo crea o si el usuario no es artesano).
