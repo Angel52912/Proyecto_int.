@@ -81,6 +81,25 @@ export function crearRouter({ rutas, contenedor, obtenerSesion }) {
     contenedor.replaceChildren(parrafo);
   }
 
+  /** La primera pantalla no mueve el foco: el lector ya lee la página al abrirla. */
+  let primeraVista = true;
+
+  /**
+   * Tras cambiar de pantalla: vuelve arriba y lleva el foco al título (h1) para que el lector
+   * de pantalla anuncie la pantalla nueva. Si no hay h1, enfoca el contenedor.
+   */
+  function prepararVista() {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (primeraVista) {
+      primeraVista = false;
+      return;
+    }
+    const titulo = /** @type {HTMLElement} */ (contenedor.querySelector("h1") ?? contenedor);
+    if (!titulo.hasAttribute("tabindex")) titulo.setAttribute("tabindex", "-1");
+    titulo.focus({ preventScroll: true });
+  }
+
   /** @param {string} ruta */
   function navegar(ruta) {
     window.location.hash = `#${ruta}`;
@@ -100,6 +119,7 @@ export function crearRouter({ rutas, contenedor, obtenerSesion }) {
       }
       const vista = await encontrada.ruta.render({ params: encontrada.params, consulta });
       contenedor.replaceChildren(vista);
+      prepararVista();
     } catch {
       mostrarMensaje("Algo salió mal. Intenta de nuevo.");
     }

@@ -13,6 +13,7 @@ import { crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js"
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { ESTADO_ORDEN, NOMBRE_FASE } from "../fases.js";
 import { api } from "../index.js";
+import { mostrarAvisoFlotante } from "../../../ui/aviso-flotante.js";
 
 /**
  * ¿El cambio de fase es un salto o retroceso (A1)?
@@ -106,6 +107,7 @@ function pintar({ pedido, solicitud }) {
             try {
               await api.markOrderReady(pedido.id);
               raiz.replaceWith(pintar({ pedido: await api.getOrder(pedido.id), solicitud }));
+            mostrarAvisoFlotante("Fase actualizada. Avisamos al cliente.");
             } catch (error) {
               aviso.replaceChildren(crear("p", { clase: "aviso aviso--error", texto: mensajeDeError(error) }));
             }

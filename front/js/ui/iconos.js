@@ -47,6 +47,8 @@ const TRAZOS = {
   ],
   // Logo de la marca (guía de Estilo en Figma): destello de 4 puntas con lados curvos.
   destello: ["M12 3c.8 4.6 3.4 7.2 9 9-5.6 1.8-8.2 4.4-9 9-.8-4.6-3.4-7.2-9-9 5.6-1.8 8.2-4.4 9-9z"],
+  // Wi-Fi tachado (aviso de "Sin conexión").
+  sinConexion: ["M2 8.8a15 15 0 0 1 4.2-2.6", "M10 5.1A15 15 0 0 1 22 8.8", "M5 12.9a10 10 0 0 1 3.1-2", "M13.5 10.3a10 10 0 0 1 5.5 2.6", "M8.5 16.4a5 5 0 0 1 7 0", "M12 20h.01", "M3 3l18 18"],
   escritorio: ["M3 5h18v11H3z", "M8 20h8", "M12 16v4"],
   movil: ["M7 2h10v20H7z", "M11 18h2"],
 };

@@ -15,6 +15,7 @@ import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
 import { MAX_MONTO_MXN, fechaDeHoy } from "../../../../../apis/api-mixanab/quotes/validar.js";
 import { descripcionDelDetalle } from "./presupuesto.js";
+import { mostrarAvisoFlotante } from "../../../ui/aviso-flotante.js";
 
 /**
  * Valida el formulario antes de llamar a la api (la api vuelve a validar).
@@ -111,6 +112,7 @@ function pintar({ solicitud, vigente }) {
           enviar.disabled = true;
           try {
             await api.sendQuote(solicitud.id, datos);
+            mostrarAvisoFlotante("Presupuesto enviado al cliente.");
             ir(`/artesano/chat/${solicitud.id}`);
           } catch (error) {
             aviso.replaceChildren(

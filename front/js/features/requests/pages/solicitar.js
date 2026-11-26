@@ -11,6 +11,7 @@ import { crearBoton, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
 import { MAX_DESCRIPCION, MAX_FOTOS_SOLICITUD } from "../../../../../apis/api-mixanab/requests/validar.js";
+import { mostrarAvisoFlotante } from "../../../ui/aviso-flotante.js";
 
 // UI: varias opciones marcables; el contrato sigue enviando un solo service_type (el primero compatible del taller).
 const SERVICIOS_FORMULARIO = Object.freeze([
@@ -219,6 +220,7 @@ function crearFormulario(taller) {
         foto.subidaId = subida.id;
       }
       await api.submitRequest(borradorId);
+      mostrarAvisoFlotante("Solicitud enviada al taller.");
       ir(`/chat/${borradorId}`);
     } catch (error) {
       const aviso = crear("div", { clase: "aviso aviso--error", attrs: { role: "alert" } }, [

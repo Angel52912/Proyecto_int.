@@ -73,6 +73,15 @@ export async function cargarEn(destino, cargar, pintar, mensajes = {}) {
     // replaceChildren convierte null en el texto "null": se filtran las entradas vacías.
     destino.replaceChildren(.../** @type {Node[]} */ ([pintar(datos)].flat().filter(Boolean)));
   } catch (error) {
-    destino.replaceChildren(crearError(mensajeDeError(error, mensajes), () => cargarEn(destino, cargar, pintar, mensajes)));
+    const reintentar = () => cargarEn(destino, cargar, pintar, mensajes);
+    if (globalThis.navigator?.onLine === false) {
+      // Sin internet: lo decimos claro y reintentamos solos en cuanto vuelva la conexión.
+      destino.replaceChildren(crearError(TEXTO_SIN_INTERNET, reintentar));
+      window.addEventListener("online", () => destino.isConnected && reintentar(), { once: true });
+      return;
+    }
+    destino.replaceChildren(crearError(mensajeDeError(error, mensajes), reintentar));
   }
 }
+
+export const TEXTO_SIN_INTERNET = "No hay conexión a internet. Lo intentaremos de nuevo cuando vuelva, o toca Reintentar.";

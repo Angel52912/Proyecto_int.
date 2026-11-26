@@ -945,3 +945,135 @@ a.boton-texto {
     transform: none;
   }
 }
+
+/* Foco del título al cambiar de pantalla (router): lo anuncia el lector, sin dibujar un recuadro. */
+h1[tabindex="-1"]:focus,
+#app[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* Avisos flotantes: abajo y centrados, encima de la navegación del celular. */
+.avisos-flotantes {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--alto-nav) + var(--espacio-3) + env(safe-area-inset-bottom));
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-2);
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--espacio-3));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.aviso-flotante {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--color-espresso);
+  color: var(--color-hueso);
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  box-shadow: var(--sombra-2);
+  animation: aviso-entra 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.aviso-flotante .icono {
+  flex: none;
+}
+
+.aviso-flotante--exito .icono {
+  color: #8fd3a8;
+}
+
+.aviso-flotante--error {
+  background: var(--color-error);
+  color: #fff;
+}
+
+.aviso-flotante--info .icono {
+  color: var(--color-miel);
+}
+
+.aviso-flotante--saliendo {
+  animation: aviso-sale 200ms ease-in both;
+}
+
+@keyframes aviso-entra {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes aviso-sale {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso-flotante,
+  .aviso-flotante--saliendo {
+    animation-name: aviso-suave;
+  }
+
+  .aviso-flotante--saliendo {
+    animation-direction: reverse;
+  }
+}
+
+@keyframes aviso-suave {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Franja "Sin conexión": fija arriba, en miel con texto espresso (7.1:1). */
+.franja-conexion {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-2);
+  padding: 8px var(--espacio-3);
+  background: var(--color-miel);
+  color: var(--color-espresso);
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  text-align: center;
+}
+
+.franja-conexion[hidden] {
+  display: none;
+}
+
+.franja-conexion .icono {
+  flex: none;
+}
+
+@media (min-width: 1024px) {
+  html:not([data-vista="movil"]) .avisos-flotantes {
+    bottom: var(--espacio-4);
+  }
+}
+
+html[data-vista="pc"] .avisos-flotantes {
+  bottom: var(--espacio-4);
+}

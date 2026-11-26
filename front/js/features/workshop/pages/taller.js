@@ -12,6 +12,7 @@ import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
+import { mostrarAvisoFlotante } from "../../../ui/aviso-flotante.js";
 
 const DIAS = /** @type {const} */ ([
   ["mon", "Lunes"],
@@ -555,7 +556,7 @@ function pintarFormulario(tallerInicial) {
     variante: "secundario",
     alHacerClic: async () => {
       botonGuardar.disabled = true;
-      if (await guardar()) aviso.replaceChildren(crear("p", { clase: "aviso", texto: "Cambios guardados." }));
+      if (await guardar()) mostrarAvisoFlotante("Cambios guardados.");
       botonGuardar.disabled = false;
     },
   });
@@ -575,6 +576,7 @@ function pintarFormulario(tallerInicial) {
           );
           return;
         }
+        mostrarAvisoFlotante("Tu taller está publicado en el mapa.");
         ir("/artesano/perfil");
       } catch (error) {
         aviso.replaceChildren(crear("p", { clase: "aviso aviso--error", texto: mensajeDeError(error, { forbidden: "Tu taller está suspendido y no se puede publicar." }) }));
