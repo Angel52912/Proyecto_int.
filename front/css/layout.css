@@ -12,7 +12,7 @@
   --nav-columnas: repeat(4, 1fr);
   --nav-borde-superior: 1px solid var(--color-borde);
   --nav-borde-derecho: 0;
-  --nav-relleno-superior: 0;
+  --nav-relleno-superior: 0px;
   --pantalla-margen-izquierdo: auto;
   --columnas-categorias: repeat(2, minmax(0, 1fr));
   --alto-portada: 220px;
@@ -115,14 +115,15 @@
   border-top: 0;
   border-right: var(--nav-borde-derecho);
   box-shadow: 0 -6px 20px rgb(43 33 27 / 18%);
-  padding: calc(var(--nav-relleno-superior) + 8px) 8px 8px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  /* Mismo margen café alrededor de los botones (arriba, a los lados y abajo). */
+  padding: calc(var(--nav-relleno-superior) + 6px) 6px 6px;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
 }
 
 .nav-inferior ul {
   display: grid;
   grid-template-columns: var(--nav-columnas);
-  gap: 8px;
+  gap: 6px;
   max-width: var(--ancho-pantalla);
   margin: 0 auto;
   padding: 0;
@@ -135,16 +136,21 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-height: calc(var(--alto-nav) - 16px);
-  padding: 4px 2px;
+  gap: 1px;
+  min-height: var(--tactil-min);
+  padding: 3px 2px;
   border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgb(255 255 255 / 10%);
   color: var(--color-hueso);
   font-size: 11px;
   text-decoration: none;
   transition: background-color var(--transicion), color var(--transicion), transform var(--transicion), box-shadow var(--transicion);
+}
+
+.nav-inferior__enlace .icono {
+  width: 20px;
+  height: 20px;
 }
 
 .nav-inferior__enlace:active {
@@ -309,7 +315,7 @@ html[data-vista="movil"] {
   --nav-columnas: repeat(4, 1fr);
   --nav-borde-superior: 1px solid var(--color-borde);
   --nav-borde-derecho: 0;
-  --nav-relleno-superior: 0;
+  --nav-relleno-superior: 0px;
   --pantalla-margen-izquierdo: auto;
   --columnas-categorias: repeat(2, minmax(0, 1fr));
   --alto-portada: 220px;
