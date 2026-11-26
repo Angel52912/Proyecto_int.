@@ -160,8 +160,13 @@ export function crearMapaLeaflet(contenedor, opciones = {}) {
   }).addTo(mapa);
   // El contenedor puede cambiar de tamaño al terminar de pintarse la pantalla (fuentes, tarjetas):
   // se recalcula para que los mosaicos llenen todo el recuadro.
-  requestAnimationFrame(() => mapa.invalidateSize());
-  void estilos.then(() => mapa.invalidateSize());
+  requestAnimationFrame(() => {
+    if (contenedor.isConnected) mapa.invalidateSize();
+  });
+  // Si la persona ya cambió de pantalla cuando llegan los estilos, el mapa ya no existe: no se toca.
+  void estilos.then(() => {
+    if (contenedor.isConnected) mapa.invalidateSize();
+  });
   return mapa;
 }
 
