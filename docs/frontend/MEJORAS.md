@@ -24,11 +24,11 @@ con el commit que lo hizo; lo pendiente queda `[ ]`, en el orden en que se va a 
 - [x] ~~Modo oscuro con selector de tema y gris de texto secundario con contraste AA~~ (`326e7df`)
 - [x] ~~La franja "Sin conexión" ya no tapa la barra superior ni la lateral~~ (`fc8a158`)
 - [x] ~~Contraste del modo oscuro revisado en chat, presupuesto, solicitud, seguimiento, actualizar fase, recoger, verificar entrega, calificar y las 6 pantallas de admin: todo ≥4.5:1, sin cambios necesarios~~ (revisión)
-- [x] ~~Reglas de escritorio sin duplicar: 47 reglas repetidas pasan a una sola con `html[data-escritorio]`~~ (este commit)
+- [x] ~~Reglas de escritorio sin duplicar: 47 reglas repetidas pasan a una sola con `html[data-escritorio]`~~ (`fcb8df7`)
+- [x] ~~Versión del caché calculada del contenido (`npm run cache:version`) y prueba que avisa si se olvida o falta un archivo en `INTERFAZ`~~ (este commit)
 
 ## Pendiente (en orden)
 
-- [ ] Versión del caché del service worker automática (hoy se sube `CACHE_VERSION` a mano).
 - [ ] Pruebas de punta a punta del flujo completo (solicitud → chat → presupuesto → seguimiento → entrega → calificación).
 - [ ] Medir con Lighthouse: carga en 3G/4G (meta < 2 s) y puntaje de accesibilidad; anotar en el reporte.
 

@@ -57,3 +57,8 @@ está `index.html`).
 
 > Al mover o renombrar un módulo hay que actualizar a la vez la lista `INTERFAZ` de
 > `../sw.js`: si un archivo falta ahí, la PWA no funciona sin red.
+>
+> Después de cualquier cambio en la interfaz corre `npm run cache:version`: calcula
+> `CACHE_VERSION` a partir del contenido de esos archivos para que los usuarios reciban la versión
+> nueva. `npm test` falla (`sw-version.test.js`) si se olvida o si un archivo de `front/` no está
+> en `INTERFAZ`.

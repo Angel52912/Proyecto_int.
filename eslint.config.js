@@ -30,6 +30,7 @@ export default [
       "jest.config.js",
       "eslint.config.js",
       "back/scripts/**/*.mjs",
+      "front/scripts/**/*.mjs",
     ],
     languageOptions: {
       ecmaVersion: 2022,

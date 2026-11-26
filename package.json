@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "vendor": "node back/scripts/vendor.mjs",
+    "cache:version": "node front/scripts/version-cache.mjs",
     "postinstall": "node back/scripts/vendor.mjs",
     "db:init": "cd back && npx supabase init",
     "db:start": "cd back && npx supabase start",
