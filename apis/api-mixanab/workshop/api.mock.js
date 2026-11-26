@@ -3,6 +3,7 @@
 import { ApiError } from "../../lib/apiError.js";
 import { validarImagen } from "../../lib/validate.js";
 import { camposFaltantes, validarDatosTaller, validarPaginaResenas } from "./validar.js";
+import { guardarFotoSimulada, urlFotoSimulada } from "../../lib/fotoSimulada.js";
 
 const UID_SIMULADO = "00000000-0000-4000-8000-000000000002";
 const ID_TALLER = "00000000-0000-4000-8000-0000000000a1";
@@ -50,7 +51,7 @@ function exigirArtesano() {
 
 /** @returns {any[]} */
 function fotosOrdenadas() {
-  return estado.fotos.slice().sort((a, b) => a.sort - b.sort).map((f) => ({ ...f, url: `https://simulado.local/workshop-photos/${f.path}` }));
+  return estado.fotos.slice().sort((a, b) => a.sort - b.sort).map((f) => ({ ...f, url: urlFotoSimulada("workshop-photos", f.path) }));
 }
 
 /** @returns {any} */
@@ -129,7 +130,8 @@ export async function addWorkshopPhoto(archivo, kind) {
   const id = idSimulado();
   const foto = { id, path: `${estado.taller.id}/${idSimulado()}`, kind, sort: orden };
   estado.fotos.push(foto);
-  return { ...foto, url: `https://simulado.local/workshop-photos/${foto.path}` };
+  guardarFotoSimulada(foto.path, archivo);
+  return { ...foto, url: urlFotoSimulada("workshop-photos", foto.path) };
 }
 
 /** @param {string} photoId */

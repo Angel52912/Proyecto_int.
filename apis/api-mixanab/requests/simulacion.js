@@ -6,6 +6,8 @@ export const UID_CLIENTE = "00000000-0000-4000-8000-0000000000c1";
 export const UID_ARTESANO = "00000000-0000-4000-8000-000000000002";
 export const UID_OTRO = "00000000-0000-4000-8000-0000000000e1";
 export const ID_TALLER_SIMULADO = "00000000-0000-4000-8000-0000000000a1";
+/** Nombre del taller simulado: el mismo en el mapa, el chat y el presupuesto. */
+export const NOMBRE_TALLER_SIMULADO = "Calzado El Buen Paso";
 
 /**
  * @typedef {{ id: string, client_id: string, workshop_id: string, service_type: string, description: string, status: string, submitted_at: string | null, created_at: string }} SolicitudSim

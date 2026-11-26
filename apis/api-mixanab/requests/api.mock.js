@@ -8,7 +8,9 @@ import {
   exigirUuid,
   validarDatosSolicitud,
 } from "./validar.js";
+import { guardarFotoSimulada, urlFotoSimulada } from "../../lib/fotoSimulada.js";
 import {
+  NOMBRE_TALLER_SIMULADO,
   UID_ARTESANO,
   UID_CLIENTE,
   agregarMensaje,
@@ -43,7 +45,7 @@ function aNotificacion(n) {
 }
 
 /** @param {string} path */
-const urlFoto = (path) => `https://simulado.local/request-photos/${path}`;
+const urlFoto = (path) => urlFotoSimulada("request-photos", path);
 
 /**
  * Solicitud propia en borrador (lo que exige RLS para subir o borrar fotos).
@@ -93,6 +95,7 @@ export async function addRequestPhoto(requestId, archivo) {
   if (estado.fotos.filter((f) => f.request_id === requestId).length >= MAX_FOTOS_SOLICITUD) throw new ApiError("limit_reached");
   const foto = { id: idSimulado(), request_id: requestId, path: `${requestId}/${idSimulado()}` };
   estado.fotos.push(foto);
+  guardarFotoSimulada(foto.path, archivo);
   return { id: foto.id, path: foto.path, url: urlFoto(foto.path) };
 }
 
@@ -162,7 +165,7 @@ export async function getRequest(requestId) {
   let counterpart;
   if (estado.rol === "client") {
     // El cliente solo ve al artesano mientras el taller siga publicado (RLS de workshops).
-    counterpart = estado.taller.published && !estado.taller.suspended ? { id: UID_ARTESANO, full_name: "Taller Simulado", avatar_path: null } : null;
+    counterpart = estado.taller.published && !estado.taller.suspended ? { id: UID_ARTESANO, full_name: NOMBRE_TALLER_SIMULADO, avatar_path: null } : null;
   } else {
     counterpart = { id: UID_CLIENTE, full_name: "Cliente Simulado", avatar_path: null };
   }

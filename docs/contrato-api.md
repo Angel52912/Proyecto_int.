@@ -108,7 +108,7 @@ Perfil nuevo: `role: null`, `full_name: ''`, `active: true`. El nombre no se tom
 ## CU-07. Perfil de taller (módulo `workshop`)
 
 Estado: **backend listo para revisión** (migraciones `0004_workshops`, `0005_workshop_photos`, `0006_workshop_publish`; sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/workshop/`.
-Simulado: la sesión es de un artesano activo; `reiniciarSimulacion()` y `fijarSesionSimulada({ sesion, rol, activo })` solo existen en el mock (para pruebas). Las URLs de fotos son `https://simulado.local/workshop-photos/{path}`.
+Simulado: la sesión es de un artesano activo; `reiniciarSimulacion()` y `fijarSesionSimulada({ sesion, rol, activo })` solo existen en el mock (para pruebas). Las URLs de fotos son `data:` con una ilustración que incluye `workshop-photos/{path}`, o la foto subida tal cual (`blob:`); ver `apis/lib/fotoSimulada.js`.
 
 Código nuevo en errores comunes: `limit_reached` (se superó un límite de negocio: 10 fotos de trabajos por taller; CU-03 lo usará para las 5 solicitudes activas).
 
@@ -161,7 +161,7 @@ Notas de visibilidad (para CU-02): el cliente activo solo ve talleres `published
 ## CU-03. Solicitud de cotización y chat (módulos `requests` y `chat`)
 
 Estado: **backend listo para revisión** (migraciones `0007_service_requests`, `0008_request_photos`, `0009_messages_notifications`, `0010_request_functions`; sin aplicar). `api.js`, `api.mock.js` y `validar.js` en `apis/api-mixanab/requests/` y `apis/api-mixanab/chat/`.
-Simulado: ambos módulos comparten estado (`apis/api-mixanab/requests/simulacion.js`). La sesión por defecto es un cliente activo y hay un taller simulado publicado (`ID_TALLER_SIMULADO`, servicios `repair` y `cleaning`). Solo en el mock: `reiniciarSimulacion()`, `fijarSesionSimulada({ sesion, rol, activo })` (cambia a `craftsman` para actuar como el artesano de esa solicitud) y `fijarTallerSimulado({ published, suspended, services })`. Las URLs de fotos son `https://simulado.local/request-photos/{path}`.
+Simulado: ambos módulos comparten estado (`apis/api-mixanab/requests/simulacion.js`). La sesión por defecto es un cliente activo y hay un taller simulado publicado (`ID_TALLER_SIMULADO`, servicios `repair` y `cleaning`). Solo en el mock: `reiniciarSimulacion()`, `fijarSesionSimulada({ sesion, rol, activo })` (cambia a `craftsman` para actuar como el artesano de esa solicitud) y `fijarTallerSimulado({ published, suspended, services })`. Las URLs de fotos son `data:` con una ilustración que incluye `request-photos/{path}`, o la foto subida tal cual (`blob:`); ver `apis/lib/fotoSimulada.js`.
 
 Códigos nuevos en errores comunes:
 

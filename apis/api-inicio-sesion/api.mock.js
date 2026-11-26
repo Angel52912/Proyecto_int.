@@ -3,6 +3,7 @@
 import { ApiError } from "../lib/apiError.js";
 import { validarCodigo, validarCorreo, validarImagen } from "../lib/validate.js";
 import { esRutaAvatar } from "./validar.js";
+import { guardarFotoSimulada, urlFotoSimulada } from "../lib/fotoSimulada.js";
 
 export const CODIGO_SIMULADO = "123456";
 const ROLES_ELEGIBLES = /** @type {ReadonlyArray<string>} */ (["client", "craftsman"]);
@@ -96,7 +97,7 @@ export async function updateMyProfile(cambios) {
   return { ...estado.perfil };
 }
 
-const URL_AVATARES = "https://simulado.mixanab.test/avatars/";
+const URL_AVATARES = "avatars";
 
 /**
  * Sube la foto de perfil y la guarda en el perfil (reemplaza a la anterior). Solo cliente o artesano activo.
@@ -108,7 +109,8 @@ export async function addAvatar(archivo) {
   if (!estado.perfil.active || !ROLES_ELEGIBLES.includes(estado.perfil.role)) throw new ApiError("forbidden");
   const path = `${uid}/${generarUuid()}`;
   estado.perfil.avatar_path = path;
-  return { path, url: `${URL_AVATARES}${path}` };
+  guardarFotoSimulada(path, archivo);
+  return { path, url: urlFotoSimulada(URL_AVATARES, path) };
 }
 
 /** Quita la foto de perfil propia. No falla si no había. */
@@ -126,7 +128,7 @@ export async function removeAvatar() {
 export async function getAvatarUrl(avatarPath) {
   if (!esRutaAvatar(avatarPath)) throw new ApiError("invalid_input");
   exigirSesion();
-  return `${URL_AVATARES}${avatarPath}`;
+  return urlFotoSimulada(URL_AVATARES, avatarPath);
 }
 
 let contadorAvatares = 0;

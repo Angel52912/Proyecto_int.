@@ -14,7 +14,20 @@ const ENTRADA = Object.freeze({ client: "/principal", craftsman: "/artesano/soli
  */
 async function cambiarRol(rol) {
   await sincronizarSesionSimulada({ sesion: true, rol });
+  if (rol === "craftsman") await prepararTallerDelArtesano();
   ir(ENTRADA[rol]);
+}
+
+/**
+ * El artesano simulado es el dueño del taller que recibe las solicitudes en el mapa ("Calzado El Buen Paso"):
+ * entra con ese taller ya configurado y publicado, sin el aviso de "Configura y publica tu taller".
+ * Un artesano que se registra desde Crear cuenta sigue empezando sin taller.
+ */
+async function prepararTallerDelArtesano() {
+  const [taller, mapa] = await Promise.all([import("../../../../../apis/api-mixanab/workshop/api.mock.js"), import("../../../../../apis/api-mixanab/map/api.mock.js")]);
+  if ((await taller.getMyWorkshop()) !== null) return;
+  await taller.saveMyWorkshop({ ...mapa.datosTallerSimulado(), description: "Taller familiar en el Centro de Mérida: reparamos y limpiamos calzado y artículos de piel." });
+  await taller.publishMyWorkshop();
 }
 
 /** @returns {Promise<Node>} */

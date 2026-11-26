@@ -4,6 +4,7 @@ import { validarImagen } from "../../lib/validate.js";
 import { exigirUuid } from "../requests/validar.js";
 import { UID_ARTESANO, UID_CLIENTE, agregarMensaje, estado, exigirClienteFuncion, exigirSesion, idSimulado, notificar } from "../requests/simulacion.js";
 import { INTENTOS_PIN, MINUTOS_BLOQUEO_PIN, extraerPin, validarResena } from "./validar.js";
+import { guardarFotoSimulada, urlFotoSimulada } from "../../lib/fotoSimulada.js";
 
 export { fijarSesionSimulada, reiniciarSimulacion } from "../requests/simulacion.js";
 
@@ -63,6 +64,7 @@ export async function advanceOrderPhase(orderId, datos) {
     created_at: new Date().toISOString(),
   };
   estado.avances.push(avance);
+  guardarFotoSimulada(avance.photo_path, datos.photo);
   notificar(orden.client_id, "order_phase_changed", { order_id: orden.id, request_id: orden.request_id, phase: datos.phase, corrected: corregida });
   for (const escucha of estado.escuchasAvances) escucha({ ...avance });
   return { order_id: orden.id, phase: orden.phase, status: orden.status, update: { ...avance } };
@@ -207,7 +209,7 @@ export async function listOrderUpdates(orderId) {
   exigirSesion();
   const orden = estado.ordenes.find((o) => o.id === orderId);
   if (!orden || !ordenVisible(orden)) return [];
-  return estado.avances.filter((a) => a.order_id === orderId).map((a) => ({ ...a, url: `https://simulado.mixanab.test/progress-photos/${a.photo_path}` }));
+  return estado.avances.filter((a) => a.order_id === orderId).map((a) => ({ ...a, url: urlFotoSimulada("progress-photos", a.photo_path) }));
 }
 
 /**

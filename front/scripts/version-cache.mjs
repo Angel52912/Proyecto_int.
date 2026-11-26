@@ -40,7 +40,7 @@ export function calcularVersion() {
   return `mixanab-ui-${hash.digest("hex").slice(0, 10)}`;
 }
 
-/** @returns {string[]} archivos de front/ (js, css, fuentes, íconos) que faltan en INTERFAZ. */
+/** @returns {string[]} archivos de front/ (js, css, fuentes, íconos) y módulos de apis/ que faltan en INTERFAZ. */
 export function archivosFaltantes() {
   const listados = new Set(rutasInterfaz());
   /** @type {string[]} */
@@ -55,10 +55,11 @@ export function archivosFaltantes() {
       }
     }
   };
-  for (const carpeta of ["front/js", "front/css", "front/fonts", "front/icons"]) {
+  for (const carpeta of ["front/js", "front/css", "front/fonts", "front/icons", "apis"]) {
     if (existsSync(join(RAIZ, carpeta))) recorrer(join(RAIZ, carpeta));
   }
-  return encontrados.filter((ruta) => !listados.has(ruta));
+  // De apis/ solo cuentan los módulos (.js): ahí también hay README y otros documentos.
+  return encontrados.filter((ruta) => !listados.has(ruta) && (!ruta.startsWith("apis/") || ruta.endsWith(".js")));
 }
 
 // Ejecutado directamente: escribe la versión en sw.js.

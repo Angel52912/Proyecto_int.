@@ -2,8 +2,9 @@
 // La sesión (rol, activo, sesión) es la compartida de requests/simulacion.js: por defecto un cliente activo.
 import { ApiError } from "../../lib/apiError.js";
 import { exigirUuid } from "../requests/validar.js";
-import { ID_TALLER_SIMULADO, estado, reiniciarSimulacion as reiniciarSesion } from "../requests/simulacion.js";
+import { ID_TALLER_SIMULADO, NOMBRE_TALLER_SIMULADO, estado, reiniciarSimulacion as reiniciarSesion } from "../requests/simulacion.js";
 import { distanciaKm, estaAbierto, validarFiltros, validarUbicacion } from "./validar.js";
+import { urlFotoSimulada } from "../../lib/fotoSimulada.js";
 
 export { fijarSesionSimulada } from "../requests/simulacion.js";
 
@@ -11,7 +12,7 @@ export { fijarSesionSimulada } from "../requests/simulacion.js";
  * @typedef {{ id: string, name: string, address: string, colonia: string, postal_code: string | null, lat: number, lng: number, services: ("repair" | "cleaning")[], hours: import("../workshop/validar.js").Horario, price_from: number, rating_avg: number | null, rating_count: number, published: boolean, suspended: boolean, photos: { id: string, path: string, kind: "profile" | "work", sort: number }[] }} TallerSim
  */
 
-const URL_FOTOS = "https://simulado.mixanab.test/workshop-photos/";
+const URL_FOTOS = "workshop-photos";
 const TODO_EL_DIA = [{ open: "00:00", close: "23:59" }];
 const SEMANA = /** @type {const} */ (["mon", "tue", "wed", "thu", "fri", "sat", "sun"]);
 
@@ -40,7 +41,7 @@ function talleresIniciales() {
   return [
     {
       id: ID_TALLER_SIMULADO,
-      name: "Calzado El Buen Paso",
+      name: NOMBRE_TALLER_SIMULADO,
       address: "Calle 60 #500, Centro",
       colonia: "Centro",
       postal_code: "97000",
@@ -150,7 +151,7 @@ function exigirClienteActivo() {
 }
 
 /** @param {string} path */
-const urlFoto = (path) => `${URL_FOTOS}${path}`;
+const urlFoto = (path) => urlFotoSimulada(URL_FOTOS, path);
 
 /**
  * Campos públicos del taller (sin owner_id, published ni suspended).
@@ -225,6 +226,16 @@ export async function searchWorkshops(filtros) {
  * @param {string} workshopId
  * @param {{ lat: number, lng: number }} [ubicacion]
  */
+/**
+ * Datos editables del taller simulado (el que recibe las solicitudes), para que el artesano simulado
+ * entre con su taller ya configurado y publicado. Solo existe en el simulado.
+ * @returns {{ name: string, address: string, colonia: string, postal_code: string | null, lat: number, lng: number, services: string[], hours: any, price_from: number }}
+ */
+export function datosTallerSimulado() {
+  const t = talleresIniciales()[0];
+  return { name: t.name, address: t.address, colonia: t.colonia, postal_code: t.postal_code, lat: t.lat, lng: t.lng, services: [...t.services], hours: t.hours, price_from: t.price_from };
+}
+
 export async function getWorkshopProfile(workshopId, ubicacion) {
   exigirUuid(workshopId);
   const { p_lat, p_lng } = validarUbicacion(ubicacion);
