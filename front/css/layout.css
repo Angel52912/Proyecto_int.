@@ -110,64 +110,64 @@
   bottom: 0;
   z-index: 20;
   width: var(--nav-ancho);
-  background: rgb(255 255 255 / 92%);
-  backdrop-filter: blur(12px);
-  border-top: var(--nav-borde-superior);
+  /* Barra en cuero oscuro para distinguirla del contenido (fondo Hueso). */
+  background: var(--color-cuero-oscuro);
+  border-top: 0;
   border-right: var(--nav-borde-derecho);
-  box-shadow: 0 -4px 16px rgb(43 33 27 / 5%);
-  padding: var(--nav-relleno-superior) 0 0;
-  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -6px 20px rgb(43 33 27 / 18%);
+  padding: calc(var(--nav-relleno-superior) + 8px) 8px 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
 }
 
 .nav-inferior ul {
   display: grid;
   grid-template-columns: var(--nav-columnas);
+  gap: 8px;
   max-width: var(--ancho-pantalla);
   margin: 0 auto;
   padding: 0;
   list-style: none;
 }
 
+/* Cada pestaña es un botón propio: recuadro claro sobre la barra (Hueso sobre el botón: 7.1:1). */
 .nav-inferior__enlace {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  min-height: var(--alto-nav);
-  color: var(--color-gris);
+  min-height: calc(var(--alto-nav) - 16px);
+  padding: 4px 2px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 10%);
+  color: var(--color-hueso);
   font-size: 11px;
   text-decoration: none;
+  transition: background-color var(--transicion), color var(--transicion), transform var(--transicion), box-shadow var(--transicion);
 }
 
-/* Pastilla detrás del ícono: misma caja en todas las pestañas para que nada salte al cambiar. */
-.nav-inferior__enlace .icono {
-  box-sizing: content-box;
-  padding: 4px 18px;
-  border-radius: 999px;
-  transition: background-color var(--transicion);
+.nav-inferior__enlace:active {
+  transform: scale(0.95);
 }
 
+/* Pestaña activa: botón miel con texto espresso (7.1:1). */
 .nav-inferior__enlace[aria-current="page"] {
-  color: var(--color-cuero);
-  font-weight: 600;
+  border-color: transparent;
+  background: var(--color-miel);
+  color: var(--color-espresso);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgb(224 163 58 / 35%);
 }
 
 @media (hover: hover) {
   .nav-inferior__enlace:hover:not([aria-current="page"]) {
-    color: var(--color-texto);
-  }
-
-  .nav-inferior__enlace:hover:not([aria-current="page"]) .icono {
-    background: #f3ede6;
+    background: rgb(255 255 255 / 18%);
   }
 }
 
 .nav-inferior__enlace:focus-visible {
   outline: none;
-}
-
-.nav-inferior__enlace:focus-visible .icono {
   box-shadow: var(--anillo-foco);
 }
 
@@ -179,9 +179,7 @@
 /* Barra lateral de escritorio (ancho natural ≥1024px o vista PC forzada por el admin). */
 @media (min-width: 1024px) {
   html:not([data-vista="movil"]) .nav-inferior {
-    background: var(--color-superficie);
-    backdrop-filter: none;
-    box-shadow: 1px 0 0 var(--color-borde), 4px 0 16px rgb(43 33 27 / 4%);
+    box-shadow: 6px 0 20px rgb(43 33 27 / 18%);
   }
 
   html:not([data-vista="movil"]) .nav-inferior__marca {
@@ -189,24 +187,12 @@
   }
 
   html:not([data-vista="movil"]) .nav-inferior__enlace {
-    min-height: 64px;
-    margin: 0 10px;
-    border-radius: var(--radio);
-  }
-
-  html:not([data-vista="movil"]) .nav-inferior__enlace[aria-current="page"] {
-    background: var(--color-cuero-suave);
-  }
-
-  html:not([data-vista="movil"]) .nav-inferior__enlace[aria-current="page"] .icono {
-    background: transparent;
+    min-height: 68px;
   }
 }
 
 html[data-vista="pc"] .nav-inferior {
-  background: var(--color-superficie);
-  backdrop-filter: none;
-  box-shadow: 1px 0 0 var(--color-borde), 4px 0 16px rgb(43 33 27 / 4%);
+  box-shadow: 6px 0 20px rgb(43 33 27 / 18%);
 }
 
 html[data-vista="pc"] .nav-inferior__marca {
@@ -214,19 +200,10 @@ html[data-vista="pc"] .nav-inferior__marca {
 }
 
 html[data-vista="pc"] .nav-inferior__enlace {
-  min-height: 64px;
-  margin: 0 10px;
-  border-radius: var(--radio);
+  min-height: 68px;
 }
 
-html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] {
-  background: var(--color-cuero-suave);
-}
-
-html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] .icono {
-  background: transparent;
-}
-
+/* Logo de la barra lateral: cuadro Hueso con el destello en cuero, para que resalte sobre la barra oscura. */
 .nav-inferior__marca {
   align-items: center;
   justify-content: center;
@@ -234,13 +211,50 @@ html[data-vista="pc"] .nav-inferior__enlace[aria-current="page"] .icono {
   height: 48px;
   margin: 0 auto var(--espacio-4);
   border-radius: 14px;
-  background: var(--color-cuero);
-  box-shadow: 0 4px 12px rgb(122 74 42 / 30%);
-  color: var(--color-hueso);
+  background: var(--color-hueso);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+  color: var(--color-cuero);
 }
 
-.nav-inferior__enlace[aria-current="page"] .icono {
-  background: var(--color-cuero-suave);
+/* Transición entre pantallas: el contenido y la barra superior entran con un fundido y suben 8px.
+   La navegación no se anima para que no parpadee al cambiar de pestaña. */
+@keyframes entrada-pantalla {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pantalla > .barra,
+.pantalla__cuerpo {
+  animation: entrada-pantalla 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.pantalla__cuerpo {
+  animation-delay: 40ms;
+}
+
+/* Con "reducir movimiento" no hay desplazamiento: solo un fundido corto. */
+@keyframes entrada-pantalla-suave {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantalla > .barra,
+  .pantalla__cuerpo {
+    animation: entrada-pantalla-suave 180ms ease-out both;
+  }
 }
 
 @media (min-width: 720px) {

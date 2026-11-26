@@ -123,7 +123,7 @@ export async function renderPrincipal() {
   const estadoMapa = crear("div");
   const pedidoEnCurso = crear("div");
 
-  const pantalla = crearPantalla({ rol: "client", activa: "inicio", clase: "inicio" }, [
+  const pantalla = crearPantalla({ rol: "client", activa: "principal", clase: "inicio" }, [
     crear("header", { clase: "inicio__encabezado" }, [
       crear("div", {}, [saludo, crear("h1", { clase: "inicio__titulo", texto: "¿Qué restauramos hoy?" })]),
       crear("div", { clase: "inicio__acciones" }, [campana, avatar]),
