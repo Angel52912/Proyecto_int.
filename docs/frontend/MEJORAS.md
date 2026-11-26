@@ -22,11 +22,11 @@ con el commit que lo hizo; lo pendiente queda `[ ]`, en el orden en que se va a 
 - [x] ~~Etiquetas de la navegación a 12px~~ (`e3301fb`)
 - [x] ~~Estados vacíos con ilustración en el estilo de la marca~~ (`e3301fb`)
 - [x] ~~Modo oscuro con selector de tema y gris de texto secundario con contraste AA~~ (`326e7df`)
-- [x] ~~La franja "Sin conexión" ya no tapa la barra superior ni la lateral~~ (`f24134a`)
+- [x] ~~La franja "Sin conexión" ya no tapa la barra superior ni la lateral~~ (`fc8a158`)
+- [x] ~~Contraste del modo oscuro revisado en chat, presupuesto, solicitud, seguimiento, actualizar fase, recoger, verificar entrega, calificar y las 6 pantallas de admin: todo ≥4.5:1, sin cambios necesarios~~ (revisión)
 
 ## Pendiente (en orden)
 
-- [ ] Revisar el contraste del modo oscuro en chat, presupuesto, seguimiento, recoger, calificar, verificar entrega y admin.
 - [ ] Juntar las 49 reglas de escritorio repetidas (`@media` y `html[data-vista="pc"]`).
 - [ ] Versión del caché del service worker automática (hoy se sube `CACHE_VERSION` a mano).
 - [ ] Pruebas de punta a punta del flujo completo (solicitud → chat → presupuesto → seguimiento → entrega → calificación).
