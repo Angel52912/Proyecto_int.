@@ -29,7 +29,7 @@
 }
 
 .pestanas__boton[aria-selected="true"] {
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-espresso);
   font-weight: 600;
 }
@@ -115,14 +115,14 @@
   width: fit-content;
   border-radius: 8px;
   background: var(--color-miel);
-  color: var(--color-espresso);
+  color: var(--color-tinta);
   font-size: 12px;
   font-weight: 600;
 }
 
 .pedido-tarjeta__aviso--cenote {
   background: var(--color-cenote);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .pedido-tarjeta__calificar {

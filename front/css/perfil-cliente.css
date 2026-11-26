@@ -13,7 +13,7 @@
   gap: var(--espacio-2);
   padding: var(--espacio-4) var(--espacio-3);
   border-radius: 18px;
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
   text-align: center;
 }
@@ -25,7 +25,7 @@
   color: var(--color-hueso);
   font-family: var(--fuente-titulo);
   font-size: 30px;
-  box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--color-cuero-suave);
+  box-shadow: 0 0 0 4px var(--color-superficie), 0 0 0 6px var(--color-cuero-suave);
 }
 
 .perfil-encabezado__nombre {
@@ -61,7 +61,7 @@
   padding: 0;
   overflow: hidden;
   border-radius: var(--radio-tarjeta);
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
   list-style: none;
 }
@@ -144,7 +144,7 @@
   min-height: 52px;
   border: 1px solid rgb(179 38 30 / 25%);
   border-radius: var(--radio);
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-error);
   font: inherit;
   font-weight: 600;

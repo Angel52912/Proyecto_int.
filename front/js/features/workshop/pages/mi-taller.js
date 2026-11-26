@@ -8,6 +8,7 @@ import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearEstrellas, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { api } from "../index.js";
+import { crearSelectorTema } from "../../../ui/tema.js";
 
 /** Reseñas que se piden al servidor para la distribución de estrellas y la lista. */
 const RESENAS_POR_PAGINA = 100;
@@ -142,6 +143,7 @@ export async function renderMiTaller() {
   const pantalla = crearPantalla({ rol: "craftsman", activa: "perfil", clase: "mi-taller" }, [
     crear("div", { clase: "fila-entre" }, [crear("h1", { clase: "pantalla__titulo", texto: "Mi taller" }), ajustes]),
     contenido,
+    crearSelectorTema(),
     enlace("/acceso/perfil?desde=taller", { clase: "boton boton--bloque boton--secundario", texto: "Editar mi perfil" }),
     crearBoton("Cerrar sesión", { variante: "secundario", alHacerClic: () => cerrarSesion() }),
   ]);

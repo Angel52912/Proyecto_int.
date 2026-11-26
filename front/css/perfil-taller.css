@@ -11,7 +11,7 @@
 
 .perfil-taller .barra__volver {
   margin: var(--espacio-2) 0 0;
-  background: #fff;
+  background: var(--color-superficie);
 }
 
 .perfil-taller .pantalla__cuerpo {
@@ -92,7 +92,7 @@
   min-height: var(--tactil-min);
   border: 1px solid var(--color-borde);
   border-radius: 999px;
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
   color: var(--color-cuero);
   font: inherit;
@@ -118,7 +118,7 @@
   gap: var(--espacio-3);
   padding: 12px var(--espacio-3);
   border-radius: var(--radio-tarjeta);
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
 }
 
@@ -207,7 +207,7 @@
 .perfil-taller__horario {
   padding: 0 var(--espacio-3);
   border-radius: var(--radio-tarjeta);
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
 }
 

@@ -23,6 +23,25 @@ Estados de la guía: Éxito, Aviso, Error e Info (colores por definir en Figma).
 | Texto y campos | Inter 15 |
 | Secundario | Inter 13 |
 
+### Modo oscuro
+
+Se activa con el sistema (`prefers-color-scheme`) o con el selector "Tema de color" de Perfil y Mi taller
+(Automático, Claro, Oscuro; se guarda en el dispositivo). Usa los mismos tokens con otros valores; la barra de
+navegación, Verificar entrega, las tarjetas en degradado y los avisos flotantes conservan sus colores.
+
+| Token | Claro | Oscuro |
+|---|---|---|
+| Fondo (`--color-hueso`) | `#FAF6F0` | `#1A1411` |
+| Texto (`--color-espresso`) | `#2B211B` | `#F3ECE4` |
+| Superficie | `#FFFFFF` | `#261D18` |
+| Cuero | `#7A4A2A` | `#D9A273` |
+| Cenote | `#1F7A7A` | `#5CC2C2` |
+| Miel | `#E0A33A` | `#E8B04F` |
+| Texto suave | `#6E6259` | `#C8B9AB` |
+
+Contraste mínimo medido en oscuro: 5.0:1 (texto gris sobre tarjeta suave); texto principal 15.6:1.
+Texto sobre botones de color: blanco en claro, `#1A1411` en oscuro (≥7.5:1). Sobre miel siempre espresso.
+
 Componentes de la guía: botón principal, botón secundario, mapa, campo de texto.
 Navegación inferior del cliente: Inicio · Mapa · Pedidos · Perfil.
 Navegación inferior del artesano: Solicitudes · Tablero · Chats · Perfil.

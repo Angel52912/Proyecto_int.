@@ -98,7 +98,7 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-2);
 }
 
@@ -125,7 +125,7 @@
   height: 38px;
   border-radius: 50%;
   background: var(--color-exito);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .acceso__chip {
@@ -137,7 +137,7 @@
   gap: 4px;
   padding: 3px 10px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 92%);
+  background: color-mix(in srgb, var(--color-superficie) 92%, transparent);
   color: var(--color-cuero);
   font-size: 11px;
   font-weight: 600;
@@ -183,7 +183,7 @@
 }
 
 .boton--blanco {
-  background: #fff;
+  background: var(--color-superficie);
   border-color: var(--color-arena);
   color: var(--color-espresso);
 }
@@ -255,7 +255,7 @@
   height: 60px;
   border: 1px solid var(--color-borde);
   border-radius: var(--radio);
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-espresso);
   font-family: var(--fuente-titulo);
   font-size: 24px;
@@ -298,7 +298,7 @@
   padding: var(--espacio-3) 20px;
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
-  background: #fff;
+  background: var(--color-superficie);
   cursor: pointer;
 }
 
@@ -317,7 +317,7 @@
 /* Elegida: fondo de color, borde grueso, ícono relleno y sombra cálida (no solo el color del borde). */
 .rol-opcion:has(input:checked) {
   border: 2px solid var(--color-cuero);
-  background: #fdf6ef;
+  background: var(--color-superficie-suave);
   box-shadow: 0 4px 14px rgb(122 74 42 / 18%);
 }
 

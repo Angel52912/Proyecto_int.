@@ -57,7 +57,7 @@
   padding: 10px;
   border-top: 3px solid var(--color-miel);
   border-radius: var(--radio-tarjeta);
-  background: rgb(231 222 211 / 45%);
+  background: color-mix(in srgb, var(--color-arena) 45%, transparent);
   scroll-snap-align: start;
 }
 
@@ -103,7 +103,7 @@
   gap: 8px;
   padding: 10px;
   border-radius: var(--radio);
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
   color: inherit;
   text-decoration: none;
@@ -161,12 +161,12 @@
 
 .kanban__entrega--atrasado {
   background: var(--color-error);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .kanban__accion {
   background: var(--color-exito);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .kanban__vacia {

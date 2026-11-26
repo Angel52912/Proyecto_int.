@@ -57,7 +57,7 @@
   --tactil-min: 44px;
 
   /* Usados en los mockups de cliente y artesano. */
-  --color-gris: #7d6f66;
+  --color-gris: #655a51; /* ≥5:1 sobre Hueso, Arena y tarjetas suaves */
   --radio-tarjeta: 14px;
   --alto-nav: 60px;
 
@@ -90,4 +90,106 @@
 
   --radio-chico: 8px;
   --radio-grande: 18px;
+
+  /* Texto sobre un color de marca o de estado (botones, insignias). */
+  --color-sobre-color: #fff;
+  /* Espresso fijo: texto sobre miel; no cambia en modo oscuro. */
+  --color-tinta: #2b211b;
+  /* Fondo de los mapas mientras cargan. */
+  --color-mapa-fondo: #e3ece2;
+  color-scheme: light;
+}
+
+/* ── Modo oscuro ──
+   Los mismos tokens con valores oscuros: fondo espresso profundo, texto Hueso y la marca en tonos
+   más claros para leerse sobre fondo oscuro. Contrastes medidos (AA ≥4.5:1): texto 15.6:1, texto suave
+   9.5:1, cuero 8.1:1, cenote 8.6:1, éxito 8.4:1, error 7.5:1; texto oscuro sobre botones ≥7.5:1.
+   Se activa con el sistema (prefers-color-scheme) o a mano con <html data-tema="oscuro">. */
+html[data-tema="oscuro"] {
+  --color-hueso: #1a1411;
+  --color-espresso: #f3ece4;
+  --color-arena: #33281f;
+  --color-cuero: #d9a273;
+  --color-cuero-oscuro: #ebbd93;
+  --color-cuero-suave: #3a2a1f;
+  --color-cenote: #5cc2c2;
+  --color-cenote-oscuro: #86d6d6;
+  --color-miel: #e8b04f;
+  --color-exito: #63c28a;
+  --color-aviso: #e8b04f;
+  --color-error: #f08a80;
+  --color-info: #5cc2c2;
+  --color-gris: #a89a8e;
+  --color-superficie: #261d18;
+  --color-superficie-suave: #211915;
+  --color-borde: #3a2e26;
+  --color-borde-fuerte: #54453a;
+  --color-texto-suave: #c8b9ab;
+  --color-exito-suave: #1e3327;
+  --color-aviso-suave: #3a2d14;
+  --color-error-suave: #3d1f1c;
+  --color-info-suave: #193333;
+  --color-sobre-color: #1a1411;
+  --color-mapa-fondo: #24302a;
+  --sombra-1: 0 1px 2px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 30%);
+  --sombra-2: 0 2px 4px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 45%);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-tema="claro"]) {
+    --color-hueso: #1a1411;
+    --color-espresso: #f3ece4;
+    --color-arena: #33281f;
+    --color-cuero: #d9a273;
+    --color-cuero-oscuro: #ebbd93;
+    --color-cuero-suave: #3a2a1f;
+    --color-cenote: #5cc2c2;
+    --color-cenote-oscuro: #86d6d6;
+    --color-miel: #e8b04f;
+    --color-exito: #63c28a;
+    --color-aviso: #e8b04f;
+    --color-error: #f08a80;
+    --color-info: #5cc2c2;
+    --color-gris: #a89a8e;
+    --color-superficie: #261d18;
+    --color-superficie-suave: #211915;
+    --color-borde: #3a2e26;
+    --color-borde-fuerte: #54453a;
+    --color-texto-suave: #c8b9ab;
+    --color-exito-suave: #1e3327;
+    --color-aviso-suave: #3a2d14;
+    --color-error-suave: #3d1f1c;
+    --color-info-suave: #193333;
+    --color-sobre-color: #1a1411;
+    --color-mapa-fondo: #24302a;
+    --sombra-1: 0 1px 2px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 30%);
+    --sombra-2: 0 2px 4px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 45%);
+    color-scheme: dark;
+  }
+}
+
+/* Piezas que ya son oscuras por diseño (barra de navegación, Verificar entrega, tarjetas en
+   degradado, avisos flotantes): conservan los colores del modo claro también en modo oscuro. */
+.nav-inferior,
+.pantalla--oscura,
+.pedido-destacado,
+.inicio__avatar,
+.acceso__ilustracion,
+.aviso-flotante {
+  --color-hueso: #faf6f0;
+  --color-espresso: #2b211b;
+  --color-arena: #e7ded3;
+  --color-cuero: #7a4a2a;
+  --color-cuero-oscuro: #5f381f;
+  --color-cuero-suave: #f1e6dd;
+  --color-cenote: #1f7a7a;
+  --color-miel: #e0a33a;
+  --color-exito: #2e7d4f;
+  --color-error: #b3261e;
+  --color-gris: #655a51; /* ≥5:1 sobre Hueso, Arena y tarjetas suaves */
+  --color-superficie: #fff;
+  --color-borde: #ece4da;
+  --color-texto-suave: #6e6259;
+  --color-sobre-color: #fff;
 }

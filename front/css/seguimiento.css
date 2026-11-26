@@ -40,13 +40,13 @@
   flex: none;
   border: 2px solid var(--color-arena);
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-superficie);
 }
 
 .linea-tiempo__paso--hecha .linea-tiempo__marca {
   border-color: var(--color-cenote);
   background: var(--color-cenote);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .linea-tiempo__paso--actual .linea-tiempo__marca {

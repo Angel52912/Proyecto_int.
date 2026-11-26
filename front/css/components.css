@@ -149,14 +149,14 @@ textarea {
 
 .campo input::placeholder,
 .campo textarea::placeholder {
-  color: #a3968c;
+  color: var(--color-gris);
 }
 
 @media (hover: hover) {
   .campo input:hover:not(:focus),
   .campo textarea:hover:not(:focus),
   .campo select:hover:not(:focus) {
-    border-color: #c3b5a6;
+    border-color: var(--color-borde-fuerte);
   }
 }
 
@@ -212,13 +212,13 @@ a {
 .boton--cenote {
   background: var(--color-cenote);
   border-color: var(--color-cenote);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .boton--miel {
   background: var(--color-miel);
   border-color: var(--color-miel);
-  color: var(--color-espresso);
+  color: var(--color-tinta);
 }
 
 .boton--icono {
@@ -249,7 +249,7 @@ a {
 }
 
 .tarjeta {
-  background: #fff;
+  background: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
   padding: var(--espacio-3);
@@ -320,7 +320,7 @@ a {
   padding: 0 14px;
   border: 1px solid var(--color-borde);
   border-radius: 999px;
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-espresso);
   font: inherit;
   font-size: var(--texto-secundario);
@@ -351,32 +351,32 @@ a {
 
 .insignia--miel {
   background: var(--color-miel);
-  color: var(--color-espresso);
+  color: var(--color-tinta);
 }
 
 .insignia--cenote {
   background: var(--color-cenote);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .insignia--exito {
   background: var(--color-exito);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .insignia--cuero {
   background: var(--color-cuero);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .insignia--error {
   background: var(--color-error);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .insignia--neutra {
   background: var(--color-texto-suave);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .progreso {
@@ -584,7 +584,7 @@ fieldset.campo {
   flex: none;
   border: 1px solid var(--color-borde);
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-espresso);
   cursor: pointer;
 }
@@ -597,7 +597,7 @@ fieldset.campo {
   height: 9px;
   border-radius: 50%;
   background: var(--color-error);
-  border: 2px solid #fff;
+  border: 2px solid var(--color-superficie);
 }
 
 .buscador {
@@ -915,7 +915,7 @@ a.boton-texto {
   gap: var(--espacio-3);
   padding: var(--espacio-3);
   border-radius: var(--radio-tarjeta);
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: var(--sombra-1);
 }
 
@@ -928,7 +928,7 @@ a.boton-texto {
 
 .esqueleto__bloque {
   border-radius: 8px;
-  background: linear-gradient(90deg, var(--color-arena) 25%, #f3ece4 50%, var(--color-arena) 75%);
+  background: linear-gradient(90deg, var(--color-arena) 25%, var(--color-superficie-suave) 50%, var(--color-arena) 75%);
   background-size: 200% 100%;
   animation: esqueleto-brillo 1.3s ease-in-out infinite;
 }
@@ -1034,7 +1034,7 @@ h1[tabindex="-1"]:focus,
 
 .aviso-flotante--error {
   background: var(--color-error);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .aviso-flotante--info .icono {
@@ -1096,7 +1096,7 @@ h1[tabindex="-1"]:focus,
   gap: var(--espacio-2);
   padding: 8px var(--espacio-3);
   background: var(--color-miel);
-  color: var(--color-espresso);
+  color: var(--color-tinta);
   font-size: var(--texto-secundario);
   font-weight: 600;
   text-align: center;
@@ -1118,4 +1118,61 @@ h1[tabindex="-1"]:focus,
 
 html[data-vista="pc"] .avisos-flotantes {
   bottom: var(--espacio-4);
+}
+
+/* Selector de tema (Perfil y Mi taller): tres botones en una pastilla; el elegido en cuero. */
+.selector-tema {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.selector-tema__titulo {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+}
+
+.selector-tema__opciones {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radio);
+  background: var(--color-arena);
+}
+
+.selector-tema__opcion {
+  min-height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transicion), color var(--transicion);
+}
+
+.selector-tema__opcion[aria-pressed="true"] {
+  background: var(--color-cuero);
+  color: var(--color-sobre-color);
+  box-shadow: var(--sombra-1);
+}
+
+.selector-tema__opcion:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+/* Mapas en modo oscuro: los mosaicos de OpenStreetMap son claros; se atenúan para no deslumbrar. */
+html[data-tema="oscuro"] .leaflet-tile-pane {
+  filter: brightness(0.75) contrast(1.1) saturate(0.85);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-tema="claro"]) .leaflet-tile-pane {
+    filter: brightness(0.75) contrast(1.1) saturate(0.85);
+  }
 }

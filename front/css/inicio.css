@@ -151,7 +151,7 @@
   height: 36px;
   margin-bottom: auto;
   border-radius: 10px;
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-cuero);
 }
 
@@ -177,7 +177,7 @@
 
 .mini-mapa {
   height: 140px;
-  background: #e3ece2;
+  background: var(--color-mapa-fondo);
   pointer-events: none;
 }
 

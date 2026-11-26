@@ -40,7 +40,7 @@
 }
 
 .resumen--miel .resumen__valor {
-  color: #b27a12;
+  color: var(--color-aviso);
 }
 
 .solicitud-artesano__descripcion {

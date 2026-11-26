@@ -23,7 +23,7 @@
 .taller__mapa {
   height: 160px;
   border-radius: var(--radio-tarjeta);
-  background: #e3ece2;
+  background: var(--color-mapa-fondo);
 }
 
 /* Escritorio: miniaturas al 50% (6 columnas en lugar de 3). Móvil conserva el tamaño actual. */
@@ -62,7 +62,7 @@ html[data-vista="movil"] .taller__fotos {
   padding: var(--espacio-2);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio);
-  background: #fff;
+  background: var(--color-superficie);
 }
 
 .horario__cabecera {
@@ -86,7 +86,7 @@ html[data-vista="movil"] .taller__fotos {
   padding: 4px 12px;
   border-radius: 999px;
   background: var(--color-exito);
-  color: #fff;
+  color: var(--color-sobre-color);
   font-size: var(--texto-secundario);
   font-weight: 600;
   text-align: center;
@@ -123,7 +123,7 @@ html[data-vista="movil"] .taller__fotos {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-superficie);
   box-shadow: 0 1px 3px rgb(43 33 27 / 30%);
   transition: transform 0.15s ease-in-out;
 }
@@ -175,7 +175,7 @@ html[data-vista="movil"] .taller__fotos {
   padding: 0 var(--espacio-1);
   border: 1px solid var(--color-borde);
   border-radius: 10px;
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-espresso);
   font: inherit;
 }
@@ -281,7 +281,7 @@ html[data-vista="movil"] .taller__fotos {
   height: 36px;
   margin-bottom: auto;
   border-radius: 10px;
-  background: #fff;
+  background: var(--color-superficie);
   color: var(--color-cuero);
 }
 
@@ -310,8 +310,8 @@ html[data-vista="movil"] .taller__fotos {
   height: 24px;
   border: 2px solid var(--color-borde-fuerte);
   border-radius: 50%;
-  background: #fff;
-  color: #fff;
+  background: var(--color-superficie);
+  color: var(--color-sobre-color);
 }
 
 .servicio-opcion__marca .icono {

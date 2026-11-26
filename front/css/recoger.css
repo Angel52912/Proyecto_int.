@@ -31,7 +31,7 @@
   padding: var(--espacio-2);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-tarjeta);
-  background: #fff;
+  background: var(--color-superficie);
 }
 
 .qr {
@@ -59,7 +59,7 @@
   height: 52px;
   border: 1px solid var(--color-borde);
   border-radius: 10px;
-  background: #fff;
+  background: var(--color-superficie);
   font-family: var(--fuente-titulo);
   font-size: 24px;
   font-weight: 700;

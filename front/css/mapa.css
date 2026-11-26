@@ -11,7 +11,7 @@
   max-width: var(--ancho-pantalla);
   margin-left: var(--pantalla-margen-izquierdo);
   margin-right: auto;
-  background: #e3ece2;
+  background: var(--color-mapa-fondo);
 }
 
 .mapa__superior {
@@ -53,7 +53,7 @@
 .mapa__tarjeta > .estado-vacio,
 .mapa__tarjeta > .estado-error,
 .mapa__tarjeta > .estado-cargando {
-  background: #fff;
+  background: var(--color-superficie);
   border-radius: var(--radio-tarjeta);
   box-shadow: 0 4px 16px rgb(43 33 27 / 15%);
 }
@@ -64,7 +64,7 @@
   margin: 0 auto var(--espacio-2);
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 94%);
+  background: color-mix(in srgb, var(--color-superficie) 94%, transparent);
   box-shadow: var(--sombra-1);
   color: var(--color-espresso);
   font-size: 12px;
