@@ -107,7 +107,7 @@ function pintar({ pedido, solicitud }) {
             try {
               await api.markOrderReady(pedido.id);
               raiz.replaceWith(pintar({ pedido: await api.getOrder(pedido.id), solicitud }));
-            mostrarAvisoFlotante("Fase actualizada. Avisamos al cliente.");
+              mostrarAvisoFlotante("Avisamos al cliente que su pedido está listo.");
             } catch (error) {
               aviso.replaceChildren(crear("p", { clase: "aviso aviso--error", texto: mensajeDeError(error) }));
             }
@@ -146,6 +146,7 @@ function pintar({ pedido, solicitud }) {
           try {
             await api.advanceOrderPhase(pedido.id, { phase: fase, photo: await comprimirImagen(foto), ...(texto ? { note: texto } : {}), ...(correccion ? { confirm: true } : {}) });
             raiz.replaceWith(pintar({ pedido: await api.getOrder(pedido.id), solicitud }));
+            mostrarAvisoFlotante("Fase actualizada. Avisamos al cliente.");
           } catch (error) {
             aviso.replaceChildren(crear("p", { clase: "aviso aviso--error", attrs: { role: "alert" }, texto: mensajeDeError(error, { photo_required: "La foto de avance es obligatoria." }) }));
             guardar.disabled = false;
