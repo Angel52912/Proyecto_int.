@@ -52,7 +52,8 @@
 /* Barra superior fija: fondo translúcido con desenfoque, para que el contenido se lea al pasar por debajo. */
 .barra {
   position: sticky;
-  top: 0;
+  /* Bajo la franja "Sin conexión" cuando está visible (ui/conexion.js mide su alto). */
+  top: var(--alto-franja, 0px);
   z-index: 10;
   display: flex;
   align-items: center;
@@ -314,7 +315,7 @@ html[data-navegacion="atras"] .pantalla > .pantalla__cuerpo {
     --ancho-pantalla: 1120px;
     --cuerpo-relleno: var(--espacio-4);
     --cuerpo-relleno-inferior: var(--espacio-4);
-    --nav-superior: 0;
+    --nav-superior: var(--alto-franja, 0px);
     --nav-derecha: auto;
     --nav-ancho: 96px;
     --nav-columnas: 1fr;
@@ -331,7 +332,7 @@ html[data-vista="pc"] {
   --ancho-pantalla: 1120px;
   --cuerpo-relleno: var(--espacio-4);
   --cuerpo-relleno-inferior: var(--espacio-4);
-  --nav-superior: 0;
+  --nav-superior: var(--alto-franja, 0px);
   --nav-derecha: auto;
   --nav-ancho: 96px;
   --nav-columnas: 1fr;

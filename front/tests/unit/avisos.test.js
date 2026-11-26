@@ -45,6 +45,8 @@ describe("aviso de conexión", () => {
     window.dispatchEvent(new Event("offline"));
     expect(franja.hidden).toBe(false);
     expect(franja.textContent).toBe(TEXTO_SIN_CONEXION);
+    // La barra superior se recorre lo que mide la franja (jsdom no mide: 0px, pero la variable existe).
+    expect(document.documentElement.style.getPropertyValue("--alto-franja")).toMatch(/^\d+px$/);
     fijarEnLinea(true);
     window.dispatchEvent(new Event("online"));
     expect(franja.hidden).toBe(true);
