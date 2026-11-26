@@ -189,34 +189,18 @@
 }
 
 /* Escritorio: las 5 columnas caben a la vez; sin deslizar ni pastillas de resumen. */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .kanban {
-    grid-auto-columns: minmax(0, 1fr);
-    margin: 0;
-    padding: 2px 0 var(--espacio-2);
-    overflow: visible;
-  }
 
-  html:not([data-vista="movil"]) .kanban__resumen {
-    display: none;
-  }
-
-  html:not([data-vista="movil"]) .kanban__columna {
-    min-height: 320px;
-  }
-}
-
-html[data-vista="pc"] .kanban {
+html[data-escritorio] .kanban {
   grid-auto-columns: minmax(0, 1fr);
   margin: 0;
   padding: 2px 0 var(--espacio-2);
   overflow: visible;
 }
 
-html[data-vista="pc"] .kanban__resumen {
+html[data-escritorio] .kanban__resumen {
   display: none;
 }
 
-html[data-vista="pc"] .kanban__columna {
+html[data-escritorio] .kanban__columna {
   min-height: 320px;
 }

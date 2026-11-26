@@ -1110,13 +1110,7 @@ h1[tabindex="-1"]:focus,
   flex: none;
 }
 
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .avisos-flotantes {
-    bottom: var(--espacio-4);
-  }
-}
-
-html[data-vista="pc"] .avisos-flotantes {
+html[data-escritorio] .avisos-flotantes {
   bottom: var(--espacio-4);
 }
 

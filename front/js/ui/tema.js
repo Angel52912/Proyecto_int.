@@ -1,5 +1,5 @@
 // Tema de color: Automático (sigue al sistema), Claro u Oscuro. Se guarda en este dispositivo.
-// El script front/js/tema-inicial.js aplica la preferencia antes de pintar para que no parpadee.
+// El script front/js/antes-de-pintar.js aplica la preferencia antes de pintar para que no parpadee.
 import { crear } from "./dom.js";
 
 export const CLAVE_TEMA = "mixanab-tema";

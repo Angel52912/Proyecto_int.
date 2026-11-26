@@ -61,15 +61,8 @@
 }
 
 /* Escritorio: solicitudes en cuadrícula de tarjetas. */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .solicitudes-artesano .lista {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: var(--espacio-3);
-  }
-}
 
-html[data-vista="pc"] .solicitudes-artesano .lista {
+html[data-escritorio] .solicitudes-artesano .lista {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: var(--espacio-3);

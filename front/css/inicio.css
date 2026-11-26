@@ -182,20 +182,11 @@
 }
 
 /* Escritorio: mapa más alto (hay espacio) y el pedido en curso con un ancho que no se estire de más. */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .mini-mapa {
-    height: 260px;
-  }
 
-  html:not([data-vista="movil"]) .pedido-destacado {
-    max-width: 640px;
-  }
-}
-
-html[data-vista="pc"] .mini-mapa {
+html[data-escritorio] .mini-mapa {
   height: 260px;
 }
 
-html[data-vista="pc"] .pedido-destacado {
+html[data-escritorio] .pedido-destacado {
   max-width: 640px;
 }

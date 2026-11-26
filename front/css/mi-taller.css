@@ -136,22 +136,11 @@
   text-underline-offset: 3px;
 }
 
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .mi-taller__perfil .mi-taller__foto {
-    width: 112px;
-    height: 112px;
-  }
-
-  html:not([data-vista="movil"]) .mi-taller__nombre {
-    font-size: var(--texto-titulo);
-  }
-}
-
-html[data-vista="pc"] .mi-taller__perfil .mi-taller__foto {
+html[data-escritorio] .mi-taller__perfil .mi-taller__foto {
   width: 112px;
   height: 112px;
 }
 
-html[data-vista="pc"] .mi-taller__nombre {
+html[data-escritorio] .mi-taller__nombre {
   font-size: var(--texto-titulo);
 }

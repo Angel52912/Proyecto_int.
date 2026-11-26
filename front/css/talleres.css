@@ -80,24 +80,13 @@
 }
 
 /* Escritorio: la lista de talleres pasa a una cuadrícula de tarjetas (no una columna estirada a 1100px). */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .talleres .lista {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: var(--espacio-3);
-  }
 
-  html:not([data-vista="movil"]) .talleres .filtros {
-    max-width: 640px;
-  }
-}
-
-html[data-vista="pc"] .talleres .lista {
+html[data-escritorio] .talleres .lista {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: var(--espacio-3);
 }
 
-html[data-vista="pc"] .talleres .filtros {
+html[data-escritorio] .talleres .filtros {
   max-width: 640px;
 }

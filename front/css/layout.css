@@ -184,29 +184,16 @@
 }
 
 /* Barra lateral de escritorio (ancho natural ≥1024px o vista PC forzada por el admin). */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .nav-inferior {
-    box-shadow: 6px 0 20px rgb(43 33 27 / 18%);
-  }
 
-  html:not([data-vista="movil"]) .nav-inferior__marca {
-    display: flex;
-  }
-
-  html:not([data-vista="movil"]) .nav-inferior__enlace {
-    min-height: 68px;
-  }
-}
-
-html[data-vista="pc"] .nav-inferior {
+html[data-escritorio] .nav-inferior {
   box-shadow: 6px 0 20px rgb(43 33 27 / 18%);
 }
 
-html[data-vista="pc"] .nav-inferior__marca {
+html[data-escritorio] .nav-inferior__marca {
   display: flex;
 }
 
-html[data-vista="pc"] .nav-inferior__enlace {
+html[data-escritorio] .nav-inferior__enlace {
   min-height: 68px;
 }
 
@@ -310,25 +297,8 @@ html[data-navegacion="atras"] .pantalla > .pantalla__cuerpo {
 }
 
 /* Fases 2 y 3: mismo bloque para ancho natural de PC y para la vista forzada por el admin. */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) {
-    --ancho-pantalla: 1120px;
-    --cuerpo-relleno: var(--espacio-4);
-    --cuerpo-relleno-inferior: var(--espacio-4);
-    --nav-superior: var(--alto-franja, 0px);
-    --nav-derecha: auto;
-    --nav-ancho: 96px;
-    --nav-columnas: 1fr;
-    --nav-borde-superior: 0;
-    --nav-borde-derecho: 1px solid var(--color-borde);
-    --nav-relleno-superior: var(--espacio-4);
-    --pantalla-margen-izquierdo: max(96px, calc((100vw - var(--ancho-pantalla)) / 2));
-    --columnas-categorias: repeat(2, minmax(0, 1fr)); /* Reparación y Limpieza llenan el ancho */
-    --alto-portada: 320px;
-  }
-}
 
-html[data-vista="pc"] {
+html[data-escritorio] {
   --ancho-pantalla: 1120px;
   --cuerpo-relleno: var(--espacio-4);
   --cuerpo-relleno-inferior: var(--espacio-4);
@@ -383,67 +353,34 @@ html:is([data-vista="movil"], [data-vista="pc"]) .nav-inferior__enlace {
    - 880px: Mi taller (estadísticas).
    Las de cuadrícula (Talleres, Tablero, Solicitudes, Admin) y dos columnas (Perfil del taller,
    Enviar presupuesto) usan todo el ancho. */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .acceso .pantalla__cuerpo {
-    width: 100%;
-    max-width: 520px;
-    margin: 0 auto;
-  }
 
-  html:not([data-vista="movil"]) :is(.actualizar-fase, .verificar, .taller, .chats, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .pedidos, .perfil-cliente, .simulacion) .pantalla__cuerpo {
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-  }
-
-  html:not([data-vista="movil"]) .mi-taller .pantalla__cuerpo {
-    width: 100%;
-    max-width: 880px;
-    margin: 0 auto;
-  }
-
-  /* La barra superior acompaña al contenido centrado (el botón Volver no queda lejos del título). */
-  html:not([data-vista="movil"]) :is(.actualizar-fase, .verificar, .taller, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .simulacion) .barra {
-    width: 100%;
-    max-width: 792px;
-    margin: 0 auto;
-  }
-}
-
-html[data-vista="pc"] .acceso .pantalla__cuerpo {
+html[data-escritorio] .acceso .pantalla__cuerpo {
   width: 100%;
   max-width: 520px;
   margin: 0 auto;
 }
 
-html[data-vista="pc"] :is(.actualizar-fase, .verificar, .taller, .chats, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .pedidos, .perfil-cliente, .simulacion) .pantalla__cuerpo {
+html[data-escritorio] :is(.actualizar-fase, .verificar, .taller, .chats, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .pedidos, .perfil-cliente, .simulacion) .pantalla__cuerpo {
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
 }
 
-html[data-vista="pc"] .mi-taller .pantalla__cuerpo {
+html[data-escritorio] .mi-taller .pantalla__cuerpo {
   width: 100%;
   max-width: 880px;
   margin: 0 auto;
 }
 
-html[data-vista="pc"] :is(.actualizar-fase, .verificar, .taller, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .simulacion) .barra {
+html[data-escritorio] :is(.actualizar-fase, .verificar, .taller, .chat-pantalla, .presupuesto, .seguimiento, .recoger, .calificar, .avisos, .simulacion) .barra {
   width: 100%;
   max-width: 792px;
   margin: 0 auto;
 }
 
 /* Acceso: la barra superior mide lo mismo que su tarjeta de 520px (más el relleno). */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .acceso .barra {
-    width: 100%;
-    max-width: 552px;
-    margin: 0 auto;
-  }
-}
 
-html[data-vista="pc"] .acceso .barra {
+html[data-escritorio] .acceso .barra {
   width: 100%;
   max-width: 552px;
   margin: 0 auto;
@@ -476,13 +413,7 @@ html[data-vista="pc"] .acceso .barra {
   color: var(--color-hueso);
 }
 
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .alternador-vista {
-    bottom: var(--espacio-3);
-  }
-}
-
-html[data-vista="pc"] .alternador-vista {
+html[data-escritorio] .alternador-vista {
   bottom: var(--espacio-3);
 }
 

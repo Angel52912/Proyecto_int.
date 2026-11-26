@@ -158,78 +158,26 @@
 }
 
 /* ── Escritorio (≥1024px o vista PC): panel en dos columnas y listas como filas de tabla ── */
-@media (min-width: 1024px) {
-  html:not([data-vista="movil"]) .admin-panel {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
-  }
 
-  html:not([data-vista="movil"]) .admin-panel__calificacion {
-    grid-column: 1 / -1;
-  }
-
-  html:not([data-vista="movil"]) .admin .buscador {
-    max-width: 520px;
-  }
-
-  html:not([data-vista="movil"]) .admin-lista {
-    gap: 6px;
-  }
-
-  /* Fila: nombre a la izquierda, estado al centro, acción a la derecha; lo largo (comentario, fechas,
-     confirmación abierta) baja a su propia línea a todo el ancho. */
-  html:not([data-vista="movil"]) .admin-fila {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: var(--espacio-4);
-    padding: 12px var(--espacio-3);
-  }
-
-  html:not([data-vista="movil"]) .admin-fila__cabecera {
-    flex: 1 1 300px;
-    min-width: 0;
-  }
-
-  html:not([data-vista="movil"]) .admin-fila > .chips {
-    flex: 0 1 auto;
-  }
-
-  html:not([data-vista="movil"]) .admin-fila > .admin-accion {
-    margin-left: auto;
-  }
-
-  html:not([data-vista="movil"]) .admin-fila > :is(.admin-fila__comentario, .admin-fechas),
-  html:not([data-vista="movil"]) .admin-fila > .admin-accion:has(.admin-confirmacion:not([hidden])) {
-    flex-basis: 100%;
-  }
-
-  html:not([data-vista="movil"]) .admin-confirmacion {
-    max-width: 640px;
-    margin-left: auto;
-  }
-}
-
-html[data-vista="pc"] .admin-panel {
+html[data-escritorio] .admin-panel {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
 }
 
-html[data-vista="pc"] .admin-panel__calificacion {
+html[data-escritorio] .admin-panel__calificacion {
   grid-column: 1 / -1;
 }
 
-html[data-vista="pc"] .admin .buscador {
+html[data-escritorio] .admin .buscador {
   max-width: 520px;
 }
 
-html[data-vista="pc"] .admin-lista {
+html[data-escritorio] .admin-lista {
   gap: 6px;
 }
 
-html[data-vista="pc"] .admin-fila {
+html[data-escritorio] .admin-fila {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
@@ -237,25 +185,25 @@ html[data-vista="pc"] .admin-fila {
   padding: 12px var(--espacio-3);
 }
 
-html[data-vista="pc"] .admin-fila__cabecera {
+html[data-escritorio] .admin-fila__cabecera {
   flex: 1 1 300px;
   min-width: 0;
 }
 
-html[data-vista="pc"] .admin-fila > .chips {
+html[data-escritorio] .admin-fila > .chips {
   flex: 0 1 auto;
 }
 
-html[data-vista="pc"] .admin-fila > .admin-accion {
+html[data-escritorio] .admin-fila > .admin-accion {
   margin-left: auto;
 }
 
-html[data-vista="pc"] .admin-fila > :is(.admin-fila__comentario, .admin-fechas),
-html[data-vista="pc"] .admin-fila > .admin-accion:has(.admin-confirmacion:not([hidden])) {
+html[data-escritorio] .admin-fila > :is(.admin-fila__comentario, .admin-fechas),
+html[data-escritorio] .admin-fila > .admin-accion:has(.admin-confirmacion:not([hidden])) {
   flex-basis: 100%;
 }
 
-html[data-vista="pc"] .admin-confirmacion {
+html[data-escritorio] .admin-confirmacion {
   max-width: 640px;
   margin-left: auto;
 }
