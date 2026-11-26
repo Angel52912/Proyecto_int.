@@ -143,7 +143,7 @@
   border-radius: 12px;
   background: rgb(255 255 255 / 10%);
   color: var(--color-hueso);
-  font-size: 11px;
+  font-size: 12px;
   text-decoration: none;
   transition: background-color var(--transicion), color var(--transicion), transform var(--transicion), box-shadow var(--transicion);
 }
@@ -245,6 +245,40 @@ html[data-vista="pc"] .nav-inferior__enlace {
   animation-delay: 40ms;
 }
 
+/* Pantallas de detalle (las que tienen Volver): al avanzar entran desde la derecha y al regresar
+   desde la izquierda. Las pestañas de la navegación conservan el fundido hacia arriba. */
+@keyframes entrada-adelante {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes entrada-atras {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html[data-navegacion="adelante"] .pantalla:has(.barra__volver) > .pantalla__cuerpo {
+  animation-name: entrada-adelante;
+}
+
+html[data-navegacion="atras"] .pantalla > .pantalla__cuerpo {
+  animation-name: entrada-atras;
+}
+
 /* Con "reducir movimiento" no hay desplazamiento: solo un fundido corto. */
 @keyframes entrada-pantalla-suave {
   from {
@@ -260,6 +294,11 @@ html[data-vista="pc"] .nav-inferior__enlace {
   .pantalla > .barra,
   .pantalla__cuerpo {
     animation: entrada-pantalla-suave 180ms ease-out both;
+  }
+
+  /* Gana también a las entradas por dirección (selectores más específicos). */
+  html[data-navegacion] .pantalla > .pantalla__cuerpo {
+    animation-name: entrada-pantalla-suave !important;
   }
 }
 

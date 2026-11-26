@@ -12,6 +12,7 @@ import { datosAcceso, limpiarDatosAcceso } from "../flujo.js";
 import { olvidarPerfil } from "../guardia.js";
 import { api } from "../index.js";
 import { crearPasosRegistro } from "./bienvenida.js";
+import { validarEnVivo } from "../../../ui/validacion.js";
 
 /**
  * @param {{ rol: string | null, nombre: string, edad: string, direccion: string }} valores
@@ -70,6 +71,9 @@ function pintar({ perfil, privados, urlFoto }, regreso) {
   edad.value = privados?.age ? String(privados.age) : "";
   const direccion = /** @type {HTMLInputElement} */ (crear("input", { attrs: { type: "text", autocomplete: "street-address", maxlength: 300, placeholder: "C. 60 #491, Centro, Mérida" } }));
   direccion.value = privados?.address ?? "";
+  validarEnVivo({ nombre, edad: esCliente ? edad : null, direccion: esCliente ? direccion : null }, () =>
+    validarDatosPerfil({ rol: perfil.role, nombre: nombre.value, edad: edad.value, direccion: direccion.value }).errores,
+  );
 
   // Foto de perfil: vista previa local hasta guardar.
   /** @type {File | null} */

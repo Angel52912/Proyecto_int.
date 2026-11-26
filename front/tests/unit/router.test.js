@@ -109,4 +109,17 @@ describe("crearRouter", () => {
     expect(h1?.getAttribute("tabindex")).toBe("-1");
     expect(document.documentElement.scrollTop).toBe(0);
   });
+  test("marca si se avanza o se regresa a la pantalla anterior", async () => {
+    const contenedor = /** @type {HTMLElement} */ (document.getElementById("app"));
+    const vista = () => document.createElement("div");
+    window.location.hash = "#/lista";
+    const router = crearRouter({ rutas: [{ path: "/lista", render: vista }, { path: "/detalle", render: vista }], contenedor, obtenerSesion: async () => null });
+    await router.iniciar();
+    window.location.hash = "#/detalle";
+    await new Promise((r) => setTimeout(r, 20));
+    expect(document.documentElement.dataset.navegacion).toBe("adelante");
+    window.location.hash = "#/lista";
+    await new Promise((r) => setTimeout(r, 20));
+    expect(document.documentElement.dataset.navegacion).toBe("atras");
+  });
 });

@@ -8,6 +8,7 @@ import { mensajeDeError } from "../../../ui/mensajes.js";
 import { datosAcceso, guardarDatosAcceso } from "../flujo.js";
 import { crearPasosRegistro } from "./bienvenida.js";
 import { api } from "../index.js";
+import { validarEnVivo } from "../../../ui/validacion.js";
 
 /** @typedef {"crear" | "entrar"} ModoAcceso */
 
@@ -118,6 +119,11 @@ export function renderCorreo(modo) {
           ]),
         ]),
       ],
+    );
+
+    validarEnVivo(
+      { nombre: crearCuenta ? nombre : null, correo },
+      () => validarFormularioAcceso({ modo, nombre: nombre.value, correo: correo.value, acepta: true }).errores,
     );
 
     return crearPantalla({ titulo: crearCuenta ? "Crear cuenta" : "Iniciar sesión", volver: "/acceso", clase: "acceso" }, [formulario]);

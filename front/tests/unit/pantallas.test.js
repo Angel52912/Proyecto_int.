@@ -17,7 +17,7 @@ import { lineaDeTiempo } from "../../js/features/orders/pages/seguimiento.js";
 import { columnasDelTablero, textoEntrega } from "../../js/features/orders/pages/tablero.js";
 import { mensajeResultadoPin } from "../../js/features/orders/pages/verificar-entrega.js";
 import { distribucionDeResenas, textoATiempo } from "../../js/features/workshop/pages/mi-taller.js";
-import { horarioDeFilas, opcionesHora, sugerirApertura, sugerirCierre } from "../../js/features/workshop/pages/taller.js";
+import { erroresDeTaller, horarioDeFilas, opcionesHora, sugerirApertura, sugerirCierre } from "../../js/features/workshop/pages/taller.js";
 
 describe("búsqueda de talleres (CU-02)", () => {
   const ubicacion = { lat: 20.97, lng: -89.62 };
@@ -264,5 +264,13 @@ describe("artesano", () => {
     ];
     expect(filtrarConversaciones(lista, "maña").map((c) => c.id)).toEqual(["2"]);
     expect(filtrarConversaciones(lista, "")).toHaveLength(2);
+  });
+});
+
+describe("erroresDeTaller (validación mientras se escribe)", () => {
+  test("vacío no es error; C.P. de 5 dígitos y precio mayor a 0", () => {
+    expect(erroresDeTaller({ cp: "", precio: "" })).toEqual({});
+    expect(erroresDeTaller({ cp: "97000", precio: "120" })).toEqual({});
+    expect(erroresDeTaller({ cp: "970", precio: "0" })).toEqual({ cp: "El código postal debe tener 5 dígitos.", precio: "Escribe un precio mayor a 0." });
   });
 });

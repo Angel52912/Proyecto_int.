@@ -799,15 +799,57 @@ a.boton-texto {
   padding: var(--espacio-4) var(--espacio-3);
 }
 
+/* Ilustración de estado vacío, en el estilo de Bienvenida: círculo Hueso con aro en degradado
+   cuero → miel, el ícono en cuero y un destello miel que flota a un lado. */
 .estado-vacio__icono {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 72px;
-  height: 72px;
+  width: 88px;
+  height: 88px;
+  margin-bottom: var(--espacio-1);
+  border: 3px solid transparent;
   border-radius: 50%;
-  background: var(--color-cuero-suave);
+  background: linear-gradient(var(--color-hueso), var(--color-hueso)) padding-box, var(--degradado-marca) border-box;
+  box-shadow: 0 0 0 8px rgb(122 74 42 / 6%), var(--sombra-1);
   color: var(--color-cuero);
+}
+
+.estado-vacio__icono .icono {
+  width: 32px;
+  height: 32px;
+}
+
+.estado-vacio__icono::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: var(--color-miel);
+  /* Destello de 4 puntas (el mismo trazo del logo) recortado con clip-path. */
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+  animation: destello-flota 2.4s ease-in-out infinite;
+}
+
+@keyframes destello-flota {
+  50% {
+    transform: translateY(-4px) rotate(12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estado-vacio__icono::after {
+    animation: none;
+  }
+}
+
+.estado-vacio > p {
+  max-width: 32ch;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-base);
 }
 
 .estado-vacio p {

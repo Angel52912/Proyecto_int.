@@ -13,6 +13,7 @@ import { crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js"
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
 import { mostrarAvisoFlotante } from "../../../ui/aviso-flotante.js";
+import { validarEnVivo } from "../../../ui/validacion.js";
 
 const DIAS = /** @type {const} */ ([
   ["mon", "Lunes"],
@@ -76,6 +77,19 @@ export function sugerirCierre(apertura) {
   return minutos + 180 > 23 * 60 + 59 ? "23:59" : aHora(minutos + 180);
 }
 
+/**
+ * Errores de formato que se avisan mientras se escribe (los obligatorios los revisa Publicar).
+ * @param {{ cp: string, precio: string }} valores
+ * @returns {Record<string, string>}
+ */
+export function erroresDeTaller({ cp, precio }) {
+  /** @type {Record<string, string>} */
+  const errores = {};
+  if (cp.trim() !== "" && !/^\d{5}$/.test(cp.trim())) errores.cp = "El código postal debe tener 5 dígitos.";
+  if (precio.trim() !== "" && !(Number(precio) > 0)) errores.precio = "Escribe un precio mayor a 0.";
+  return errores;
+}
+
 /** Etiqueta de cada campo que puede faltar al publicar (`missing` de publishMyWorkshop). */
 export const CAMPO_FALTANTE = Object.freeze({
   name: "Nombre del taller",
@@ -130,10 +144,12 @@ function pintarFormulario(tallerInicial) {
   /** @param {string} id @param {string} etiqueta @param {HTMLElement} control @param {string} [nombreIcono] */
   const campo = (id, etiqueta, control, nombreIcono) => {
     control.id = id;
+    control.setAttribute("aria-describedby", `${id}-error`);
     return crear("div", { clase: `campo${nombreIcono ? " campo--icono" : ""}`, attrs: { "data-campo": id } }, [
       crear("label", { texto: etiqueta, attrs: { for: id } }),
       nombreIcono ? icono(nombreIcono, { tam: 18 }) : null,
       control,
+      crear("p", { clase: "campo__error", attrs: { id: `${id}-error`, "aria-live": "polite" } }),
     ]);
   };
   const entrada = (/** @type {Record<string, any>} */ attrs) => /** @type {HTMLInputElement} */ (crear("input", { attrs }));
@@ -146,6 +162,7 @@ function pintarFormulario(tallerInicial) {
     crear("textarea", { attrs: { rows: 3, maxlength: 500, placeholder: "Ej. Talabartería familiar desde 1985: reparamos bolsas, cinturones, sillas de montar y calzado de piel." } })
   );
   const precio = entrada({ type: "number", min: "1", step: "10", inputmode: "decimal", placeholder: "120" });
+  validarEnVivo({ cp, precio }, () => erroresDeTaller({ cp: cp.value, precio: precio.value }));
   /** @type {{ lat: number, lng: number } | null} */
   let ubicacion = null;
   /** @type {Set<string>} */

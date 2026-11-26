@@ -16,6 +16,7 @@ import { api } from "../index.js";
 import { MAX_MONTO_MXN, fechaDeHoy } from "../../../../../apis/api-mixanab/quotes/validar.js";
 import { descripcionDelDetalle } from "./presupuesto.js";
 import { mostrarAvisoFlotante } from "../../../ui/aviso-flotante.js";
+import { validarEnVivo } from "../../../ui/validacion.js";
 
 /**
  * Valida el formulario antes de llamar a la api (la api vuelve a validar).
@@ -91,6 +92,7 @@ function pintar({ solicitud, vigente }) {
   const enviar = crearBoton(vigente ? "Rectificar presupuesto" : "Enviar presupuesto", { tipo: "submit", icono: "enviar" });
 
   const campos = { monto: crearCampo("monto", "Costo (MXN)", monto, "dinero"), fecha: crearCampo("fecha", "Entrega", fecha, "calendario"), detalle: crearCampo("detalle", "Detalle del trabajo", detalle) };
+  validarEnVivo({ monto, fecha, detalle }, () => validarFormularioPresupuesto({ monto: monto.value, fecha: fecha.value, detalle: detalle.value }).errores);
 
   const formulario = crear(
     "form",

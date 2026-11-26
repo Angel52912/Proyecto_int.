@@ -83,6 +83,25 @@ export function crearRouter({ rutas, contenedor, obtenerSesion }) {
 
   /** La primera pantalla no mueve el foco: el lector ya lee la página al abrirla. */
   let primeraVista = true;
+  /** Rutas visitadas, para saber si el cambio es hacia atrás (la animación entra por el otro lado). */
+  /** @type {string[]} */
+  const historial = [];
+
+  /**
+   * Marca en `<html data-navegacion>` si se avanza o se regresa (lo usa layout.css).
+   * @param {string} ruta
+   */
+  function marcarDireccion(ruta) {
+    let direccion = "adelante";
+    if (historial.length >= 2 && historial[historial.length - 2] === ruta) {
+      historial.pop();
+      direccion = "atras";
+    } else if (historial[historial.length - 1] !== ruta) {
+      historial.push(ruta);
+    }
+    if (historial.length > 50) historial.shift();
+    document.documentElement.dataset.navegacion = direccion;
+  }
 
   /**
    * Tras cambiar de pantalla: vuelve arriba y lleva el foco al título (h1) para que el lector
@@ -118,6 +137,7 @@ export function crearRouter({ rutas, contenedor, obtenerSesion }) {
         return;
       }
       const vista = await encontrada.ruta.render({ params: encontrada.params, consulta });
+      marcarDireccion(ruta);
       contenedor.replaceChildren(vista);
       prepararVista();
     } catch {
