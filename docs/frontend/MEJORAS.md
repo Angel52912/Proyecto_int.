@@ -27,7 +27,7 @@ con el commit que lo hizo; lo pendiente queda `[ ]`, en el orden en que se va a 
 - [x] ~~Reglas de escritorio sin duplicar: 47 reglas repetidas pasan a una sola con `html[data-escritorio]`~~ (`fcb8df7`)
 - [x] ~~Versión del caché calculada del contenido (`npm run cache:version`) y prueba que avisa si se olvida o falta un archivo en `INTERFAZ`~~ (`0005fda`)
 - [x] ~~Prueba de punta a punta por las pantallas (solicitud → chat → presupuesto → fases → entrega → calificación) con el router real; encontró y corrigió el aviso de "Fase actualizada" mal ubicado~~ (`33c5d46`)
-- [x] ~~Medición con Lighthouse y mejoras de carga: librerías con `defer` y `leaflet.css` solo al abrir un mapa~~ (este commit)
+- [x] ~~Medición con Lighthouse y mejoras de carga: librerías con `defer` y `leaflet.css` solo al abrir un mapa~~ (`7879f2d`)
 
 ## Pendiente (en orden)
 
