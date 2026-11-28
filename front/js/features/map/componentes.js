@@ -138,7 +138,8 @@ function elementoPin(taller, seleccionado) {
  * @param {any} mapa lo que devuelve crearMapaLeaflet
  * @param {{ lat: number, lng: number }} punto
  * @param {HTMLElement} elemento contenido del pin (`.pin` o el punto de tu ubicación)
- * @param {{ titulo?: string, alTocar?: () => void, centrado?: boolean }} [opciones]
+ * @param {{ titulo?: string, alTocar?: () => void, centrado?: boolean, arrastrable?: boolean, alSoltar?: (punto: { lat: number, lng: number }) => void }} [opciones]
+ *   `arrastrable`: el pin se puede arrastrar; `alSoltar` recibe el punto donde quedó.
  * @returns {{ mover: (punto: { lat: number, lng: number }) => void, remove: () => void }}
  */
 export function ponerPin(mapa, punto, elemento, opciones = {}) {
@@ -149,8 +150,16 @@ export function ponerPin(mapa, punto, elemento, opciones = {}) {
     title: opciones.titulo ?? "",
     alt: opciones.titulo ?? "",
     keyboard: Boolean(opciones.alTocar),
+    draggable: Boolean(opciones.arrastrable),
+    autoPan: Boolean(opciones.arrastrable),
   });
   if (opciones.alTocar) marcador.on("click", () => opciones.alTocar?.());
+  if (opciones.alSoltar) {
+    marcador.on("dragend", () => {
+      const { lat, lng } = marcador.getLatLng();
+      opciones.alSoltar?.({ lat, lng });
+    });
+  }
   marcador.addTo(mapa);
   return {
     mover: (nuevo) => marcador.setLatLng([nuevo.lat, nuevo.lng]),

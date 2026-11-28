@@ -162,7 +162,7 @@ export function crearMapaGoogle(contenedor, opciones) {
  * @param {any} mapaGoogle lo que devuelve crearMapaGoogle
  * @param {Punto} punto
  * @param {HTMLElement} contenido
- * @param {{ titulo?: string, alTocar?: () => void, centrado?: boolean }} [opciones] `centrado`: el punto queda al centro del
+ * @param {{ titulo?: string, alTocar?: () => void, centrado?: boolean, arrastrable?: boolean, alSoltar?: (punto: Punto) => void }} [opciones] `centrado`: el punto queda al centro del
  *   contenido (punto de "tu ubicación"); si no, en la punta de abajo (pin).
  * @returns {{ mover: (punto: Punto) => void, remove: () => void }}
  */
@@ -175,8 +175,23 @@ export function crearPinGoogle(mapaGoogle, punto, contenido, opciones = {}) {
     const { AdvancedMarkerElement } = await /** @type {any} */ (window).google.maps.importLibrary("marker");
     if (quitado) return;
     if (opciones.centrado) contenido.style.transform = "translateY(50%)";
-    marcador = new AdvancedMarkerElement({ map: mapa, position: posicion, content: contenido, title: opciones.titulo ?? "", gmpClickable: Boolean(opciones.alTocar) });
+    marcador = new AdvancedMarkerElement({
+      map: mapa,
+      position: posicion,
+      content: contenido,
+      title: opciones.titulo ?? "",
+      gmpClickable: Boolean(opciones.alTocar),
+      gmpDraggable: Boolean(opciones.arrastrable),
+    });
     if (opciones.alTocar) marcador.addListener("click", () => opciones.alTocar?.());
+    if (opciones.alSoltar) {
+      marcador.addListener("dragend", () => {
+        const p = marcador.position;
+        const punto = typeof p?.lat === "function" ? { lat: p.lat(), lng: p.lng() } : { lat: p.lat, lng: p.lng };
+        posicion = punto;
+        opciones.alSoltar?.(punto);
+      });
+    }
   });
   return {
     mover(nuevo) {

@@ -225,11 +225,17 @@ function pintarFormulario(tallerInicial) {
     }
   });
 
-  // Mapa: al tocarlo se fija el punto y se completa la dirección; al escribir la dirección se mueve el punto.
-  const mapaContenedor = crear("div", { clase: "taller__mapa", attrs: { role: "application", "aria-label": "Toca el mapa para marcar la ubicación del taller" } });
+  // Mapa (OpenStreetMap): manda el pin que pone el artesano. OpenStreetMap no conoce bien los números de Mérida, así que
+  // al tocar el mapa o arrastrar el pin la dirección que ya escribió NO se reemplaza: solo se llenan los campos vacíos y lo
+  // distinto se ofrece como sugerencia. Con el pin ya fijo, escribir no lo mueve: hay un botón para eso (cambio de local).
+  const mapaContenedor = crear("div", { clase: "taller__mapa", attrs: { role: "application", "aria-label": "Toca el mapa o arrastra el pin para marcar la ubicación del taller" } });
   const textoUbicacion = crear("p", { clase: "texto-secundario", texto: "Toca el mapa para marcar tu taller o escribe la dirección." });
   const avisoUbicacion = crear("p", { clase: "campo__error", attrs: { role: "alert", "aria-live": "assertive" } });
   avisoUbicacion.hidden = true;
+  const sugerencia = crear("div", { clase: "taller__sugerencia", attrs: { "aria-live": "polite" } });
+  sugerencia.hidden = true;
+  const botonMover = crear("button", { clase: "boton-texto taller__mover-pin", texto: "Mover el pin a esta dirección", attrs: { type: "button" } });
+  botonMover.hidden = true;
   /** @type {any} */
   let mapaTaller = null;
   /** @type {any} */
@@ -237,6 +243,8 @@ function pintarFormulario(tallerInicial) {
   let versionCampos = 0;
   /** @type {ReturnType<typeof setTimeout> | null} */
   let temporizadorCampos = null;
+  // El pin lo puso el artesano (o venía guardado, ver "Valores iniciales"): escribir la dirección ya no lo mueve solo.
+  let fijadoAMano = false;
 
   const limpiarAviso = () => {
     avisoUbicacion.textContent = "";
@@ -247,11 +255,15 @@ function pintarFormulario(tallerInicial) {
     avisoUbicacion.textContent = mensaje;
     avisoUbicacion.hidden = false;
   };
+  const ocultarSugerencia = () => {
+    sugerencia.replaceChildren();
+    sugerencia.hidden = true;
+  };
   /** @param {string} motivo */
   const mensajeDeUbicacion = (motivo) =>
     ({
-      no_encontrado: "No encontramos esa dirección en el mapa. Revisa la calle, el número, la colonia y el C.P.",
-      incompleto: "Para ubicar el taller escribe la calle y el número, además de la colonia o el C.P.",
+      no_encontrado: "No encontramos esa dirección en el mapa. Toca el mapa o arrastra el pin hasta tu local.",
+      incompleto: "Para buscarla en el mapa escribe la calle y el número, además de la colonia o el C.P.",
       error: "No se pudo consultar la dirección. Revisa tu conexión e inténtalo de nuevo.",
     })[motivo] ?? "No se pudo consultar la dirección. Inténtalo de nuevo.";
 
@@ -260,54 +272,135 @@ function pintarFormulario(tallerInicial) {
     ubicacion = { lat: Number(punto.lat.toFixed(6)), lng: Number(punto.lng.toFixed(6)) };
     if (!mapaTaller) return;
     if (marcador) marcador.mover(ubicacion);
-    else marcador = ponerPin(mapaTaller, ubicacion, crear("span", { clase: "pin" }, [icono("reparacion", { tam: 16 })]), { titulo: "Tu taller" });
+    else {
+      marcador = ponerPin(mapaTaller, ubicacion, crear("span", { clase: "pin" }, [icono("reparacion", { tam: 16 })]), {
+        titulo: "Tu taller. Arrástralo hasta tu local.",
+        arrastrable: true,
+        alSoltar: (/** @type {{ lat: number, lng: number }} */ p) => fijarAMano(p),
+      });
+    }
     mapaTaller.setView([ubicacion.lat, ubicacion.lng], Math.max(mapaTaller.getZoom(), 16));
+  };
+
+  /** Quita espacios, acentos y "#" para comparar lo escrito con lo que sugiere el mapa. @param {string} t */
+  const normal = (t) =>
+    t
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[#.,]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+
+  /**
+   * Lo que el mapa sugiere y no coincide con lo escrito: se muestra con un botón para usarlo (no se aplica solo).
+   * @param {Array<[HTMLInputElement, string]>} distintos
+   */
+  const mostrarSugerencia = (distintos) => {
+    const usar = crear("button", {
+      clase: "boton-texto",
+      texto: "Usar esta dirección",
+      attrs: { type: "button" },
+      on: {
+        click: () => {
+          for (const [campo, valor] of distintos) campo.value = valor;
+          ocultarSugerencia();
+          textoUbicacion.textContent = "Usamos la dirección del mapa. Revísala antes de guardar.";
+        },
+      },
+    });
+    sugerencia.replaceChildren(crear("p", { texto: `El mapa sugiere: ${distintos.map(([, valor]) => valor).join(", ")}.` }), usar);
+    sugerencia.hidden = false;
   };
 
   /** @param {{ lat: number, lng: number }} punto */
   const completarCampos = async (punto) => {
     const version = versionCampos;
     limpiarAviso();
-    textoUbicacion.textContent = "Ubicación marcada. Buscando dirección…";
+    ocultarSugerencia();
+    textoUbicacion.textContent = "Ubicación marcada. Buscando la dirección…";
     const { direccion: datos, motivo } = await reverseGeocodeDetallado(punto);
     // Descarta la respuesta si el artesano movió el pin o editó los campos mientras llegaba.
     if (versionCampos !== version || !ubicacion || ubicacion.lat !== punto.lat || ubicacion.lng !== punto.lng) return;
-    if (datos) {
-      direccion.value = datos.direccion;
-      colonia.value = datos.colonia;
-      cp.value = datos.codigoPostal;
-      textoUbicacion.textContent = "Ubicación marcada. Dirección, colonia y C.P. completados. Puedes mover el punto.";
+    if (!datos) {
+      textoUbicacion.textContent = "Ubicación marcada. Escribe la dirección como la conocen tus clientes.";
+      if (motivo === "error") mostrarAviso(mensajeDeUbicacion(motivo));
       return;
     }
-    textoUbicacion.textContent = "Ubicación marcada, pero no se pudo completar la dirección.";
+    let llenados = 0;
+    /** @type {Array<[HTMLInputElement, string]>} */
+    const distintos = [];
+    for (const [campo, valor] of /** @type {Array<[HTMLInputElement, string]>} */ ([
+      [direccion, datos.direccion],
+      [colonia, datos.colonia],
+      [cp, datos.codigoPostal],
+    ])) {
+      if (!valor) continue;
+      if (campo.value.trim() === "") {
+        campo.value = valor;
+        llenados += 1;
+      } else if (normal(campo.value) !== normal(valor)) {
+        distintos.push([campo, valor]);
+      }
+    }
+    textoUbicacion.textContent =
+      distintos.length > 0
+        ? "Ubicación marcada. Conservamos la dirección que escribiste."
+        : llenados > 0
+          ? "Ubicación marcada. Completamos los campos vacíos con lo que dice el mapa: revísalos."
+          : "Ubicación marcada. Puedes arrastrar el pin si hace falta.";
+    if (distintos.length > 0) mostrarSugerencia(distintos);
+  };
+
+  /** El artesano tocó el mapa o soltó el pin: ese punto manda. @param {{ lat: number, lng: number }} punto */
+  const fijarAMano = (punto) => {
+    fijadoAMano = true;
+    botonMover.hidden = true;
+    colocar(punto);
+    completarCampos(/** @type {{ lat: number, lng: number }} */ (ubicacion));
+  };
+
+  /** Busca en el mapa la dirección escrita y mueve el pin ahí. */
+  const buscarEnMapa = async () => {
+    const version = versionCampos;
+    textoUbicacion.textContent = "Buscando la dirección en el mapa…";
+    const { punto, motivo, categoria } = await geocodificarDireccion({ direccion: direccion.value, colonia: colonia.value, codigoPostal: cp.value });
+    if (version !== versionCampos) return;
+    if (punto) {
+      colocar(punto);
+      botonMover.hidden = true;
+      textoUbicacion.textContent = ["house", "building"].includes(categoria)
+        ? "Ubicamos la dirección. Revisa que el pin esté en tu local; puedes arrastrarlo."
+        : "Ubicamos la calle, no el número exacto. Arrastra el pin hasta tu local.";
+      return;
+    }
+    textoUbicacion.textContent = "El pin no se movió.";
     mostrarAviso(mensajeDeUbicacion(motivo));
   };
 
-  const moverDesdeCampos = () => {
+  const alEscribirDireccion = () => {
     versionCampos += 1;
     if (temporizadorCampos) clearTimeout(temporizadorCampos);
     limpiarAviso();
+    ocultarSugerencia();
     if (![direccion.value, colonia.value, cp.value].some((valor) => valor.trim())) {
+      botonMover.hidden = true;
       textoUbicacion.textContent = "Toca el mapa para marcar tu taller o escribe la dirección.";
       return;
     }
-    textoUbicacion.textContent = "Buscando la dirección en el mapa…";
-    temporizadorCampos = setTimeout(async () => {
-      const version = versionCampos;
-      const { punto, motivo, categoria } = await geocodificarDireccion({ direccion: direccion.value, colonia: colonia.value, codigoPostal: cp.value });
-      if (version !== versionCampos) return;
-      if (punto) {
-        colocar(punto);
-        textoUbicacion.textContent = ["house", "building"].includes(categoria)
-          ? "Ubicación actualizada desde la dirección. Puedes mover el punto en el mapa."
-          : "Ubicamos la calle. Ajusta el punto en el mapa si hace falta.";
-        return;
-      }
-      textoUbicacion.textContent = "No se pudo actualizar el punto desde la dirección.";
-      mostrarAviso(mensajeDeUbicacion(motivo));
-    }, 600);
+    if (fijadoAMano && ubicacion) {
+      // El pin ya está donde lo puso el artesano: escribir no lo mueve (solo si cambió de local, con el botón).
+      botonMover.hidden = false;
+      textoUbicacion.textContent = "Tu pin se queda donde lo pusiste.";
+      return;
+    }
+    temporizadorCampos = setTimeout(buscarEnMapa, 600);
   };
-  for (const campo of [direccion, colonia, cp]) campo.addEventListener("input", moverDesdeCampos);
+  for (const campo of [direccion, colonia, cp]) campo.addEventListener("input", alEscribirDireccion);
+  botonMover.addEventListener("click", () => {
+    fijadoAMano = false;
+    buscarEnMapa();
+  });
   alSalir(() => {
     if (temporizadorCampos) clearTimeout(temporizadorCampos);
   });
@@ -321,10 +414,7 @@ function pintarFormulario(tallerInicial) {
     }
     alSalir(() => mapaTaller && quitarMapa(mapaTaller));
     if (ubicacion) colocar(ubicacion);
-    mapaTaller.on("click", (/** @type {any} */ e) => {
-      colocar(e.latlng);
-      completarCampos(ubicacion);
-    });
+    mapaTaller.on("click", (/** @type {any} */ e) => fijarAMano(e.latlng));
   }, 0);
 
   // Servicios: tarjetas de color como las categorías de la pantalla principal (Reparación cuero, Limpieza cenote).
@@ -495,6 +585,8 @@ function pintarFormulario(tallerInicial) {
     precio.value = taller.price_from === null ? "" : String(taller.price_from);
     descripcion.value = taller.description ?? "";
     ubicacion = taller.lat === null ? null : { lat: taller.lat, lng: taller.lng };
+    // La ubicación guardada ya la había puesto el artesano: escribir la dirección no la mueve.
+    fijadoAMano = ubicacion !== null;
     for (const s of taller.services ?? []) servicios.add(s);
     chipsServicios.querySelectorAll("[data-servicio]").forEach((chip) => chip.setAttribute("aria-pressed", String(servicios.has(chip.getAttribute("data-servicio") ?? ""))));
     for (const [dia] of DIAS) {
@@ -610,7 +702,7 @@ function pintarFormulario(tallerInicial) {
     crear("div", { clase: "campo" }, [crear("span", { clase: "campo__etiqueta", texto: "Fotos del taller" }), entradaFoto, fotos, avisoFotos]),
     campo("direccion", "Dirección", direccion, "mapa"),
     crear("div", { clase: "filtros__fila" }, [campo("colonia", "Colonia", colonia), campo("cp", "C.P.", cp)]),
-    crear("div", { clase: "campo", attrs: { "data-campo": "ubicacion" } }, [crear("span", { clase: "campo__etiqueta", texto: "Ubicación en el mapa" }), mapaContenedor, textoUbicacion, avisoUbicacion]),
+    crear("div", { clase: "campo", attrs: { "data-campo": "ubicacion" } }, [crear("span", { clase: "campo__etiqueta", texto: "Ubicación en el mapa" }), mapaContenedor, textoUbicacion, botonMover, sugerencia, avisoUbicacion]),
     crear("div", { clase: "campo", attrs: { "data-campo": "servicios" } }, [crear("span", { clase: "campo__etiqueta", texto: "Servicios" }), chipsServicios]),
     crear("section", { clase: "campo taller__horario", attrs: { "data-campo": "horario" } }, [
       crear("span", { clase: "campo__etiqueta", texto: "Horario" }),

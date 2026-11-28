@@ -1278,3 +1278,38 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
   background: var(--color-cenote);
   box-shadow: 0 0 0 4px rgb(31 58 95 / 20%);
 }
+
+/* Mi taller: lo que sugiere el mapa se ofrece, no se aplica solo. */
+.taller__sugerencia {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-1) var(--espacio-2);
+  margin-top: var(--espacio-2);
+  padding: 10px 12px;
+  border-radius: var(--radio);
+  background: var(--color-info-suave);
+  color: var(--color-cenote);
+  font-size: 13px;
+}
+
+.taller__sugerencia[hidden] {
+  display: none;
+}
+
+.taller__sugerencia p {
+  margin: 0;
+}
+
+.taller__sugerencia .boton-texto {
+  padding: 4px 0;
+}
+
+.taller__mover-pin {
+  align-self: flex-start;
+  padding-left: 0;
+}
+
+.taller__mover-pin[hidden] {
+  display: none;
+}
