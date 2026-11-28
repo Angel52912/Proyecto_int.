@@ -6,7 +6,7 @@ import { crearCargando, crearError, crearVacio } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
-import { NOMBRE_SERVICIO, buscarTalleres, crearMapaLeaflet, crearTarjetaTaller, obtenerUbicacion, pintarPines } from "../componentes.js";
+import { NOMBRE_SERVICIO, buscarTalleres, crearMapaLeaflet, crearTarjetaTaller, obtenerUbicacion, pintarPines, quitarMapa } from "../componentes.js";
 
 /**
  * Convierte el texto del buscador "Buscar taller o colonia" en filtro: 5 dígitos = C.P. (A1); lo demás busca en el
@@ -202,7 +202,7 @@ export async function renderMapa({ consulta }) {
   setTimeout(async () => {
     mapa = crearMapaLeaflet(mapaContenedor);
     if (mapa === null) mapaContenedor.replaceChildren(crear("p", { clase: "estado-error", texto: "No se pudo cargar el mapa. Usa la lista de talleres." }));
-    else alSalir(() => mapa.remove());
+    else alSalir(() => quitarMapa(mapa));
     estado.ubicacion = await obtenerUbicacion();
     buscar();
   }, 0);

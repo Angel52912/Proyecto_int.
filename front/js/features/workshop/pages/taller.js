@@ -1,6 +1,6 @@
 // 17 · Datos del taller (Artesano, CU-07): nombre, fotos, dirección, ubicación en el mapa, servicios, horario,
 // precio "desde", Guardar y Publicar taller. A1: resalta los campos obligatorios que faltan.
-import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet } from "../../map/componentes.js";
+import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet, quitarMapa } from "../../map/componentes.js";
 import { geocodificarDireccion, reverseGeocodeDetallado } from "../../../lib/geocodificar.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
@@ -319,7 +319,7 @@ function pintarFormulario(tallerInicial) {
       mostrarAviso("No se pudo cargar el mapa. Revisa tu conexión e inténtalo de nuevo.");
       return;
     }
-    alSalir(() => mapaTaller?.remove());
+    alSalir(() => mapaTaller && quitarMapa(mapaTaller));
     if (ubicacion) colocar(ubicacion);
     mapaTaller.on("click", (/** @type {any} */ e) => {
       colocar(e.latlng);

@@ -170,6 +170,21 @@ export function crearMapaLeaflet(contenedor, opciones = {}) {
   return mapa;
 }
 
+/**
+ * Quita un mapa al salir de la pantalla. Si la persona se va a media animación de zoom, Leaflet la terminaría después
+ * sobre un mapa ya quitado (error "_leaflet_pos" en la consola): se termina antes de quitarlo.
+ * @param {any} mapa L.Map
+ */
+export function quitarMapa(mapa) {
+  try {
+    if (mapa._animatingZoom) mapa._onZoomTransitionEnd();
+    mapa.stop();
+    mapa.remove();
+  } catch {
+    // El mapa ya no estaba en la pantalla.
+  }
+}
+
 /** @type {Promise<void> | null} */
 let estilosLeaflet = null;
 
@@ -214,7 +229,7 @@ export function pintarPines(mapa, talleres, opciones = {}) {
     puntos.push([taller.lat, taller.lng]);
   }
   if (opciones.ubicacion) {
-    L.circleMarker([opciones.ubicacion.lat, opciones.ubicacion.lng], { radius: 8, color: "#fff", weight: 3, fillColor: "#1f7a7a", fillOpacity: 1 }).addTo(capa);
+    L.circleMarker([opciones.ubicacion.lat, opciones.ubicacion.lng], { radius: 8, color: "#fff", weight: 3, fillColor: "#1f3a5f", fillOpacity: 1 }).addTo(capa);
     puntos.push([opciones.ubicacion.lat, opciones.ubicacion.lng]);
   }
   const margen = opciones.margen ?? { arriba: 0, abajo: 0 };
