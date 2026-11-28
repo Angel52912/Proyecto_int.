@@ -90,3 +90,164 @@ html[data-escritorio] .talleres .lista {
 html[data-escritorio] .talleres .filtros {
   max-width: 640px;
 }
+
+/* ── Panel de filtros flotante ──
+   El panel y el fondo están fuera del flujo: abrirlos no desplaza ni redimensiona la lista. */
+
+.talleres__filtro-ancla {
+  position: relative;
+  display: flex;
+}
+
+.pantalla.talleres > .barra {
+  /* La animación de entrada mantiene un transform activo (aunque sea identidad) y eso convierte a
+     la barra en bloque contenedor: el panel fixed se mediría contra ella y la hoja móvil saldría arriba. */
+  animation: none;
+  /* Sin franja sólida: la barra es transparente. Como es sticky, se funde con el fondo de la página
+     (no hay token --bg; el fondo es --color-hueso) para que el contenido que pasa por debajo no corte. */
+  background: transparent;
+  background: linear-gradient(
+    to bottom,
+    var(--color-hueso) 0%,
+    color-mix(in srgb, var(--color-hueso) 65%, transparent) 60%,
+    transparent 100%
+  );
+  border-bottom: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.pantalla.talleres--filtros-abiertos > .barra {
+  z-index: 60;
+}
+
+.talleres .boton-circular[aria-expanded="true"] {
+  border-color: var(--color-cuero);
+  background: var(--color-cuero);
+  color: var(--color-superficie);
+}
+
+.talleres .boton-circular[aria-expanded="true"] .punto-aviso {
+  border-color: var(--color-cuero);
+}
+
+.talleres__fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(0 0 0 / 20%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 150ms ease-out,
+    visibility 0s linear 150ms;
+}
+
+.talleres--filtros-abiertos .talleres__fondo {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 200ms ease-out;
+}
+
+/* Móvil: hoja inferior que sube desde abajo. */
+.talleres__filtros {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  width: auto;
+  max-width: none;
+  max-height: 85dvh;
+  overflow-y: auto;
+  gap: var(--espacio-2);
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 28px rgb(24 24 27 / 18%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(100%);
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out,
+    visibility 0s linear 150ms;
+}
+
+.talleres--filtros-abiertos .talleres__filtros {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out;
+}
+
+.talleres__filtros-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.talleres__filtros-titulo {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-size: var(--texto-subtitulo);
+  font-weight: 600;
+}
+
+.talleres__filtros-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+/* Escritorio: popover anclado al embudo, con el pico apuntando al botón. */
+html[data-escritorio] .pantalla.talleres .talleres__filtros {
+  position: absolute;
+  left: auto;
+  top: calc(100% + 8px);
+  bottom: auto;
+  right: 0;
+  width: 380px;
+  max-height: calc(100dvh - 88px);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-2);
+  transform-origin: top right;
+  transform: scale(0.85) translateY(-8px);
+}
+
+html[data-escritorio] .pantalla.talleres--filtros-abiertos .talleres__filtros {
+  transform: scale(1) translateY(0);
+}
+
+/* El pico va en el ancla, no en el panel: el `overflow-y: auto` del panel lo recortaría
+   y quedaría un hueco entre el embudo y el borde superior del popover. */
+html[data-escritorio] .pantalla.talleres--filtros-abiertos .talleres__filtro-ancla::before {
+  content: "";
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 16px;
+  width: 12px;
+  height: 12px;
+  background: var(--color-superficie);
+  border-top: 1px solid var(--color-borde);
+  border-left: 1px solid var(--color-borde);
+  transform: rotate(45deg);
+}
+
+/* Quien prefiera menos movimiento solo ve un fundido: sin escala ni desplazamiento. */
+@media (prefers-reduced-motion: reduce) {
+  .talleres__filtros,
+  .talleres--filtros-abiertos .talleres__filtros,
+  html[data-escritorio] .pantalla.talleres .talleres__filtros,
+  html[data-escritorio] .pantalla.talleres--filtros-abiertos .talleres__filtros {
+    transform: none !important;
+  }
+}

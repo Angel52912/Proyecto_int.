@@ -1,20 +1,51 @@
 /* Mi perfil (Cliente) */
+
+/* El cuerpo no añade relleno lateral: el contenedor interior es el que fija el ancho y el centro. */
+.perfil-cliente > .pantalla__cuerpo {
+  padding-inline: 0;
+}
+
+.perfil-cliente > .pantalla__cuerpo > .pantalla__titulo,
+.perfil-cliente__contenido {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+
 .perfil-cliente__contenido {
   display: flex;
   flex-direction: column;
   gap: var(--espacio-4);
 }
 
-/* Encabezado: avatar grande, nombre, rol y Editar. */
+/* Escritorio: el contenido se centra en el espacio que queda a la derecha de la barra lateral,
+   sin el margin-left del cuerpo de 760px que lo desplazaba. */
+html[data-escritorio] .pantalla.perfil-cliente > .pantalla__cuerpo {
+  max-width: none;
+  margin-inline: 0;
+}
+
+html[data-escritorio] .perfil-cliente > .pantalla__cuerpo > .pantalla__titulo,
+html[data-escritorio] .perfil-cliente__contenido {
+  padding-inline: 24px;
+}
+
+/* Encabezado: avatar grande, nombre, rol y Editar. Comparte ancho y borde con las dos listas. */
+.perfil-encabezado,
+.perfil-lista {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-1);
+}
+
 .perfil-encabezado {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--espacio-2);
   padding: var(--espacio-4) var(--espacio-3);
-  border-radius: 18px;
   background: var(--color-superficie);
-  box-shadow: var(--sombra-1);
   text-align: center;
 }
 
@@ -60,9 +91,7 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border-radius: var(--radio-tarjeta);
   background: var(--color-superficie);
-  box-shadow: var(--sombra-1);
   list-style: none;
 }
 

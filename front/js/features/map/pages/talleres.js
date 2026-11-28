@@ -1,4 +1,5 @@
 // 08 · Talleres por categoría (CU-02): orden por más cercanos, mejor valorados o precio, y filtros.
+import { alSalir } from "../../../ui/ciclo.js";
 import { crear } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
@@ -64,45 +65,99 @@ export async function renderTalleres({ consulta }) {
   const casillaAbierto = /** @type {HTMLInputElement} */ (crear("input", { attrs: { type: "checkbox", name: "open_now" } }));
   const avisoDistancia = crear("p", { clase: "texto-secundario", texto: "La distancia necesita tu ubicación." });
 
+  let abierto = false;
+  /** @type {{ overflow: string, padding: string } | null} */
+  let restaurarScroll = null;
+
+  function alTeclar(evento) {
+    if (evento.key === "Escape") cerrarFiltros();
+  }
+
+  function abrirFiltros() {
+    abierto = true;
+    pantalla.classList.add("talleres--filtros-abiertos");
+    botonFiltros.setAttribute("aria-expanded", "true");
+    panel.setAttribute("aria-hidden", "false");
+    document.addEventListener("keydown", alTeclar);
+    // Al ocultar la barra de desplazamiento se compensa su ancho para que la lista no se desplace.
+    const hueco = window.innerWidth - document.documentElement.clientWidth;
+    restaurarScroll = { overflow: document.body.style.overflow, padding: document.body.style.paddingRight };
+    document.body.style.overflow = "hidden";
+    if (hueco > 0) document.body.style.paddingRight = `${hueco}px`;
+    requestAnimationFrame(() => selectServicio.focus());
+  }
+
+  /** @param {boolean} [devolverFoco] */
+  function cerrarFiltros(devolverFoco = true) {
+    if (!abierto) return;
+    abierto = false;
+    pantalla.classList.remove("talleres--filtros-abiertos");
+    botonFiltros.setAttribute("aria-expanded", "false");
+    panel.setAttribute("aria-hidden", "true");
+    document.removeEventListener("keydown", alTeclar);
+    if (restaurarScroll) {
+      document.body.style.overflow = restaurarScroll.overflow;
+      document.body.style.paddingRight = restaurarScroll.padding;
+      restaurarScroll = null;
+    }
+    if (devolverFoco && pantalla.isConnected) botonFiltros.focus();
+  }
+
+  function limpiarFiltros() {
+    selectServicio.value = servicio;
+    entradaLugar.value = "";
+    selectCalificacion.value = "";
+    entradaPrecio.value = "";
+    selectDistancia.value = "";
+    casillaAbierto.checked = false;
+    cerrarFiltros();
+    return buscar();
+  }
+
   const panel = crear(
     "form",
     {
-      clase: "tarjeta filtros",
-      attrs: { hidden: true, "aria-label": "Filtros de búsqueda" },
+      clase: "tarjeta filtros talleres__filtros",
+      attrs: { id: "filtros-talleres", "aria-label": "Filtros de búsqueda", "aria-hidden": "true" },
       on: {
         submit: (evento) => {
           evento.preventDefault();
           buscar();
+          cerrarFiltros();
         },
       },
     },
     [
+      crear("div", { clase: "talleres__filtros-encabezado" }, [
+        crear("h2", { clase: "talleres__filtros-titulo", texto: "Filtros" }),
+        crear("button", { clase: "boton-circular talleres__cerrar", attrs: { type: "button", "aria-label": "Cerrar filtros" }, on: { click: () => cerrarFiltros() } }, [icono("cerrar")]),
+      ]),
       campo("Servicio", selectServicio),
       campo("Colonia o C.P.", entradaLugar),
       crear("div", { clase: "filtros__fila" }, [campo("Calificación", selectCalificacion), campo("Precio desde (máx.)", entradaPrecio)]),
       campo("Distancia", selectDistancia),
       avisoDistancia,
       crear("label", { clase: "casilla" }, [casillaAbierto, crear("span", { texto: "Solo abiertos ahora" })]),
-      crear("button", { clase: "boton boton--bloque", texto: "Aplicar filtros", attrs: { type: "submit" } }),
+      crear("div", { clase: "talleres__filtros-acciones" }, [
+        crear("button", { clase: "boton boton--secundario", texto: "Limpiar", attrs: { type: "button" }, on: { click: limpiarFiltros } }),
+        crear("button", { clase: "boton boton--bloque", texto: "Aplicar filtros", attrs: { type: "submit" } }),
+      ]),
     ],
   );
 
+  const fondo = crear("div", { clase: "talleres__fondo", attrs: { "aria-hidden": "true" }, on: { click: () => cerrarFiltros() } });
   const puntoFiltros = crear("span", { clase: "punto-aviso", attrs: { hidden: true, "aria-hidden": "true" } });
   const botonFiltros = crear(
     "button",
     {
       clase: "boton-circular",
-      attrs: { type: "button", "aria-label": "Filtros", "aria-expanded": "false" },
-      on: {
-        click: () => {
-          const abierto = panel.hidden;
-          panel.hidden = !abierto;
-          botonFiltros.setAttribute("aria-expanded", String(abierto));
-        },
-      },
+      attrs: { type: "button", "aria-label": "Filtros", "aria-expanded": "false", "aria-controls": "filtros-talleres" },
+      on: { click: () => (abierto ? cerrarFiltros() : abrirFiltros()) },
     },
     [icono("filtro"), puntoFiltros],
   );
+  // El panel va dentro del ancla para que en escritorio crezca desde el propio embudo.
+  const anclaFiltros = crear("div", { clase: "talleres__filtro-ancla" }, [botonFiltros, panel]);
 
   /** @type {HTMLButtonElement[]} */
   const chipsOrden = [];
@@ -167,15 +222,17 @@ export async function renderTalleres({ consulta }) {
   }
 
   const titulo = servicio === "all" ? (textoInicial ? `“${textoInicial}”` : "Talleres") : NOMBRE_SERVICIO[servicio];
-  const pantalla = crearPantalla({ rol: "client", activa: "mapa", titulo, volver: "/principal", accion: botonFiltros, clase: "talleres" }, [
+  const pantalla = crearPantalla({ rol: "client", activa: "mapa", titulo, volver: "/principal", accion: anclaFiltros, clase: "talleres" }, [
     crear("div", { clase: "chips", attrs: { role: "group", "aria-label": "Ordenar por" } }, [
       chipOrden("Más cercanos", "cercanos"),
       chipOrden("Mejor valorados", "valorados"),
       chipOrden("Precio", "precio"),
     ]),
-    panel,
     lista,
   ]);
+  // El fondo se cuelga de la pantalla, no del cuerpo (que conserva un transform de animación).
+  pantalla.append(fondo);
+  alSalir(() => cerrarFiltros(false));
 
   obtenerUbicacion().then((ubicacion) => {
     estado.ubicacion = ubicacion;
