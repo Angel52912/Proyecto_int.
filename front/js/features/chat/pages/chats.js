@@ -63,8 +63,7 @@ async function pintarChats(rol) {
   const textos = POR_ROL[rol];
   const entrada = /** @type {HTMLInputElement} */ (crear("input", { attrs: { type: "search", placeholder: "Buscar conversación", "aria-label": "Buscar conversación" } }));
   const lista = crear("div");
-  const pantalla = crearPantalla({ rol, activa: "chats", clase: "chats" }, [
-    crear("h1", { clase: "pantalla__titulo", texto: "Chats" }),
+  const pantalla = crearPantalla({ rol, activa: "chats", clase: "chats", titulo: "Chats", perfil: true }, [
     crear("div", { clase: "campo campo--icono buscador" }, [icono("buscar", { tam: 18 }), entrada]),
     lista,
   ]);

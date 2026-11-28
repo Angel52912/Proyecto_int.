@@ -1,4 +1,5 @@
-// 07 · Mapa de talleres (CU-02): búsqueda en Mérida, filtros (Todos, Reparación, Limpieza, Abierto) y tarjeta del taller.
+// 07 · Buscar taller (CU-02), nuevo front: mapa casi a pantalla completa con buscador y filtros flotando arriba y un
+// panel abajo con el taller elegido y el acceso a la lista completa.
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { crearCargando, crearError, crearVacio } from "../../../ui/estados.js";
@@ -89,7 +90,7 @@ export async function renderMapa({ consulta }) {
   };
   const chipAbierto = crear("button", {
     clase: "chip",
-    texto: "Abierto",
+    texto: "Abierto ahora",
     attrs: { type: "button", "aria-pressed": "false" },
     on: {
       click: () => {
@@ -133,7 +134,11 @@ export async function renderMapa({ consulta }) {
   function pintarTarjeta(taller) {
     estado.seleccionado = taller.id;
     tarjeta.replaceChildren(
-      crear("p", { clase: "mapa__conteo", texto: resultados.length === 1 ? "1 taller" : `${resultados.length} talleres · toca un pin para ver otro` }),
+      crear("span", { clase: "mapa__asa", attrs: { "aria-hidden": "true" } }),
+      crear("div", { clase: "mapa__encabezado-panel" }, [
+        crear("p", { clase: "mapa__conteo", texto: resultados.length === 1 ? "1 taller cerca de ti" : `${resultados.length} talleres cerca de ti` }),
+        enlace(`/talleres?servicio=${estado.servicio}`, { clase: "boton-texto", texto: "Ver lista" }),
+      ]),
       crearTarjetaTaller(taller),
     );
   }

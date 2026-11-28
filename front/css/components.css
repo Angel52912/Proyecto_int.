@@ -1160,17 +1160,6 @@ html[data-escritorio] .avisos-flotantes {
   box-shadow: var(--anillo-foco);
 }
 
-/* Mapas en modo oscuro: los mosaicos de OpenStreetMap son claros; se atenúan para no deslumbrar. */
-html[data-tema="oscuro"] .leaflet-tile-pane {
-  filter: brightness(0.75) contrast(1.1) saturate(0.85);
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-tema="claro"]) .leaflet-tile-pane {
-    filter: brightness(0.75) contrast(1.1) saturate(0.85);
-  }
-}
-
 /* Aviso flotante que se puede tocar (novedad de un pedido): lleva al pedido. */
 .aviso-flotante__texto {
   display: flex;

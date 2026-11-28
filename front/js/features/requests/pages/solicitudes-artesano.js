@@ -47,8 +47,7 @@ export async function renderSolicitudesArtesano() {
   const lista = crear("div", { clase: "seccion" });
   const campana = crearCampana("craftsman");
 
-  const pantalla = crearPantalla({ rol: "craftsman", activa: "solicitudes", clase: "solicitudes-artesano" }, [
-    crear("div", { clase: "fila-entre" }, [crear("h1", { clase: "pantalla__titulo", texto: "Solicitudes" }), campana]),
+  const pantalla = crearPantalla({ rol: "craftsman", activa: "solicitudes", clase: "solicitudes-artesano", titulo: "Solicitudes", accion: campana, perfil: true }, [
     resumen,
     lista,
   ]);

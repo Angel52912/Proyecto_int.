@@ -426,16 +426,6 @@ html[data-escritorio] .nav-inferior ul {
   grid-template-columns: 1fr;
 }
 
-/* Modo oscuro: la barra lleva un borde claro arriba (o a la derecha en escritorio) para separarse del fondo. */
-html[data-tema="oscuro"] .nav-inferior {
-  border-top: 1px solid rgb(255 255 255 / 8%);
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-tema="claro"]) .nav-inferior {
-    border-top: 1px solid rgb(255 255 255 / 8%);
-  }
-}
 
 
 /* Contador de avisos sin leer en una pestaña (insignias.js): círculo rojo arriba a la derecha. */

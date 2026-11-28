@@ -153,7 +153,7 @@ function pintarPedidos(elementos) {
 /** @returns {Promise<Node>} */
 export async function renderPedidos() {
   const contenido = crear("div", { clase: "pedidos__contenido" });
-  const pantalla = crearPantalla({ rol: "client", activa: "pedidos", clase: "pedidos" }, [crear("h1", { clase: "pedidos__titulo", texto: "Mis pedidos" }), contenido]);
+  const pantalla = crearPantalla({ rol: "client", activa: "pedidos", clase: "pedidos", titulo: "Mis pedidos", perfil: true }, [contenido]);
   cargarEn(contenido, async () => {
     const [pedidos, solicitudes, pendientes] = await Promise.all([api.listMyOrders(), apiSolicitudes.listMyRequests(), api.listPendingReviews()]);
     const idsTaller = [...new Set([...pedidos.map((p) => p.workshop_id), ...solicitudes.map((s) => s.workshop_id)])];

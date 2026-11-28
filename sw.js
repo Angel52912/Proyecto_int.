@@ -1,6 +1,6 @@
 // Service worker: solo cachea la interfaz (HTML, CSS, JS, íconos).
 // Nunca cachea Supabase, tiles del mapa ni fotos. Ignora todo lo que no sea GET del mismo origen.
-const CACHE_VERSION = "mixanab-ui-573600c4d8";
+const CACHE_VERSION = "mixanab-ui-1f2c50b66b";
 
 // Toda la interfaz: los módulos ES se cargan por import, así que cada archivo debe estar aquí para funcionar sin red.
 const INTERFAZ = [
@@ -26,6 +26,8 @@ const INTERFAZ = [
   "./front/css/portada.css",
   "./front/css/perfil-taller.css",
   "./front/css/perfil-cliente.css",
+  "./front/css/historial.css",
+  "./front/css/nuevo-front.css",
   "./front/css/presupuesto.css",
   "./front/css/recoger.css",
   "./front/css/seguimiento.css",

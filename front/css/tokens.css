@@ -27,25 +27,28 @@
   font-display: swap;
 }
 
+/* Paleta C "Mérida moderna" (docs/diseno.md): neutros fríos, un solo acento naranja y azul marino de apoyo.
+   Los nombres de los tokens se conservan para no tocar cada hoja: --color-cuero es el acento,
+   --color-cenote el apoyo, --color-hueso el fondo y --color-espresso el texto. */
 :root {
-  --color-cuero: #9c4a1f; /* Acento único: botones, pestaña activa, enlaces (6.2:1 con blanco) */
-  --color-cenote: #0e6e66; /* Secundario: información, mapa */
-  --color-miel: #d99a2b; /* Solo estrellas y detalles pequeños */
-  --color-espresso: #1f1b16; /* Texto principal (15.8:1 sobre el fondo) */
-  --color-hueso: #f7f6f3; /* Fondo de las pantallas */
-  --color-arena: #efede8; /* Superficie alterna: filtros, pestañas, mensajes recibidos */
+  --color-cuero: #c2410c; /* Acento: acción principal, pestaña activa, enlaces (5.2:1 con blanco) */
+  --color-cenote: #1f3a5f; /* Apoyo: avance del pedido, información, mensajes propios (11.5:1 con blanco) */
+  --color-miel: #d99a2b; /* Solo estrellas */
+  --color-espresso: #18181b; /* Texto (16.5:1 sobre el fondo) */
+  --color-hueso: #f7f7f8; /* Fondo de las pantallas */
+  --color-arena: #f1f1f3; /* Superficie alterna: filtros, pestañas, esqueletos */
 
-  /* Estados: Entregado / Abierto (verde), En proceso / Atención (ámbar), Urgente / Error (rojo). */
-  --color-exito: #17693b;
-  --color-aviso: #8c5007;
-  --color-error: #b42318;
-  --color-info: #0e6e66;
+  /* Estados: color fuerte (texto e ícono) y suave (fondo de etiquetas y avisos). */
+  --color-exito: #15803d;
+  --color-aviso: #a16207;
+  --color-error: #b91c1c;
+  --color-info: #1f3a5f;
 
-  --fuente-titulo: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fuente-titulo: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --fuente-texto: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --texto-titulo: 26px;
-  --texto-subtitulo: 20px;
+  --texto-titulo: 22px;
+  --texto-subtitulo: 18px;
   --texto-base: 15px;
   --texto-secundario: 13px;
 
@@ -56,144 +59,46 @@
   --radio: 12px;
   --tactil-min: 44px;
 
-  /* Usados en los mockups de cliente y artesano. */
-  --color-gris: #5e574f; /* ≥5.9:1 sobre fondo, superficies y acento suave */
-  --radio-tarjeta: 14px;
+  --color-gris: #52525b; /* 7.2:1 sobre el fondo */
+  --radio-tarjeta: 12px;
   --alto-nav: 60px;
 
-  /* Profundidad y movimiento (componentes compartidos). */
-  --sombra-1: 0 1px 2px rgb(31 27 22 / 5%), 0 1px 6px rgb(31 27 22 / 5%);
-  --sombra-2: 0 2px 4px rgb(31 27 22 / 6%), 0 8px 24px rgb(31 27 22 / 8%);
-  --color-cuero-suave: #f6e8df; /* Fondo de lo seleccionado y mensajes enviados */
-  --degradado-marca: linear-gradient(135deg, var(--color-cuero) 0%, #b8622f 100%);
+  /* Sin sombras en tarjetas (borde de 1px); la sombra 2 queda para lo que flota (paneles, avisos). */
+  --sombra-1: 0 1px 2px rgb(24 24 27 / 4%);
+  --sombra-2: 0 4px 16px rgb(24 24 27 / 10%);
+  --color-cuero-suave: #fff1ea; /* Selección, contador "Nuevas" (#9a3412 encima: 6.6:1) */
+  /* Plano (sin degradado): se conserva como imagen para las reglas que lo usan en background. */
+  --degradado-marca: linear-gradient(var(--color-cuero), var(--color-cuero));
   --transicion: 160ms ease;
 
-  /* ── Sistema base (rediseño UI): neutros cálidos, interacción y estados ──
-     Se conserva la paleta aprobada (docs/diseno.md); estos tokens ordenan superficies, bordes y estados. */
   --color-superficie: #fff;
-  --color-superficie-suave: #fbfaf8;
-  --color-borde: #e2ded6;
-  --color-borde-fuerte: #cfc9bf;
+  --color-superficie-suave: #fafafa;
+  --color-borde: #e4e4e7;
+  --color-borde-fuerte: #d4d4d8;
   --color-texto: var(--color-espresso);
-  --color-texto-suave: #5e574f; /* 6.6:1 sobre el fondo */
+  --color-texto-suave: #52525b; /* 7.2:1 sobre el fondo */
+  --color-texto-tenue: #71717a; /* 4.5:1 sobre el fondo: marcadores, pestañas inactivas, pendientes */
 
-  /* Interacción de la marca: hover más oscuro y fondo suave para lo activo. */
-  --color-cuero-oscuro: #7e3a16; /* Hover y presionado del acento (8.4:1 con blanco) */
-  --color-cenote-oscuro: #0a5650;
-  --anillo-foco: 0 0 0 3px rgb(156 74 31 / 35%);
+  --color-cuero-oscuro: #9a3412; /* Hover y presionado del acento (7.3:1 con blanco) */
+  --color-cenote-oscuro: #152a45;
+  --color-cenote-suave: #e8eef6; /* Avisos informativos y fase actual (#1f3a5f encima: 9.8:1) */
+  --anillo-foco: 0 0 0 3px rgb(194 65 12 / 30%);
 
-  /* Estados: texto oscuro legible (≥4.5:1 sobre blanco) y fondo suave para etiquetas y avisos. */
-  --color-exito-suave: #e6f2ea;
-  --color-aviso-suave: #fbf0df;
-  --color-error-suave: #fce8e6;
-  --color-info-suave: #e2f1ef;
+  --color-exito-suave: #e8f5ec;
+  --color-aviso-suave: #fef6dc;
+  --color-error-suave: #fdecec;
+  --color-info-suave: #e8eef6;
 
   --radio-chico: 8px;
-  --radio-grande: 18px;
+  --radio-grande: 16px;
 
-  /* Texto sobre un color de marca o de estado (botones, insignias). */
   --color-sobre-color: #fff;
-  /* Espresso fijo: texto sobre miel; no cambia en modo oscuro. */
-  --color-tinta: #1f1b16;
-  /* Fondo de los mapas mientras cargan. */
-  --color-mapa-fondo: #e3ece2;
-  /* Barra de navegación: casi negro, con la pestaña activa en el acento. */
-  --color-nav: #1f1b16;
+  --color-tinta: #18181b;
+  --color-mapa-fondo: #eceef1;
+  /* Barra de navegación blanca con borde arriba; la pestaña activa en el acento. */
+  --color-nav: #fff;
   color-scheme: light;
 }
 
-/* ── Modo oscuro ──
-   Los mismos tokens con valores oscuros: fondo espresso profundo, texto Hueso y la marca en tonos
-   más claros para leerse sobre fondo oscuro. Contrastes medidos (AA ≥4.5:1): texto 15.6:1, texto suave
-   9.5:1, cuero 8.1:1, cenote 8.6:1, éxito 8.4:1, error 7.5:1; texto oscuro sobre botones ≥7.5:1.
-   Se activa con el sistema (prefers-color-scheme) o a mano con <html data-tema="oscuro">. */
-html[data-tema="oscuro"] {
-  --color-hueso: #1a1411;
-  --color-espresso: #f3ece4;
-  --color-arena: #33281f;
-  --color-cuero: #d9a273;
-  --color-cuero-oscuro: #ebbd93;
-  --color-cuero-suave: #3a2a1f;
-  --color-cenote: #5cc2c2;
-  --color-cenote-oscuro: #86d6d6;
-  --color-miel: #e8b04f;
-  --color-exito: #63c28a;
-  --color-aviso: #e8b04f;
-  --color-error: #f08a80;
-  --color-info: #5cc2c2;
-  --color-gris: #a89a8e;
-  --color-superficie: #261d18;
-  --color-superficie-suave: #211915;
-  --color-borde: #3a2e26;
-  --color-borde-fuerte: #54453a;
-  --color-texto-suave: #c8b9ab;
-  --color-exito-suave: #1e3327;
-  --color-aviso-suave: #3a2d14;
-  --color-error-suave: #3d1f1c;
-  --color-info-suave: #193333;
-  --color-sobre-color: #1a1411;
-  --color-mapa-fondo: #24302a;
-  --color-nav: #2e2722; /* Un tono más claro que el fondo para que la barra se distinga */
-  --sombra-1: 0 1px 2px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 30%);
-  --sombra-2: 0 2px 4px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 45%);
-  color-scheme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-tema="claro"]) {
-    --color-hueso: #1a1411;
-    --color-espresso: #f3ece4;
-    --color-arena: #33281f;
-    --color-cuero: #d9a273;
-    --color-cuero-oscuro: #ebbd93;
-    --color-cuero-suave: #3a2a1f;
-    --color-cenote: #5cc2c2;
-    --color-cenote-oscuro: #86d6d6;
-    --color-miel: #e8b04f;
-    --color-exito: #63c28a;
-    --color-aviso: #e8b04f;
-    --color-error: #f08a80;
-    --color-info: #5cc2c2;
-    --color-gris: #a89a8e;
-    --color-superficie: #261d18;
-    --color-superficie-suave: #211915;
-    --color-borde: #3a2e26;
-    --color-borde-fuerte: #54453a;
-    --color-texto-suave: #c8b9ab;
-    --color-exito-suave: #1e3327;
-    --color-aviso-suave: #3a2d14;
-    --color-error-suave: #3d1f1c;
-    --color-info-suave: #193333;
-    --color-sobre-color: #1a1411;
-    --color-mapa-fondo: #24302a;
-    --color-nav: #2e2722;
-    --sombra-1: 0 1px 2px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 30%);
-    --sombra-2: 0 2px 4px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 45%);
-    color-scheme: dark;
-  }
-}
-
-/* Piezas que ya son oscuras por diseño (barra de navegación, Verificar entrega, tarjetas en
-   degradado, avisos flotantes): conservan los colores del modo claro también en modo oscuro. */
-.nav-inferior,
-.pantalla--oscura,
-.pedido-destacado,
-.inicio__avatar,
-.acceso__ilustracion,
-.aviso-flotante {
-  --color-hueso: #f7f6f3;
-  --color-espresso: #1f1b16;
-  --color-arena: #efede8;
-  --color-cuero: #9c4a1f;
-  --color-cuero-oscuro: #7e3a16;
-  --color-cuero-suave: #f6e8df;
-  --color-cenote: #0e6e66;
-  --color-miel: #d99a2b;
-  --color-exito: #17693b;
-  --color-error: #b42318;
-  --color-gris: #5e574f;
-  --color-superficie: #fff;
-  --color-borde: #e2ded6;
-  --color-texto-suave: #5e574f;
-  --color-sobre-color: #fff;
-}
+/* Modo oscuro: pospuesto (docs/diseno.md). Se diseñará después sobre esta paleta;
+   mientras tanto la app se ve siempre en claro aunque el sistema esté en oscuro. */

@@ -4,21 +4,22 @@ import { icono } from "./iconos.js";
 
 /** @typedef {"client" | "craftsman" | "admin"} RolNavegacion */
 
-/** Navegación inferior según docs/diseno.md. */
+/**
+ * Navegación inferior según docs/diseno.md (nuevo front): 4 pestañas por rol. El Perfil del cliente y
+ * Mi taller del artesano no son pestaña: se abren desde el avatar de la barra superior (ver PERFIL).
+ */
 export const NAVEGACION = Object.freeze({
   client: [
     { id: "principal", ruta: "/principal", texto: "Inicio", icono: "inicio" },
-    { id: "mapa", ruta: "/mapa", texto: "Mapa", icono: "mapa" },
+    { id: "mapa", ruta: "/mapa", texto: "Buscar", icono: "buscar" },
     { id: "pedidos", ruta: "/pedidos", texto: "Pedidos", icono: "pedidos" },
-    // Acceso directo al chat desde cualquier pantalla principal (revisión: "poco intuitivo").
     { id: "chats", ruta: "/chats", texto: "Chats", icono: "chat" },
-    { id: "perfil", ruta: "/perfil", texto: "Perfil", icono: "perfil" },
   ],
   craftsman: [
-    { id: "solicitudes", ruta: "/artesano/solicitudes", texto: "Solicitudes", icono: "solicitudes" },
     { id: "tablero", ruta: "/artesano/tablero", texto: "Tablero", icono: "tablero" },
+    { id: "solicitudes", ruta: "/artesano/solicitudes", texto: "Solicitudes", icono: "solicitudes" },
     { id: "chats", ruta: "/artesano/chats", texto: "Chats", icono: "chat" },
-    { id: "perfil", ruta: "/artesano/perfil", texto: "Perfil", icono: "perfil" },
+    { id: "historial", ruta: "/artesano/historial", texto: "Historial", icono: "reloj" },
   ],
   // Panel de administración (CU-08): no viene en el Figma; sigue el mismo patrón de 4 pestañas.
   admin: [
@@ -28,6 +29,23 @@ export const NAVEGACION = Object.freeze({
     { id: "resenas", ruta: "/admin/resenas", texto: "Reseñas", icono: "estrella" },
   ],
 });
+
+/** Destino del avatar de la barra superior por rol. */
+export const PERFIL = Object.freeze({
+  client: { ruta: "/perfil", texto: "Mi perfil" },
+  craftsman: { ruta: "/artesano/perfil", texto: "Mi taller" },
+});
+
+/**
+ * Avatar redondo que abre el Perfil (cliente) o Mi taller (artesano). Lleva `data-pestana="perfil"` para que
+ * los avisos de reseñas y del taller pinten ahí su contador (features/requests/insignias.js).
+ * @param {"client" | "craftsman"} rol
+ * @returns {HTMLElement}
+ */
+export function crearAvatarPerfil(rol) {
+  const destino = PERFIL[rol];
+  return enlace(destino.ruta, { clase: "avatar barra__perfil", attrs: { "aria-label": destino.texto, title: destino.texto, "data-pestana": "perfil" } }, [icono("perfil", { tam: 20 })]);
+}
 
 /**
  * @param {RolNavegacion} rol
@@ -59,6 +77,7 @@ export function crearNavegacion(rol, activa) {
  * @property {Node | null} [accion] Botón a la derecha de la barra.
  * @property {string} [clase] Clase extra de la pantalla (para su hoja CSS).
  * @property {boolean} [oscura] Variante oscura (Verificar entrega).
+ * @property {boolean} [perfil] Pantalla raíz de una pestaña: título grande y avatar del perfil a la derecha.
  */
 
 /**
@@ -67,14 +86,16 @@ export function crearNavegacion(rol, activa) {
  * @returns {HTMLElement}
  */
 export function crearPantalla(opciones, contenido) {
+  const conPerfil = opciones.perfil === true && (opciones.rol === "client" || opciones.rol === "craftsman");
   const barra =
-    opciones.titulo !== undefined || opciones.volver !== undefined
-      ? crear("header", { clase: "barra" }, [
+    opciones.titulo !== undefined || opciones.volver !== undefined || conPerfil
+      ? crear("header", { clase: conPerfil ? "barra barra--raiz" : "barra" }, [
           opciones.volver !== undefined
             ? enlace(opciones.volver, { clase: "barra__volver", attrs: { "aria-label": "Volver" } }, [icono("atras", { tam: 22 })])
             : null,
           crear("h1", { clase: "barra__titulo", texto: opciones.titulo ?? "" }),
           opciones.accion ?? null,
+          conPerfil ? crearAvatarPerfil(/** @type {"client" | "craftsman"} */ (opciones.rol)) : null,
         ])
       : null;
   const clases = ["pantalla", opciones.clase, opciones.rol ? "pantalla--con-nav" : "", opciones.oscura ? "pantalla--oscura" : ""];

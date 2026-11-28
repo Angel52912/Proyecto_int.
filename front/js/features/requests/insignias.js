@@ -45,11 +45,11 @@ export function contarPorPestana(rol, avisos) {
 }
 
 /**
- * Pone (o quita) el contador en cada pestaña de la barra que esté en pantalla.
+ * Pone (o quita) el contador en cada pestaña de la barra y en el avatar del perfil que estén en pantalla.
  * @param {Record<string, number>} conteo
  */
 export function pintarContadores(conteo) {
-  document.querySelectorAll(".nav-inferior__enlace[data-pestana]").forEach((enlace) => {
+  document.querySelectorAll(".nav-inferior__enlace[data-pestana], .barra__perfil[data-pestana]").forEach((enlace) => {
     const cantidad = conteo[/** @type {HTMLElement} */ (enlace).dataset.pestana ?? ""] ?? 0;
     let contador = enlace.querySelector(".nav-inferior__contador");
     if (cantidad === 0) {

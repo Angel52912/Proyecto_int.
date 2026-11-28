@@ -1,0 +1,413 @@
+/* Nuevo front, "Mérida moderna" (docs/diseno.md). Se carga al final: ajusta los componentes compartidos a la
+   paleta C (tarjetas planas con borde, un solo acento, etiquetas suaves) sin reescribir cada hoja. */
+
+/* ── Botones: principal en el acento, secundario blanco con borde gris ── */
+.boton {
+  min-height: 48px;
+  border-color: var(--color-cuero);
+  color: #fff;
+  font-weight: 600;
+}
+
+.boton:not(.boton--secundario) {
+  box-shadow: none;
+}
+
+.boton--secundario {
+  border: 1px solid var(--color-borde-fuerte);
+  background: var(--color-superficie);
+  color: var(--color-espresso);
+}
+
+.boton--cenote {
+  border-color: var(--color-cenote);
+  background: var(--color-cenote);
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .boton:not(.boton--secundario, .boton--cenote, .boton--miel, :disabled):hover {
+    border-color: var(--color-cuero-oscuro);
+    background: var(--color-cuero-oscuro);
+  }
+
+  .boton--secundario:not(:disabled):hover {
+    background: var(--color-superficie-suave);
+    border-color: var(--color-texto-tenue);
+  }
+}
+
+.boton-circular {
+  border: 1px solid var(--color-borde);
+  background: var(--color-superficie);
+  box-shadow: none;
+}
+
+/* ── Tarjetas: blancas, borde de 1px, sin sombra ── */
+.tarjeta {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .tarjeta--enlace:hover {
+    border-color: var(--color-borde-fuerte);
+    box-shadow: none;
+  }
+}
+
+/* ── Etiquetas de estado: píldora con fondo suave y texto fuerte ── */
+.insignia {
+  font-weight: 600;
+}
+
+.insignia--miel {
+  background: var(--color-aviso-suave);
+  color: var(--color-aviso);
+}
+
+.insignia--cenote {
+  background: var(--color-info-suave);
+  color: var(--color-cenote);
+}
+
+.insignia--exito {
+  background: var(--color-exito-suave);
+  color: var(--color-exito);
+}
+
+.insignia--cuero {
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero-oscuro);
+}
+
+.insignia--error {
+  background: var(--color-error-suave);
+  color: var(--color-error);
+}
+
+.insignia--neutra {
+  background: var(--color-arena);
+  color: var(--color-texto-suave);
+}
+
+/* ── Fases: hechas en azul marino, pendientes en gris claro ── */
+.pasos__segmento,
+.progreso {
+  background: var(--color-borde);
+}
+
+.pasos__segmento--actual {
+  background: linear-gradient(90deg, var(--color-cenote) 50%, var(--color-borde) 50%);
+}
+
+/* ── Avisos dentro de la pantalla ── */
+.aviso {
+  border-radius: var(--radio);
+}
+
+.aviso--miel {
+  background: var(--color-aviso-suave);
+  color: var(--color-aviso);
+}
+
+/* ── Barra superior ── */
+.barra {
+  background: color-mix(in srgb, var(--color-hueso) 92%, transparent);
+}
+
+/* Pantalla raíz de una pestaña: título grande y avatar del perfil a la derecha. */
+.barra--raiz {
+  min-height: 64px;
+  padding-top: var(--espacio-2);
+}
+
+.barra--raiz .barra__titulo {
+  font-size: var(--texto-titulo);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.barra__perfil {
+  position: relative;
+  width: var(--tactil-min);
+  height: var(--tactil-min);
+  text-decoration: none;
+}
+
+.barra__perfil:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.barra__perfil .nav-inferior__contador {
+  top: -2px;
+  right: -2px;
+  border-color: var(--color-hueso);
+}
+
+/* ── Navegación inferior: blanca, con borde arriba; la pestaña activa en el acento ── */
+.nav-inferior {
+  border-top: 1px solid var(--color-borde);
+  background: var(--color-nav);
+  box-shadow: none;
+  padding: 4px 4px calc(6px + env(safe-area-inset-bottom));
+}
+
+.nav-inferior ul {
+  gap: 0;
+}
+
+.nav-inferior__enlace {
+  gap: 2px;
+  border: 0;
+  border-radius: var(--radio-chico);
+  background: transparent;
+  color: var(--color-texto-tenue);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.nav-inferior__enlace .icono {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-inferior__enlace[aria-current="page"] {
+  background: transparent;
+  color: var(--color-cuero);
+  font-weight: 700;
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .nav-inferior__enlace:hover:not([aria-current="page"]) {
+    background: var(--color-arena);
+    color: var(--color-espresso);
+  }
+}
+
+.nav-inferior__contador {
+  top: 0;
+  right: calc(50% - 22px);
+  border-color: var(--color-nav);
+}
+
+/* Escritorio: barra lateral blanca con borde a la derecha; la pestaña activa con fondo suave. */
+html[data-escritorio] .nav-inferior {
+  border-top: 0;
+  border-right: 1px solid var(--color-borde);
+  box-shadow: none;
+  padding: var(--espacio-3) var(--espacio-2);
+}
+
+html[data-escritorio] .nav-inferior ul {
+  gap: 4px;
+}
+
+html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero-oscuro);
+}
+
+.nav-inferior__marca {
+  background: var(--color-cuero);
+  box-shadow: none;
+  color: #fff;
+}
+
+/* ── Avisos flotantes: oscuros y planos ── */
+.aviso-flotante {
+  border-radius: var(--radio);
+  background: var(--color-espresso);
+  color: #fff;
+}
+
+.aviso-flotante--info .icono {
+  color: #fdba8c;
+}
+
+/* ── Inicio del cliente ── */
+.inicio__avatar {
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero-oscuro);
+  box-shadow: none;
+}
+
+.inicio__pedido:empty {
+  display: none;
+}
+
+/* Pedido en curso: tarjeta blanca; fase y pasos en azul marino. */
+.pedido-destacado {
+  gap: var(--espacio-2);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: none;
+  color: var(--color-espresso);
+}
+
+.pedido-destacado--listo {
+  border-color: var(--color-exito);
+  background: var(--color-superficie);
+  box-shadow: none;
+}
+
+.pedido-destacado--listo .insignia {
+  background: var(--color-exito-suave);
+  color: var(--color-exito);
+}
+
+.pedido-destacado__etiqueta {
+  color: var(--color-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pedido-destacado__icono {
+  background: var(--color-info-suave);
+  color: var(--color-cenote);
+}
+
+.pedido-destacado--listo .pedido-destacado__icono {
+  background: var(--color-exito-suave);
+  color: var(--color-exito);
+}
+
+.pedido-destacado__taller {
+  color: var(--color-texto-suave);
+  opacity: 1;
+}
+
+.pedido-destacado__fase {
+  color: var(--color-cenote);
+  font-weight: 600;
+}
+
+.pedido-destacado__accion {
+  color: var(--color-cuero);
+}
+
+.inicio__buscar {
+  min-height: 52px;
+  font-size: 16px;
+}
+
+/* Accesos Reparación y Limpieza: tarjetas blancas con el ícono en color. */
+.categoria {
+  min-height: 96px;
+  border: 1px solid var(--color-borde);
+  background: var(--color-superficie);
+}
+
+.categoria--cleaning {
+  background: var(--color-superficie);
+}
+
+.categoria__icono {
+  background: var(--color-cuero-suave);
+}
+
+.categoria--cleaning .categoria__icono {
+  background: var(--color-info-suave);
+}
+
+.seccion__titulo {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── Filtros (chips): el elegido en casi negro, para no competir con el acento ── */
+.chip {
+  border-color: var(--color-borde);
+  background: var(--color-superficie);
+  color: var(--color-espresso);
+}
+
+.chip[aria-pressed="true"],
+.chip[aria-checked="true"],
+.chip--activo {
+  border-color: var(--color-espresso);
+  background: var(--color-espresso);
+  color: #fff;
+}
+
+/* ── Buscar taller: mapa casi a pantalla completa y panel blanco abajo ── */
+.mapa__superior .buscador input {
+  border-color: var(--color-borde);
+  box-shadow: var(--sombra-2);
+}
+
+.mapa__superior .chip,
+.mapa__superior .chip[aria-pressed="true"] {
+  box-shadow: 0 2px 8px rgb(24 24 27 / 12%);
+}
+
+.mapa__superior .chip:not([aria-pressed="true"]) {
+  border-color: transparent;
+}
+
+.mapa__tarjeta {
+  bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) var(--espacio-3) var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-bottom: 0;
+  border-radius: var(--radio-grande) var(--radio-grande) 0 0;
+  background: var(--color-superficie);
+  box-shadow: 0 -4px 16px rgb(24 24 27 / 8%);
+}
+
+.mapa__tarjeta:empty {
+  display: none;
+}
+
+.mapa__asa {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 2px;
+  border-radius: 999px;
+  background: var(--color-borde-fuerte);
+}
+
+.mapa__encabezado-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mapa__conteo {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-texto-suave);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mapa__tarjeta .tarjeta-taller,
+.mapa__tarjeta > .tarjeta,
+.mapa__tarjeta > .estado-vacio,
+.mapa__tarjeta > .estado-error,
+.mapa__tarjeta > .estado-cargando {
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.mapa__ubicar {
+  bottom: calc(var(--alto-nav) + 190px + env(safe-area-inset-bottom));
+  box-shadow: var(--sombra-2);
+}
+
+/* Pin elegido: anillo blanco y casi negro (el miel ya no es parte de la paleta). */
+.pin--seleccionado {
+  outline: 3px solid #fff;
+  box-shadow: 0 0 0 5px var(--color-espresso);
+}

@@ -79,13 +79,23 @@ describe("layout", () => {
     const pantalla = crearPantalla({ rol: "client", activa: "pedidos", titulo: "T", volver: "/inicio" }, [crear("p")]);
     expect(pantalla.querySelector("h1")?.textContent).toBe("T");
     expect(pantalla.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe("#/pedidos");
-    // El cliente tiene 5 pestañas: Chats es acceso directo al chat desde las pantallas principales.
-    expect([...pantalla.querySelectorAll(".nav-inferior a")].map((a) => a.textContent)).toEqual(["Inicio", "Mapa", "Pedidos", "Chats", "Perfil"]);
-    expect(/** @type {HTMLElement} */ (pantalla.querySelector(".nav-inferior ul")).style.getPropertyValue("--nav-elementos")).toBe("5");
+    // Nuevo front: 4 pestañas; el Perfil se abre desde el avatar de la barra superior.
+    expect([...pantalla.querySelectorAll(".nav-inferior a")].map((a) => a.textContent)).toEqual(["Inicio", "Buscar", "Pedidos", "Chats"]);
+    expect(/** @type {HTMLElement} */ (pantalla.querySelector(".nav-inferior ul")).style.getPropertyValue("--nav-elementos")).toBe("4");
+    // Con Volver no es pantalla raíz: no lleva avatar.
+    expect(pantalla.querySelector(".barra__perfil")).toBeNull();
   });
   test("navegación del artesano", () => {
     const pantalla = crearPantalla({ rol: "craftsman", activa: "tablero" }, []);
     expect(pantalla.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe("#/artesano/tablero");
+    expect([...pantalla.querySelectorAll(".nav-inferior a")].map((a) => a.textContent)).toEqual(["Tablero", "Solicitudes", "Chats", "Historial"]);
+  });
+  test("pantalla raíz de pestaña: título grande y avatar que abre el perfil", () => {
+    const cliente = crearPantalla({ rol: "client", activa: "pedidos", titulo: "Mis pedidos", perfil: true }, []);
+    expect(cliente.querySelector(".barra--raiz h1")?.textContent).toBe("Mis pedidos");
+    expect(cliente.querySelector(".barra__perfil")?.getAttribute("href")).toBe("#/perfil");
+    const artesano = crearPantalla({ rol: "craftsman", activa: "chats", titulo: "Chats", perfil: true }, []);
+    expect(artesano.querySelector(".barra__perfil")?.getAttribute("aria-label")).toBe("Mi taller");
   });
   test("progreso, estrellas e iniciales", () => {
     expect(crearProgreso(0.75, "x").getAttribute("aria-valuenow")).toBe("75");
