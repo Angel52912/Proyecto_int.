@@ -395,3 +395,143 @@ html[data-escritorio] .tablero__todo-al-dia {
 html[data-escritorio] .tablero__numeros {
   max-width: 560px;
 }
+
+/* ── Formularios y tareas cortas (Pedir cotización, Calificar, Recoger): tarjeta de 640px al centro ── */
+html[data-escritorio] :is(.solicitar, .calificar, .recoger) .barra {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+html[data-escritorio] :is(.solicitar, .calificar, .recoger) .pantalla__cuerpo {
+  flex: none;
+  width: 100%;
+  max-width: 640px;
+  margin: var(--espacio-2) auto var(--espacio-4);
+  padding: var(--espacio-4) 32px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-grande);
+  background: var(--color-superficie);
+}
+
+html[data-escritorio] .solicitar__formulario {
+  min-height: 0;
+}
+
+/* Atrás y Continuar al pie de la tarjeta (no pegados al fondo de la ventana). */
+html[data-escritorio] .solicitar__acciones {
+  position: static;
+  margin-top: var(--espacio-4);
+  padding-bottom: 0;
+  background: none;
+}
+
+html[data-escritorio] .solicitar__fotos {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* ── Tableta (768px a 1023px): barra lateral angosta con íconos y el contenido a 680px al centro ──
+   Las pantallas son las del celular (una columna); solo la navegación pasa al costado. */
+@media (min-width: 768px) {
+  html:not([data-escritorio], [data-vista="movil"]) {
+    --ancho-pantalla: 680px;
+    --alto-nav: 0px;
+    --nav-ancho: 88px;
+    --pantalla-margen-izquierdo: calc(var(--nav-ancho) + max(0px, (100vw - var(--nav-ancho) - var(--ancho-pantalla)) / 2));
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior {
+    top: var(--alto-franja, 0px);
+    right: auto;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    width: var(--nav-ancho);
+    padding: var(--espacio-3) var(--espacio-2);
+    border-top: 0;
+    border-right: 1px solid var(--color-borde);
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior ul {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    max-width: none;
+    margin: 0;
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior__enlace {
+    min-height: 60px;
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior__enlace[aria-current="page"] {
+    background: var(--color-cuero-suave);
+    color: var(--color-cuero-oscuro);
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior__marca {
+    display: flex;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    margin: 0 0 var(--espacio-3);
+    background: none;
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior__nombre {
+    display: none;
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior__perfil {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: auto;
+    padding: var(--espacio-2) 0;
+    color: var(--color-texto-tenue);
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  html:not([data-escritorio], [data-vista="movil"]) .nav-inferior__perfil[aria-current="page"] {
+    color: var(--color-cuero-oscuro);
+  }
+
+  /* El perfil ya está en la barra lateral. */
+  html:not([data-escritorio], [data-vista="movil"]) :is(.barra__perfil, .inicio__avatar) {
+    display: none;
+  }
+
+  /* Pantallas sin barra (chat, formularios): centradas en toda la ventana. */
+  html:not([data-escritorio], [data-vista="movil"]) .pantalla:not(.pantalla--con-nav) {
+    margin-left: auto;
+  }
+
+  /* Buscar: el mapa llena todo a la derecha de la barra lateral. */
+  html:not([data-escritorio], [data-vista="movil"]) .mapa__lienzo {
+    left: var(--nav-ancho);
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* ── PC: pantallas sin barra lateral (formularios, presupuesto, entrega…) ──
+   El fondo cubre toda la ventana y el contenido se centra (antes quedaba una franja a la izquierda). :where() deja
+   la especificidad baja para que mandan los anchos propios de cada pantalla (520, 640, 760px). */
+html[data-escritorio] .pantalla:not(.pantalla--con-nav) {
+  max-width: none;
+  margin-left: 0;
+}
+
+html[data-escritorio] :where(.pantalla:not(.pantalla--con-nav)) > :is(.pantalla__cuerpo, .barra) {
+  width: 100%;
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+}

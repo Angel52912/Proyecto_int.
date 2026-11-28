@@ -1,5 +1,6 @@
 // Historial (Artesano), nuevo front: pedidos entregados del más reciente al más viejo, filtros por mes y por servicio, y
-// un resumen arriba (entregados, a tiempo y calificación). Pestaña propia en la barra del artesano.
+// un resumen arriba (entregados, a tiempo y calificación). Pestaña propia en la barra del artesano. En PC la lista
+// es una tabla (fecha, servicio, cliente, folio, monto y si fue a tiempo).
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { folio } from "../../chat/pages/chat.js";
 import { api as apiPresupuestos } from "../../quotes/index.js";
@@ -115,6 +116,42 @@ function crearFila(pedido, solicitud, monto) {
 }
 
 /**
+ * Tabla de PC: una fila por entrega; el servicio lleva a la conversación con el cliente.
+ * @param {any[]} visibles
+ * @param {Map<string, any>} solicitudes
+ * @param {Map<string, number>} montos
+ * @returns {HTMLElement}
+ */
+function crearTabla(visibles, solicitudes, montos) {
+  const encabezados = ["Entregado", "Servicio", "Cliente", "Folio", "Monto", "Entrega"];
+  return crear("div", { clase: "historial__tabla-contenedor" }, [
+    crear("table", { clase: "historial__tabla" }, [
+      crear("caption", { clase: "oculto-visual", texto: "Pedidos entregados" }),
+      crear("thead", {}, [crear("tr", {}, encabezados.map((t) => crear("th", { texto: t, attrs: { scope: "col" } })))]),
+      crear(
+        "tbody",
+        {},
+        visibles.map((p) => {
+          const solicitud = solicitudes.get(p.request_id);
+          const aTiempo = entregadoATiempo(p);
+          const monto = montos.get(p.id);
+          return crear("tr", {}, [
+            crear("td", { texto: formatearFecha(p.delivered_at) }),
+            crear("td", {}, [
+              enlace(`/artesano/chat/${p.request_id}`, { clase: "historial__servicio", texto: NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud?.service_type)] ?? "Pedido" }),
+            ]),
+            crear("td", { texto: solicitud?.counterpart?.full_name ?? "Cliente" }),
+            crear("td", { clase: "historial__folio", texto: folio(p.id) }),
+            crear("td", { clase: "historial__monto", texto: monto === undefined ? "—" : formatearMxn(monto) }),
+            crear("td", {}, [aTiempo === null ? crear("span", { texto: "—" }) : crearInsignia(aTiempo ? "A tiempo" : "Con retraso", aTiempo ? "exito" : "miel")]),
+          ]);
+        }),
+      ),
+    ]),
+  ]);
+}
+
+/**
  * @param {{ pedidos: any[], solicitudes: Map<string, any>, montos: Map<string, number>, calificacion: number | null }} datos
  */
 function pintarHistorial({ pedidos, solicitudes, montos, calificacion }) {
@@ -167,7 +204,9 @@ function pintarHistorial({ pedidos, solicitudes, montos, calificacion }) {
     lista.replaceChildren(
       visibles.length === 0
         ? crearVacio(pedidos.some((p) => p.status === "delivered") ? "No hay entregas con esos filtros." : "Aún no has entregado pedidos. Aquí verás cada entrega.", null, { icono: "reloj" })
-        : crear("ul", { clase: "lista" }, visibles.map((p) => crearFila(p, solicitudes.get(p.request_id), montos.get(p.id)))),
+        : document.documentElement.hasAttribute("data-escritorio")
+          ? crearTabla(visibles, solicitudes, montos)
+          : crear("ul", { clase: "lista" }, visibles.map((p) => crearFila(p, solicitudes.get(p.request_id), montos.get(p.id)))),
     );
   }
   pintar();

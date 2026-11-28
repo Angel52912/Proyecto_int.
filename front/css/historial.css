@@ -71,7 +71,75 @@
   font-size: 15px;
 }
 
+/* PC: la lista de entregas es una tabla. */
 html[data-escritorio] .historial .pantalla__cuerpo {
   width: 100%;
-  max-width: 760px;
+  max-width: 1040px;
+}
+
+html[data-escritorio] .historial__filtros {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+html[data-escritorio] .historial__mes {
+  width: 220px;
+}
+
+.historial__tabla-contenedor {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  overflow-x: auto;
+}
+
+.historial__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.historial__tabla th {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-borde);
+  background: var(--color-superficie-suave);
+  color: var(--color-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.historial__tabla td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-borde);
+  vertical-align: middle;
+}
+
+.historial__tabla tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.historial__tabla tbody tr:hover {
+  background: var(--color-superficie-suave);
+}
+
+.historial__servicio {
+  color: var(--color-cuero);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.historial__servicio:hover {
+  text-decoration: underline;
+}
+
+.historial__folio {
+  color: var(--color-texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.historial__tabla .historial__monto {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
