@@ -9,7 +9,7 @@ import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
+import { agregarChatEnBarra, crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { ESTADO_ORDEN, NOMBRE_FASE } from "../fases.js";
 import { api } from "../index.js";
@@ -172,6 +172,7 @@ export async function renderActualizarFase({ params }) {
     contenido,
     async () => {
       const pedido = await api.getOrder(params.orderId);
+      agregarChatEnBarra(pantalla, `/artesano/chat/${pedido.request_id}`, "Escribir al cliente");
       return { pedido, solicitud: await apiSolicitudes.getRequest(pedido.request_id).catch(() => null) };
     },
     pintar,

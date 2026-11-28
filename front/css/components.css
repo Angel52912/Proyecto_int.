@@ -1170,3 +1170,28 @@ html[data-tema="oscuro"] .leaflet-tile-pane {
     filter: brightness(0.75) contrast(1.1) saturate(0.85);
   }
 }
+
+/* Aviso flotante que se puede tocar (novedad de un pedido): lleva al pedido. */
+.aviso-flotante__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.aviso-flotante__texto span {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.aviso-flotante--enlace {
+  pointer-events: auto;
+  border-radius: var(--radio);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.aviso-flotante--enlace:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco), var(--sombra-2);
+}

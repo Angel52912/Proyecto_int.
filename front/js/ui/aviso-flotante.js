@@ -1,6 +1,6 @@
 // Avisos flotantes ("Cambios guardados", "Sin conexión"): aparecen abajo unos segundos y se van solos.
 // Viven fuera de #app, así que siguen visibles aunque la acción lleve a otra pantalla.
-import { crear } from "./dom.js";
+import { crear, enlace } from "./dom.js";
 import { icono } from "./iconos.js";
 
 /** Tiempo visible por defecto, en milisegundos. */
@@ -21,12 +21,18 @@ function region() {
 /**
  * Muestra un aviso flotante. El texto siempre va con `textContent`.
  * @param {string} texto
- * @param {{ tono?: "exito" | "error" | "info", duracion?: number }} [opciones]
+ * @param {{ tono?: "exito" | "error" | "info", duracion?: number, ruta?: string | null, detalle?: string }} [opciones]
+ *   `ruta`: el aviso se vuelve un enlace (por ejemplo, al pedido que cambió). `detalle`: segundo renglón.
  * @returns {HTMLElement} el aviso (por si se quiere quitar antes).
  */
 export function mostrarAvisoFlotante(texto, opciones = {}) {
   const tono = opciones.tono ?? "exito";
-  const aviso = crear("div", { clase: `aviso-flotante aviso-flotante--${tono}` }, [icono(ICONOS[tono], { tam: 18 }), crear("span", { texto })]);
+  const contenido = [
+    icono(ICONOS[tono], { tam: 18 }),
+    crear("span", { clase: "aviso-flotante__texto" }, [crear("strong", { texto }), opciones.detalle ? crear("span", { texto: opciones.detalle }) : null]),
+  ];
+  const clase = `aviso-flotante aviso-flotante--${tono}${opciones.ruta ? " aviso-flotante--enlace" : ""}`;
+  const aviso = opciones.ruta ? enlace(opciones.ruta, { clase }, contenido) : crear("div", { clase }, contenido);
   region().append(aviso);
   const quitar = () => {
     aviso.classList.add("aviso-flotante--saliendo");

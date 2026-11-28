@@ -5,7 +5,7 @@ import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace, ir } from "../../../ui/dom.js";
 import { cargarEn, crearError } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
+import { agregarChatEnBarra, crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { crearQr } from "../../../ui/qr.js";
 import { api } from "../index.js";
@@ -127,6 +127,7 @@ export async function renderRecoger({ params }) {
     async () => {
       const pedido = await api.getOrder(params.orderId);
       const taller = await apiMapa.getWorkshopProfile(pedido.workshop_id).catch(() => null);
+      agregarChatEnBarra(pantalla, `/chat/${pedido.request_id}`, "Escribir al taller");
       return { pedido, taller };
     },
     pintarRecoger,

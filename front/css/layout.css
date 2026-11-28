@@ -437,3 +437,33 @@ html[data-tema="oscuro"] .nav-inferior {
   }
 }
 
+
+/* Contador de avisos sin leer en una pestaña (insignias.js): círculo rojo arriba a la derecha. */
+.nav-inferior__enlace {
+  position: relative;
+}
+
+.nav-inferior__contador {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid var(--color-nav);
+  border-radius: 999px;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Botón de chat en la barra superior (acceso rápido): pegado a la derecha. */
+.barra__chat {
+  flex: none;
+  margin-left: auto;
+}

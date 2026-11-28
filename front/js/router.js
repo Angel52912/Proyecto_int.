@@ -140,6 +140,8 @@ export function crearRouter({ rutas, contenedor, obtenerSesion }) {
       marcarDireccion(ruta);
       contenedor.replaceChildren(vista);
       prepararVista();
+      // Aviso para quien decora la pantalla ya pintada (contadores de la barra, ui/… y features/…).
+      window.dispatchEvent(new CustomEvent("mixanab:pantalla", { detail: { ruta } }));
     } catch {
       mostrarMensaje("Algo salió mal. Intenta de nuevo.");
     }

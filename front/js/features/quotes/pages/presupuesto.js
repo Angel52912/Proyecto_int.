@@ -7,7 +7,7 @@ import { crear, enlace, ir } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearBoton, crearEstrellas, crearInsignia, crearPantalla } from "../../../ui/layout.js";
+import { agregarChatEnBarra, crearBoton, crearEstrellas, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
 import { ESTADO_PRESUPUESTO } from "../tarjeta.js";
@@ -127,6 +127,7 @@ export async function renderPresupuesto({ params }) {
       const solicitud = await apiSolicitudes.getRequest(presupuesto.request_id);
       const taller = await apiMapa.getWorkshopProfile(solicitud.workshop_id).catch(() => null);
       pantalla.querySelector(".barra__volver")?.setAttribute("href", `#/chat/${presupuesto.request_id}`);
+      agregarChatEnBarra(pantalla, `/chat/${presupuesto.request_id}`, "Escribir al taller");
       return { presupuesto, solicitud, taller };
     },
     pintarPresupuesto,

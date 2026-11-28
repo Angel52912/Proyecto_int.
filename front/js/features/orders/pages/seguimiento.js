@@ -9,7 +9,7 @@ import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
-import { crearInsignia, crearPantalla } from "../../../ui/layout.js";
+import { agregarChatEnBarra, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { ESTADO_ORDEN, NOMBRE_FASE } from "../fases.js";
 import { crearPasos } from "../pasos.js";
 import { api } from "../index.js";
@@ -112,6 +112,7 @@ export async function renderSeguimiento({ params }) {
       contenido,
       async () => {
         const pedido = await api.getOrder(params.orderId);
+        agregarChatEnBarra(pantalla, `/chat/${pedido.request_id}`, "Escribir al taller");
         const [avances, solicitud] = await Promise.all([api.listOrderUpdates(pedido.id), apiSolicitudes.getRequest(pedido.request_id).catch(() => null)]);
         const taller = await apiMapa.getWorkshopProfile(pedido.workshop_id).catch(() => null);
         return { pedido, avances, solicitud, taller };

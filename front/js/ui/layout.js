@@ -37,7 +37,7 @@ export const NAVEGACION = Object.freeze({
 export function crearNavegacion(rol, activa) {
   const elementos = NAVEGACION[rol].map((item) =>
     crear("li", {}, [
-      enlace(item.ruta, { clase: "nav-inferior__enlace", attrs: { "aria-current": item.id === activa ? "page" : null } }, [
+      enlace(item.ruta, { clase: "nav-inferior__enlace", attrs: { "aria-current": item.id === activa ? "page" : null, "data-pestana": item.id } }, [
         icono(item.icono, { tam: 22 }),
         crear("span", { texto: item.texto }),
       ]),
@@ -83,6 +83,18 @@ export function crearPantalla(opciones, contenido) {
     crear("div", { clase: "pantalla__cuerpo" }, contenido),
     opciones.rol ? crearNavegacion(opciones.rol, opciones.activa) : null,
   ]);
+}
+
+/**
+ * Botón redondo de chat en la barra superior de una pantalla ya creada (acceso rápido al chat).
+ * @param {HTMLElement} pantalla
+ * @param {string} ruta ruta del chat
+ * @param {string} etiqueta texto para lector de pantalla ("Escribir al taller")
+ */
+export function agregarChatEnBarra(pantalla, ruta, etiqueta) {
+  const barra = pantalla.querySelector(".barra");
+  if (!barra || barra.querySelector(".barra__chat")) return;
+  barra.append(enlace(ruta, { clase: "boton-circular barra__chat", attrs: { "aria-label": etiqueta, title: etiqueta } }, [icono("chat")]));
 }
 
 /**
