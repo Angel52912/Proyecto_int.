@@ -740,3 +740,127 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
   color: var(--color-espresso);
   font-size: 17px;
 }
+
+/* ── Tablero del talabartero: números del día y bloques con su acción ── */
+.tablero__fecha {
+  margin: calc(-1 * var(--espacio-2)) 0 0;
+  color: var(--color-texto-suave);
+  font-size: 14px;
+}
+
+.tablero__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+}
+
+.tablero__numeros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-2);
+}
+
+.tablero__numero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+  color: var(--color-texto-suave);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.tablero__numero strong {
+  color: var(--color-espresso);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tablero__numero--cuero {
+  border-color: var(--color-cuero-suave);
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero-oscuro);
+}
+
+.tablero__numero--cuero strong {
+  color: var(--color-cuero-oscuro);
+}
+
+.tablero__numero--exito strong {
+  color: var(--color-exito);
+}
+
+.tablero__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tablero__tarjeta p {
+  margin: 0;
+}
+
+.tablero__descripcion {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tablero__accion {
+  min-height: 44px;
+  margin-top: var(--espacio-2);
+}
+
+.tablero__pedido {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--espacio-3);
+}
+
+.tablero__pedido .tarjeta__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tablero__fase {
+  color: var(--color-cenote);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tablero__entrega {
+  color: var(--color-texto-suave);
+  font-size: 12px;
+}
+
+.tablero__entrega--atrasado {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.tablero__listo {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.tablero__listo .tarjeta__cuerpo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.tablero__entregar {
+  min-height: 40px;
+  padding: 0 var(--espacio-3);
+}

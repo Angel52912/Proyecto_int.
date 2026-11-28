@@ -2,6 +2,7 @@ import { soloPara } from "../auth/guardia.js";
 import { REQUIERE_SESION } from "../../ui/sesion.js";
 import { renderActualizarFase } from "./pages/actualizar-fase.js";
 import { renderCalificar } from "./pages/calificar.js";
+import { renderHistorial } from "./pages/historial.js";
 import { renderPedidos } from "./pages/pedidos.js";
 import { renderRecoger } from "./pages/recoger.js";
 import { renderSeguimiento } from "./pages/seguimiento.js";
@@ -16,5 +17,6 @@ export const rutas = [
   { path: "/pedido/:orderId/calificar", requiereSesion: REQUIERE_SESION, render: soloPara(["client"], renderCalificar) },
   { path: "/artesano/tablero", requiereSesion: REQUIERE_SESION, render: soloPara(["craftsman"], renderTablero) },
   { path: "/artesano/pedido/:orderId", requiereSesion: REQUIERE_SESION, render: soloPara(["craftsman"], renderActualizarFase) },
+  { path: "/artesano/historial", requiereSesion: REQUIERE_SESION, render: soloPara(["craftsman"], renderHistorial) },
   { path: "/artesano/pedido/:orderId/entrega", requiereSesion: REQUIERE_SESION, render: soloPara(["craftsman"], renderVerificarEntrega) },
 ];

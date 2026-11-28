@@ -1,16 +1,23 @@
-// 20 · Tablero Kanban (Artesano, CU-05): pedidos en 4 columnas por fase y una de listos para entrega.
+// 20 · Tablero (Artesano, CU-05), nuevo front: qué hacer hoy. Tres números del día (Nuevas, En proceso, Listos) y tres
+// bloques con su acción directa: solicitudes nuevas (Hacer presupuesto), pedidos en proceso por fase (Avanzar fase) y
+// listos para entregar (Entregar).
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { crearCampana } from "../../requests/avisos.js";
 import { folio } from "../../chat/pages/chat.js";
-import { diasHasta, formatearFecha } from "../../../lib/fechas.js";
+import { diasHasta, formatearFecha, formatearHace } from "../../../lib/fechas.js";
+import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearPantalla } from "../../../ui/layout.js";
 import { NOMBRE_FASE_CORTO } from "../fases.js";
+import { crearPasos } from "../pasos.js";
 import { api } from "../index.js";
+
+/** Cuántas solicitudes nuevas se muestran en el Tablero (el resto, en la pestaña Solicitudes). */
+const MAX_NUEVAS = 3;
 
 /**
  * Agrupa los pedidos activos por columna: fases 1 a 4 (en proceso) y "listo" (esperan entrega).
@@ -42,111 +49,160 @@ export function textoEntrega(fecha, ahora = new Date()) {
 }
 
 /**
+ * "Viernes 27 nov": fecha de hoy para el encabezado del Tablero.
+ * @param {Date} [ahora]
+ * @returns {string}
+ */
+export function fechaDelTablero(ahora = new Date()) {
+  const texto = new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "numeric", month: "short", timeZone: "America/Merida" }).format(ahora).replace(/[.,]/g, "").replace(/ de /g, " ");
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+/**
+ * @param {string} etiqueta
+ * @param {number} valor
+ * @param {"cuero" | "neutra" | "exito"} tono
+ * @param {string} ruta
+ */
+const crearNumero = (etiqueta, valor, tono, ruta) =>
+  enlace(ruta, { clase: `tablero__numero tablero__numero--${tono}` }, [crear("strong", { texto: String(valor) }), crear("span", { texto: etiqueta })]);
+
+/** @param {any} detalle SolicitudDetalle */
+function crearNueva(detalle) {
+  const servicio = NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (detalle.service_type)] ?? "Solicitud";
+  return crear("li", { clase: "tarjeta tablero__tarjeta" }, [
+    crear("div", { clase: "fila-entre" }, [
+      crear("p", { clase: "tarjeta__titulo", texto: `${servicio} · ${detalle.counterpart?.full_name ?? "Cliente"}` }),
+      crear("span", { clase: "texto-secundario", texto: formatearHace(detalle.submitted_at ?? detalle.created_at) }),
+    ]),
+    crear("p", { clase: "tarjeta__detalle tablero__descripcion", texto: detalle.description }),
+    enlace(`/artesano/solicitud/${detalle.id}`, { clase: "boton boton--bloque tablero__accion", texto: "Hacer presupuesto" }),
+  ]);
+}
+
+/**
  * @param {any} pedido
  * @param {any | undefined} solicitud
- * @param {string} tono
  */
-function crearTarjeta(pedido, solicitud, tono) {
-  const listo = pedido.status === "ready";
-  const ruta = listo ? `/artesano/pedido/${pedido.id}/entrega` : `/artesano/pedido/${pedido.id}`;
+function crearEnProceso(pedido, solicitud) {
   const servicio = NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud?.service_type)] ?? "Pedido";
-  const entrega = listo ? null : textoEntrega(pedido.due_date);
+  const entrega = textoEntrega(pedido.due_date);
   return crear("li", {}, [
-    enlace(ruta, { clase: `kanban__tarjeta kanban__tarjeta--${tono}` }, [
-      crear("div", { clase: "kanban__fila" }, [
-        crearFoto(solicitud?.photos?.[0]?.url, "Foto del calzado", "kanban__foto"),
-        crear("div", { clase: "kanban__texto" }, [
-          crear("span", { clase: "kanban__nombre", texto: servicio }),
-          crear("span", { clase: "kanban__cliente", texto: `${folio(pedido.id)} · ${solicitud?.counterpart?.full_name ?? "Cliente"}` }),
+    enlace(`/artesano/pedido/${pedido.id}`, { clase: "tarjeta tarjeta--enlace tablero__tarjeta tablero__pedido" }, [
+      crearFoto(solicitud?.photos?.[0]?.url, "Foto del calzado", "foto--chica"),
+      crear("div", { clase: "tarjeta__cuerpo" }, [
+        crear("div", { clase: "fila-entre" }, [
+          crear("p", { clase: "tarjeta__titulo", texto: servicio }),
+          crear("span", { clase: "tablero__fase", texto: `Fase ${pedido.phase} · ${NOMBRE_FASE_CORTO[/** @type {1|2|3|4} */ (pedido.phase)] ?? ""}` }),
         ]),
+        crear("p", { clase: "tarjeta__detalle", texto: `${folio(pedido.id)} · ${solicitud?.counterpart?.full_name ?? "Cliente"}` }),
+        crearPasos(pedido),
+        entrega ? crear("p", { clase: `tablero__entrega${entrega.atrasado ? " tablero__entrega--atrasado" : ""}`, texto: entrega.texto }) : null,
       ]),
-      entrega
-        ? crear("span", { clase: `kanban__entrega${entrega.atrasado ? " kanban__entrega--atrasado" : ""}` }, [icono("calendario", { tam: 12 }), crear("span", { texto: entrega.texto })])
-        : null,
-      listo ? crear("span", { clase: "kanban__accion" }, [icono("qr", { tam: 14 }), crear("span", { texto: "Verificar entrega" })]) : null,
     ]),
   ]);
 }
 
-/** @param {{ pedidos: any[], solicitudes: Map<string, any> }} datos */
-function pintarTablero({ pedidos, solicitudes }) {
-  const columnas = columnasDelTablero(pedidos);
-  const total = pedidos.filter((p) => p.status === "in_progress" || p.status === "ready").length;
-  /** @type {Array<[keyof typeof columnas, string, string]>} */
-  const definicion = [
-    [1, NOMBRE_FASE_CORTO[1], "miel"],
-    [2, NOMBRE_FASE_CORTO[2], "cenote"],
-    [3, NOMBRE_FASE_CORTO[3], "cuero"],
-    [4, NOMBRE_FASE_CORTO[4], "exito"],
-    ["listo", "Listos", "exito"],
-  ];
-  if (total === 0) return [crearVacio("No tienes pedidos en el taller. Aparecerán aquí cuando un cliente acepte tu presupuesto.", enlace("/artesano/solicitudes", { clase: "boton", texto: "Ver solicitudes" }), { icono: "tablero" })];
-
-  const secciones = definicion.map(([clave, titulo, tono]) =>
-    crear("section", { clase: `kanban__columna kanban__columna--${tono}`, attrs: { role: "listitem", "aria-label": `${titulo}: ${columnas[clave].length}` } }, [
-      crear("div", { clase: "kanban__encabezado" }, [
-        crear("h2", { clase: "kanban__titulo", texto: titulo }),
-        crear("span", { clase: `insignia insignia--${tono}`, texto: String(columnas[clave].length), attrs: { "aria-hidden": "true" } }),
-      ]),
-      columnas[clave].length === 0
-        ? crear("p", { clase: "kanban__vacia", texto: "Sin pedidos" })
-        : crear(
-            "ul",
-            { clase: "kanban__lista" },
-            columnas[clave].map((p) => crearTarjeta(p, solicitudes.get(p.request_id), tono)),
-          ),
+/**
+ * @param {any} pedido
+ * @param {any | undefined} solicitud
+ */
+function crearListo(pedido, solicitud) {
+  const servicio = NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud?.service_type)] ?? "Pedido";
+  return crear("li", { clase: "tarjeta tablero__tarjeta tablero__listo" }, [
+    crear("div", { clase: "tarjeta__cuerpo" }, [
+      crear("p", { clase: "tarjeta__titulo", texto: `${servicio} · ${solicitud?.counterpart?.full_name ?? "Cliente"}` }),
+      crear("span", { clase: "insignia insignia--exito", texto: "Listo para entregar" }),
     ]),
-  );
+    enlace(`/artesano/pedido/${pedido.id}/entrega`, { clase: "boton boton--secundario tablero__entregar" }, [icono("qr", { tam: 16 }), crear("span", { texto: "Entregar" })]),
+  ]);
+}
 
-  // Resumen: una pastilla por columna con su número; al tocarla, el tablero se desliza a esa columna.
-  const resumen = crear(
-    "div",
-    { clase: "chips kanban__resumen", attrs: { role: "group", "aria-label": "Ir a una columna" } },
-    definicion.map(([clave, titulo], i) =>
-      crear(
-        "button",
-        {
-          clase: `chip${columnas[clave].length > 0 ? " kanban__chip--con" : ""}`,
-          attrs: { type: "button" },
-          on: { click: () => secciones[i].scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", inline: "start", block: "nearest" }) },
-        },
-        [crear("span", { texto: titulo }), crear("strong", { texto: String(columnas[clave].length) })],
+/**
+ * @param {string} titulo
+ * @param {Node} contenido
+ * @param {Node | null} [extra]
+ */
+const crearBloque = (titulo, contenido, extra = null) =>
+  crear("section", { clase: "seccion" }, [crear("div", { clase: "seccion__encabezado" }, [crear("h2", { clase: "seccion__titulo", texto: titulo }), extra]), contenido]);
+
+/** @param {{ pedidos: any[], solicitudes: Map<string, any>, nuevas: any[] }} datos */
+function pintarTablero({ pedidos, solicitudes, nuevas }) {
+  const columnas = columnasDelTablero(pedidos);
+  const enProceso = [...columnas[1], ...columnas[2], ...columnas[3], ...columnas[4]];
+  const bloques = [
+    crear("div", { clase: "tablero__numeros" }, [
+      crearNumero("Nuevas", nuevas.length, "cuero", "/artesano/solicitudes"),
+      crearNumero("En proceso", enProceso.length, "neutra", "/artesano/tablero"),
+      crearNumero("Listos", columnas.listo.length, "exito", "/artesano/tablero"),
+    ]),
+  ];
+  if (nuevas.length > 0) {
+    bloques.push(
+      crearBloque(
+        "Solicitudes nuevas",
+        crear("ul", { clase: "lista" }, nuevas.slice(0, MAX_NUEVAS).map(crearNueva)),
+        nuevas.length > MAX_NUEVAS ? enlace("/artesano/solicitudes", { clase: "boton-texto", texto: "Ver todas" }) : null,
       ),
+    );
+  }
+  bloques.push(
+    crearBloque(
+      "En proceso",
+      enProceso.length === 0
+        ? crear("p", { clase: "texto-secundario", texto: "Sin pedidos en proceso. Aparecen aquí cuando un cliente acepta tu presupuesto." })
+        : crear("ul", { clase: "lista" }, enProceso.map((p) => crearEnProceso(p, solicitudes.get(p.request_id)))),
     ),
   );
-
-  const kanban = crear("div", { clase: "kanban", attrs: { role: "list", "aria-label": "Tablero de pedidos" } }, secciones);
-  // Al abrir, el tablero arranca en la primera columna con pedidos (no en una vacía).
-  const primera = secciones[definicion.findIndex(([clave]) => columnas[clave].length > 0)];
-  requestAnimationFrame(() => {
-    if (!primera?.isConnected) return;
-    kanban.scrollLeft += primera.getBoundingClientRect().left - kanban.getBoundingClientRect().left - parseFloat(getComputedStyle(kanban).paddingLeft);
-  });
-
-  return [
-    crear("p", { clase: "kanban__total", texto: total === 1 ? "1 pedido activo" : `${total} pedidos activos` }),
-    resumen,
-    kanban,
-    crear("div", { clase: "aviso" }, [icono("camara", { tam: 18 }), crear("p", { texto: "Sube una foto al mover un pedido de fase para que el cliente vea el avance." })]),
-  ];
+  if (columnas.listo.length > 0) {
+    bloques.push(crearBloque("Listos para entregar", crear("ul", { clase: "lista" }, columnas.listo.map((p) => crearListo(p, solicitudes.get(p.request_id))))));
+  }
+  if (nuevas.length === 0 && pedidos.length === 0) {
+    bloques.push(crearVacio("Todo al día. Te avisamos cuando llegue una solicitud.", enlace("/artesano/solicitudes", { clase: "boton boton--secundario", texto: "Ver solicitudes" }), { icono: "tablero" }));
+  }
+  return bloques;
 }
 
 /** @returns {Promise<Node>} */
 export async function renderTablero() {
   const contenido = crear("div", { clase: "tablero__contenido" });
-  const pantalla = crearPantalla({ rol: "craftsman", activa: "tablero", clase: "tablero" }, [
-    crear("div", { clase: "fila-entre" }, [crear("h1", { clase: "pantalla__titulo", texto: "Tablero" }), crearCampana("craftsman")]),
+  const pantalla = crearPantalla({ rol: "craftsman", activa: "tablero", clase: "tablero", titulo: "Tablero", accion: crearCampana("craftsman"), perfil: true }, [
+    crear("p", { clase: "tablero__fecha", texto: fechaDelTablero() }),
     contenido,
   ]);
-  cargarEn(
-    contenido,
-    async () => {
-      const pedidos = await api.listMyOrders();
-      const activos = pedidos.filter((p) => p.status === "in_progress" || p.status === "ready");
-      const detalles = await Promise.all(activos.map((p) => apiSolicitudes.getRequest(p.request_id).catch(() => null)));
-      return { pedidos: activos, solicitudes: new Map(detalles.filter(Boolean).map((s) => [s.id, s])) };
-    },
-    pintarTablero,
-  );
+  const cargar = () =>
+    cargarEn(
+      contenido,
+      async () => {
+        const [pedidos, propias] = await Promise.all([api.listMyOrders(), apiSolicitudes.listMyRequests().catch(() => [])]);
+        const activos = pedidos.filter((p) => p.status === "in_progress" || p.status === "ready");
+        const abiertas = propias.filter((s) => s.status === "open");
+        const [detallesPedidos, nuevas] = await Promise.all([
+          Promise.all(activos.map((p) => apiSolicitudes.getRequest(p.request_id).catch(() => null))),
+          Promise.all(abiertas.map((s) => apiSolicitudes.getRequest(s.id).catch(() => ({ ...s, photos: [], counterpart: null })))),
+        ]);
+        return { pedidos: activos, solicitudes: new Map(detallesPedidos.filter(Boolean).map((s) => [s.id, s])), nuevas };
+      },
+      pintarTablero,
+    );
+  cargar();
+
+  // Se actualiza solo cuando llega una solicitud nueva, se cancela una o aceptan un presupuesto.
+  let salio = false;
+  /** @type {(() => void) | null} */
+  let cancelar = null;
+  alSalir(() => {
+    salio = true;
+    cancelar?.();
+  });
+  apiSolicitudes
+    .subscribeToNotifications((aviso) => {
+      if (["request_received", "request_cancelled", "quote_accepted"].includes(aviso.type)) cargar();
+    })
+    .then((c) => {
+      if (salio) c();
+      else cancelar = c;
+    })
+    .catch(() => {});
   return pantalla;
 }

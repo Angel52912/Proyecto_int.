@@ -1,1 +1,77 @@
-/* Historial del talabartero: entregados, filtros y resumen (docs/diseno.md). */
+/* Historial del talabartero: resumen, filtros y lista de entregas (docs/diseno.md). */
+.historial__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.historial__resumen {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espacio-2);
+}
+
+.historial__dato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+}
+
+.historial__dato strong {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.historial__dato span {
+  color: var(--color-texto-suave);
+  font-size: 12px;
+}
+
+.historial__filtros {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+}
+
+.historial__mes {
+  min-height: var(--tactil-min);
+  padding: 0 var(--espacio-3);
+  border: 1px solid var(--color-borde-fuerte);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+  color: var(--color-espresso);
+  font: inherit;
+}
+
+.historial__mes:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.historial__fila {
+  align-items: flex-start;
+}
+
+.historial__fila .tarjeta__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.historial__fila .tarjeta__cuerpo p {
+  margin: 0;
+}
+
+.historial__monto {
+  font-size: 15px;
+}
+
+html[data-escritorio] .historial .pantalla__cuerpo {
+  width: 100%;
+  max-width: 760px;
+}
