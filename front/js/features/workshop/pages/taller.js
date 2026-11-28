@@ -1,6 +1,6 @@
 // 17 · Datos del taller (Artesano, CU-07): nombre, fotos, dirección, ubicación en el mapa, servicios, horario,
 // precio "desde", Guardar y Publicar taller. A1: resalta los campos obligatorios que faltan.
-import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet, quitarMapa } from "../../map/componentes.js";
+import { CENTRO_MERIDA, NOMBRE_SERVICIO, crearMapaLeaflet, ponerPin, quitarMapa } from "../../map/componentes.js";
 import { geocodificarDireccion, reverseGeocodeDetallado } from "../../../lib/geocodificar.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
@@ -259,8 +259,8 @@ function pintarFormulario(tallerInicial) {
   const colocar = (punto) => {
     ubicacion = { lat: Number(punto.lat.toFixed(6)), lng: Number(punto.lng.toFixed(6)) };
     if (!mapaTaller) return;
-    if (marcador) marcador.setLatLng([ubicacion.lat, ubicacion.lng]);
-    else marcador = L.marker([ubicacion.lat, ubicacion.lng], { icon: L.divIcon({ html: crear("span", { clase: "pin" }, [icono("reparacion", { tam: 16 })]), className: "pin-contenedor", iconSize: [36, 36], iconAnchor: [18, 36] }) }).addTo(mapaTaller);
+    if (marcador) marcador.mover(ubicacion);
+    else marcador = ponerPin(mapaTaller, ubicacion, crear("span", { clase: "pin" }, [icono("reparacion", { tam: 16 })]), { titulo: "Tu taller" });
     mapaTaller.setView([ubicacion.lat, ubicacion.lng], Math.max(mapaTaller.getZoom(), 16));
   };
 

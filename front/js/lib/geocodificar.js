@@ -2,6 +2,10 @@
 // - al tocar el mapa, de punto a dirección;
 // - al escribir dirección, colonia y C.P., de dirección a punto.
 // Nominatim permite 1 petición por segundo: las peticiones se encolan y se memoizan.
+// Con llave de Google (apis/config-mapa.js) se usa el Geocoder de Google, que conoce mejor las direcciones de Mérida
+// ("Calle 60 #500"); devuelve los mismos datos, así que la pantalla del taller no cambia.
+import { usaGoogleMaps } from "../../../apis/config-mapa.js";
+import { categoriaDeGoogle, direccionDeGoogle, geocodificarConGoogle } from "./mapa-google.js";
 
 /** @typedef {{ direccion: string, colonia: string, codigoPostal: string }} DireccionMapa */
 /** @typedef {{ lat: number, lng: number }} Punto */
@@ -175,6 +179,11 @@ function urlEstructurada(calle, numero, cp) {
 export async function reverseGeocodeDetallado(punto) {
   const lat = Number(punto.lat.toFixed(5));
   const lng = Number(punto.lng.toFixed(5));
+  if (usaGoogleMaps()) {
+    const { resultados, motivo } = await geocodificarConGoogle({ location: { lat, lng } });
+    const direccion = resultados.map(direccionDeGoogle).find(Boolean) ?? null;
+    return { direccion, motivo: direccion ? "encontrado" : motivo === "error" ? "error" : "no_encontrado" };
+  }
   const url = new URL("https://nominatim.openstreetmap.org/reverse");
   url.searchParams.set("format", "jsonv2");
   url.searchParams.set("addressdetails", "1");
@@ -261,6 +270,15 @@ export async function geocodificarDireccion(campos) {
   const cpUsuario = /(\d{5})/.exec(limpiar(campos.codigoPostal))?.[1] ?? "";
   if (calle.length < 5 || (!cpUsuario && colonia.length < 3)) {
     return { punto: null, motivo: /** @type {Motivo} */ ("incompleto"), categoria: "", tipo: "" };
+  }
+
+  if (usaGoogleMaps()) {
+    const consulta = consultaDeDireccion(campos);
+    const { resultados, motivo } = await geocodificarConGoogle({ address: consulta, componentRestrictions: { country: "MX", administrativeArea: "Yucatán" } });
+    const lugar = resultados[0];
+    const ubicacion = lugar?.geometry?.location;
+    if (!ubicacion) return { punto: null, motivo: motivo === "error" ? "error" : "no_encontrado", categoria: "", tipo: "" };
+    return { punto: { lat: ubicacion.lat(), lng: ubicacion.lng() }, motivo: "encontrado", ...categoriaDeGoogle(lugar) };
   }
 
   const centro = await centroDeColonia(colonia);

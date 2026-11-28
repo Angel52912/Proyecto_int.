@@ -1267,3 +1267,14 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
 .reputacion__titulo {
   font-weight: 700;
 }
+
+/* Punto de "tu ubicación" en el mapa (Leaflet y Google). */
+.pin-ubicacion {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--color-cenote);
+  box-shadow: 0 0 0 4px rgb(31 58 95 / 20%);
+}

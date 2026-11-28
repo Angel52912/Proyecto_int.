@@ -4,6 +4,8 @@ import { crearFoto } from "../../ui/foto.js";
 import { icono } from "../../ui/iconos.js";
 import { crearEstrellas, crearInsignia } from "../../ui/layout.js";
 import { formatearMxn } from "../../lib/money.js";
+import { crearMapaGoogle, crearPinGoogle } from "../../lib/mapa-google.js";
+import { usaGoogleMaps } from "../../../../apis/config-mapa.js";
 import { api } from "./index.js";
 
 /** Nombre en pantalla de cada servicio. */
@@ -119,18 +121,45 @@ export function crearTarjetaTaller(taller, opciones = {}) {
 }
 
 /**
- * Pin del mapa con ícono del servicio (reparación en Cuero, limpieza en Cenote).
+ * Pin del mapa con ícono del servicio (reparación en el acento, limpieza en azul marino).
  * @param {any} taller
  * @param {boolean} seleccionado
- * @returns {any} L.DivIcon
+ * @returns {HTMLElement}
  */
-function crearPin(taller, seleccionado) {
+function elementoPin(taller, seleccionado) {
   const soloLimpieza = taller.services.length === 1 && taller.services[0] === "cleaning";
-  const elemento = crear("span", { clase: `pin${soloLimpieza ? " pin--cenote" : ""}${seleccionado ? " pin--seleccionado" : ""}` }, [
+  return crear("span", { clase: `pin${soloLimpieza ? " pin--cenote" : ""}${seleccionado ? " pin--seleccionado" : ""}` }, [
     icono(soloLimpieza ? "limpieza" : "reparacion", { tam: 16 }),
   ]);
-  return L.divIcon({ html: elemento, className: "pin-contenedor", iconSize: [36, 36], iconAnchor: [18, 36] });
 }
+
+/**
+ * Pone un pin HTML en el mapa, con Leaflet o con Google según apis/config-mapa.js.
+ * @param {any} mapa lo que devuelve crearMapaLeaflet
+ * @param {{ lat: number, lng: number }} punto
+ * @param {HTMLElement} elemento contenido del pin (`.pin` o el punto de tu ubicación)
+ * @param {{ titulo?: string, alTocar?: () => void, centrado?: boolean }} [opciones]
+ * @returns {{ mover: (punto: { lat: number, lng: number }) => void, remove: () => void }}
+ */
+export function ponerPin(mapa, punto, elemento, opciones = {}) {
+  if (mapa.esGoogle) return crearPinGoogle(mapa, punto, elemento, opciones);
+  const tam = opciones.centrado ? 16 : 36;
+  const marcador = L.marker([punto.lat, punto.lng], {
+    icon: L.divIcon({ html: elemento, className: "pin-contenedor", iconSize: [tam, tam], iconAnchor: opciones.centrado ? [tam / 2, tam / 2] : [18, 36] }),
+    title: opciones.titulo ?? "",
+    alt: opciones.titulo ?? "",
+    keyboard: Boolean(opciones.alTocar),
+  });
+  if (opciones.alTocar) marcador.on("click", () => opciones.alTocar?.());
+  marcador.addTo(mapa);
+  return {
+    mover: (nuevo) => marcador.setLatLng([nuevo.lat, nuevo.lng]),
+    remove: () => marcador.remove(),
+  };
+}
+
+/** @returns {HTMLElement} punto azul de "tu ubicación" */
+const elementoUbicacion = () => crear("span", { clase: "pin-ubicacion", attrs: { "aria-hidden": "true" } });
 
 /**
  * Crea un mapa de Leaflet con OpenStreetMap. Devuelve null si Leaflet no cargó (la pantalla sigue funcionando con la lista).
@@ -139,6 +168,8 @@ function crearPin(taller, seleccionado) {
  * @returns {any | null} L.Map
  */
 export function crearMapaLeaflet(contenedor, opciones = {}) {
+  // Con llave de Google (apis/config-mapa.js) el mapa es de Google, con la misma forma que el de Leaflet.
+  if (usaGoogleMaps()) return crearMapaGoogle(contenedor, { interactivo: opciones.interactivo, centro: opciones.centro ?? CENTRO_MERIDA, zoom: opciones.zoom ?? 13 });
   if (typeof L === "undefined") return null;
   const estilos = cargarEstilosLeaflet();
   const interactivo = opciones.interactivo !== false;
@@ -215,21 +246,23 @@ export function cargarEstilosLeaflet() {
  * @returns {any} L.LayerGroup
  */
 export function pintarPines(mapa, talleres, opciones = {}) {
-  const capa = L.layerGroup().addTo(mapa);
+  /** @type {Array<{ remove: () => void }>} */
+  const pines = [];
+  // Capa con la misma forma que un L.LayerGroup para quien la quita (capa.remove()).
+  const capa = { remove: () => pines.forEach((p) => p.remove()) };
+  /** @type {Array<[number, number]>} */
   const puntos = [];
   for (const taller of talleres) {
-    const marcador = L.marker([taller.lat, taller.lng], {
-      icon: crearPin(taller, taller.id === opciones.seleccionado),
-      title: taller.name,
-      alt: taller.name,
-      keyboard: true,
-    });
-    if (opciones.alElegir) marcador.on("click", () => opciones.alElegir?.(taller));
-    marcador.addTo(capa);
+    pines.push(
+      ponerPin(mapa, { lat: taller.lat, lng: taller.lng }, elementoPin(taller, taller.id === opciones.seleccionado), {
+        titulo: taller.name,
+        alTocar: opciones.alElegir ? () => opciones.alElegir?.(taller) : undefined,
+      }),
+    );
     puntos.push([taller.lat, taller.lng]);
   }
   if (opciones.ubicacion) {
-    L.circleMarker([opciones.ubicacion.lat, opciones.ubicacion.lng], { radius: 8, color: "#fff", weight: 3, fillColor: "#1f3a5f", fillOpacity: 1 }).addTo(capa);
+    pines.push(ponerPin(mapa, opciones.ubicacion, elementoUbicacion(), { titulo: "Tu ubicación", centrado: true }));
     puntos.push([opciones.ubicacion.lat, opciones.ubicacion.lng]);
   }
   const margen = opciones.margen ?? { arriba: 0, abajo: 0 };
