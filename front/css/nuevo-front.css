@@ -19,6 +19,11 @@
   color: var(--color-espresso);
 }
 
+/* El botón de Google es blanco: esta hoja se carga después de acceso.css y su `.boton { color: #fff }` lo dejaba ilegible. */
+.boton--blanco {
+  color: var(--color-espresso);
+}
+
 .boton--cenote {
   border-color: var(--color-cenote);
   background: var(--color-cenote);
@@ -26,12 +31,17 @@
 }
 
 @media (hover: hover) {
-  .boton:not(.boton--secundario, .boton--cenote, .boton--miel, :disabled):hover {
+  .boton:not(.boton--secundario, .boton--blanco, .boton--cenote, .boton--miel, :disabled):hover {
     border-color: var(--color-cuero-oscuro);
     background: var(--color-cuero-oscuro);
   }
 
   .boton--secundario:not(:disabled):hover {
+    background: var(--color-superficie-suave);
+    border-color: var(--color-texto-tenue);
+  }
+
+  .boton--blanco:not(:disabled):hover {
     background: var(--color-superficie-suave);
     border-color: var(--color-texto-tenue);
   }
@@ -153,6 +163,17 @@
   background: var(--color-nav);
   box-shadow: none;
   padding: 4px 4px calc(6px + env(safe-area-inset-bottom));
+}
+
+/* La barra mide exactamente --alto-nav (más el área segura): así la lámina del mapa queda pegada a ella. */
+@media (max-width: 767px) {
+  .nav-inferior {
+    height: calc(var(--alto-nav) + env(safe-area-inset-bottom));
+  }
+}
+
+html[data-vista="movil"] .nav-inferior {
+  height: calc(var(--alto-nav) + env(safe-area-inset-bottom));
 }
 
 .nav-inferior ul {
@@ -366,12 +387,59 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
   display: none;
 }
 
+/* El asa es el control de la lámina: botón con barra visual y etiqueta para lectores de pantalla. */
 .mapa__asa {
+  display: block;
+  width: 56px;
+  min-height: 32px;
+  margin: -10px auto 0;
+  padding: 14px 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.mapa__asa::after {
+  content: "";
+  display: block;
   width: 36px;
   height: 4px;
-  margin: 0 auto 2px;
+  margin: 0 auto;
   border-radius: 999px;
   background: var(--color-borde-fuerte);
+}
+
+.mapa__asa[aria-expanded="true"]::after {
+  background: var(--color-cuero);
+}
+
+.mapa__asa:focus-visible {
+  outline: 2px solid var(--color-cuero);
+  outline-offset: 2px;
+}
+
+.mapa__desplegable {
+  display: none;
+  max-height: min(40dvh, 340px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-top: var(--espacio-2);
+  border-top: 1px solid var(--color-borde);
+}
+
+.mapa__tarjeta--abierta .mapa__desplegable {
+  display: block;
+}
+
+html:not([data-escritorio]) .mapa__tarjeta--abierta .mapa__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: 0;
+  overflow: visible;
 }
 
 .mapa__encabezado-panel {

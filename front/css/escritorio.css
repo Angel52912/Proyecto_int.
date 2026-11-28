@@ -126,15 +126,24 @@ html[data-escritorio] .mapa {
   margin-left: var(--nav-ancho);
 }
 
+/* El cuerpo va en fila: primero el panel de resultados y después el mapa, sin columnas intermedias.
+   Se desactiva la animación de entrada aquí: su transform deja un bloque contenedor y sumaba el ancho
+   de la barra lateral al `left` de los paneles fijos (de ahí la franja vacía). */
+html[data-escritorio] .mapa .pantalla__cuerpo {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  animation: none;
+}
+
 html[data-escritorio] .mapa__lateral {
-  position: fixed;
-  top: var(--alto-franja, 0px);
-  bottom: 0;
-  left: var(--nav-ancho);
-  z-index: 6;
+  position: static;
+  order: 1;
+  flex: 0 0 400px;
+  width: 400px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  width: 380px;
   border-right: 1px solid var(--color-borde);
   background: var(--color-superficie);
 }
@@ -172,8 +181,12 @@ html[data-escritorio] .mapa__lista {
 }
 
 html[data-escritorio] .mapa__lienzo {
-  left: calc(var(--nav-ancho) + 380px);
-  right: 0;
+  position: static;
+  order: 2;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  height: 100vh;
   max-width: none;
   margin: 0;
 }

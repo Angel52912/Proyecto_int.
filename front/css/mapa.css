@@ -71,13 +71,19 @@
   font-weight: 600;
 }
 
-/* Filtros: deslizan de borde a borde y se leen sobre el mapa. */
+/* Filtros: deslizan de borde a borde y se leen sobre el mapa. El scroll horizontal evita que el último chip se corte. */
 .mapa__superior .chips {
   margin: 0 calc(-1 * var(--espacio-3));
   padding: 2px var(--espacio-3) 6px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-borde-fuerte) transparent;
 }
 
 .mapa__superior .chip {
+  padding-inline: 8px;
   border-color: transparent;
   box-shadow: 0 2px 8px rgb(43 33 27 / 14%);
   font-weight: 600;

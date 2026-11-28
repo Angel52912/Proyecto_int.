@@ -1,6 +1,6 @@
 // 07 · Buscar taller (CU-02), nuevo front: mapa casi a pantalla completa con buscador y filtros flotando arriba y un
-// panel abajo con el taller elegido y el acceso a la lista completa. En PC: lista de talleres a la izquierda y el
-// mapa a la derecha; al pasar el ratón por un taller se marca su pin.
+// panel abajo con el taller elegido; al tocar el asa se despliega la lista completa. En PC: lista de talleres a la
+// izquierda y el mapa a la derecha; al pasar el ratón por un taller se marca su pin.
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { crearCargando, crearError, crearVacio } from "../../../ui/estados.js";
@@ -35,9 +35,59 @@ export async function renderMapa({ consulta }) {
 
   const mapaContenedor = crear("div", { clase: "mapa__lienzo", attrs: { role: "region", "aria-label": "Mapa de talleres" } });
   const tarjeta = crear("div", { clase: "mapa__tarjeta", attrs: { "aria-live": "polite" } });
-  // Lista completa de resultados: solo se ve en PC (escritorio.css), a la izquierda del mapa.
+  // Lista completa de resultados: en PC va a la izquierda del mapa (escritorio.css); en móvil se abre dentro de la lámina.
   const lista = crear("div", { clase: "mapa__lista" });
+  const listaMovil = crear("div", { clase: "mapa__lista", attrs: { id: "mapa-lista-movil" } });
+  const desplegable = crear("div", { clase: "mapa__desplegable" }, [listaMovil]);
+  const asa = /** @type {HTMLButtonElement} */ (
+    crear("button", {
+      clase: "mapa__asa",
+      attrs: { type: "button", "aria-label": "Ver lista de talleres", "aria-expanded": "false", "aria-controls": "mapa-lista-movil" },
+      on: { click: alternarLista },
+    })
+  );
+  // «Ver lista» también abre la lámina: es el control visible; el asa sigue siendo el gesto rápido.
+  const botonVerLista = /** @type {HTMLButtonElement} */ (
+    crear("button", {
+      clase: "boton-texto",
+      texto: "Ver lista",
+      attrs: { type: "button", "aria-expanded": "false", "aria-controls": "mapa-lista-movil" },
+      on: { click: alternarLista },
+    })
+  );
   const esEscritorio = () => document.documentElement.hasAttribute("data-escritorio");
+  let listaAbierta = false;
+
+  function cerrarLista() {
+    listaAbierta = false;
+    tarjeta.classList.remove("mapa__tarjeta--abierta");
+    asa.setAttribute("aria-expanded", "false");
+    asa.setAttribute("aria-label", "Ver lista de talleres");
+    botonVerLista.setAttribute("aria-expanded", "false");
+    botonVerLista.textContent = "Ver lista";
+  }
+
+  function abrirLista() {
+    if (esEscritorio()) return;
+    listaAbierta = true;
+    tarjeta.classList.add("mapa__tarjeta--abierta");
+    asa.setAttribute("aria-expanded", "true");
+    asa.setAttribute("aria-label", "Ocultar lista de talleres");
+    botonVerLista.setAttribute("aria-expanded", "true");
+    botonVerLista.textContent = "Ocultar lista";
+  }
+
+  function alternarLista() {
+    if (listaAbierta) cerrarLista();
+    else abrirLista();
+  }
+
+  /** Repinta la lámina conservando el asa y el panel desplegable. */
+  function pintarContenidoTarjeta(hijos, conLista = true) {
+    if (!conLista) cerrarLista();
+    tarjeta.replaceChildren(...(conLista ? [asa, ...hijos, desplegable] : hijos));
+  }
+  alSalir(cerrarLista);
   /** @type {any} */
   let mapa = null;
   /** @type {any} */
@@ -114,7 +164,7 @@ export async function renderMapa({ consulta }) {
         click: async () => {
           const ubicacion = await obtenerUbicacion({ preguntar: true });
           if (ubicacion === null) {
-            tarjeta.replaceChildren(crear("p", { clase: "aviso aviso--miel", texto: "No pudimos obtener tu ubicación. Escribe tu colonia o C.P." }));
+            pintarContenidoTarjeta([crear("p", { clase: "aviso aviso--miel", texto: "No pudimos obtener tu ubicación. Escribe tu colonia o C.P." })], false);
             entrada.focus();
             return;
           }
@@ -139,37 +189,46 @@ export async function renderMapa({ consulta }) {
   /** @param {any} taller */
   function pintarTarjeta(taller) {
     estado.seleccionado = taller.id;
-    tarjeta.replaceChildren(
-      crear("span", { clase: "mapa__asa", attrs: { "aria-hidden": "true" } }),
+    pintarContenidoTarjeta([
       crear("div", { clase: "mapa__encabezado-panel" }, [
         crear("p", { clase: "mapa__conteo", texto: resultados.length === 1 ? "1 taller cerca de ti" : `${resultados.length} talleres cerca de ti` }),
-        enlace(`/talleres?servicio=${estado.servicio}`, { clase: "boton-texto", texto: "Ver lista" }),
+        botonVerLista,
       ]),
       crearTarjetaTaller(taller),
-    );
+    ]);
     pintarLista();
   }
 
-  /** Lista de PC: todos los resultados; el elegido queda marcado y, al pasar el ratón, se marca su pin. */
-  function pintarLista() {
-    lista.replaceChildren(
-      crear("p", { clase: "mapa__conteo", texto: resultados.length === 1 ? "1 taller" : `${resultados.length} talleres` }),
+  /**
+   * Filas de resultados para la lista de PC y para la de la lámina móvil.
+   * @param {{ alPasar?: (t: any) => void, alTocar?: () => void }} [eventos]
+   */
+  function contenidoDeLista(eventos = {}) {
+    const conteo = resultados.length === 1 ? "1 taller" : `${resultados.length} talleres`;
+    return [
+      crear("p", { clase: "mapa__conteo", texto: conteo }),
       crear(
         "ul",
         { clase: "lista" },
         resultados.map((t) => {
           const fila = crear("li", { clase: t.id === estado.seleccionado ? "mapa__fila mapa__fila--elegida" : "mapa__fila" }, [crearTarjetaTaller(t)]);
-          fila.addEventListener("mouseenter", () => {
-            if (t.id !== estado.seleccionado) elegir(t);
-          });
+          if (eventos.alPasar) fila.addEventListener("mouseenter", () => eventos.alPasar?.(t));
+          if (eventos.alTocar) fila.addEventListener("click", eventos.alTocar);
           return fila;
         }),
       ),
-    );
+    ];
+  }
+
+  /** Lista de PC con hover sobre los pines; en móvil se sobreescribe la que queda dentro de la lámina. */
+  function pintarLista() {
+    lista.replaceChildren(...contenidoDeLista({ alPasar: (t) => { if (t.id !== estado.seleccionado) elegir(t); } }));
+    listaMovil.replaceChildren(...contenidoDeLista({ alTocar: cerrarLista }));
   }
 
   /** @param {any} taller */
   function elegir(taller) {
+    if (!esEscritorio()) cerrarLista();
     pintarTarjeta(taller);
     if (mapa) {
       // Solo se repintan los pines para marcar el elegido; la vista no salta, solo se desliza hacia él.
@@ -180,7 +239,7 @@ export async function renderMapa({ consulta }) {
   }
 
   async function buscar() {
-    tarjeta.replaceChildren(crearCargando("Buscando talleres…"));
+    pintarContenidoTarjeta([crearCargando("Buscando talleres…")], false);
     lista.replaceChildren(crearCargando("Buscando talleres…"));
     try {
       resultados = await buscarTalleres({
@@ -192,7 +251,7 @@ export async function renderMapa({ consulta }) {
       });
     } catch (error) {
       const texto = mensajeDeError(error, { invalid_input: "Revisa la colonia o el código postal." });
-      tarjeta.replaceChildren(crearError(texto, buscar));
+      pintarContenidoTarjeta([crearError(texto, buscar)], false);
       lista.replaceChildren(crearError(texto, buscar));
       return;
     }
@@ -200,7 +259,7 @@ export async function renderMapa({ consulta }) {
     capa = null;
     if (resultados.length === 0) {
       // A2: aviso sin resultados.
-      tarjeta.replaceChildren(crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros."));
+      pintarContenidoTarjeta([crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros.")], false);
       lista.replaceChildren(crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros."));
       return;
     }
