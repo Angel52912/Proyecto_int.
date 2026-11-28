@@ -1,4 +1,4 @@
-// 16 · Mis pedidos (Cliente): pestañas Activos e Historial con solicitudes y pedidos.
+// 16 · Mis pedidos (Cliente), nuevo front: apartados "En curso" e "Historial" con solicitudes y pedidos.
 import { api as apiMapa } from "../../map/index.js";
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
@@ -102,17 +102,14 @@ function crearTarjeta(e) {
  * @param {Elemento[]} lista
  * @param {string} vacio
  */
-const crearLista = (lista, vacio) => (lista.length === 0 ? crearVacio(vacio, enlace("/talleres", { clase: "boton", texto: "Buscar un taller" }), { icono: "pedidos" }) : crear("ul", { clase: "lista" }, lista.map(crearTarjeta)));
+const crearLista = (lista, vacio) => (lista.length === 0 ? crearVacio(vacio, enlace("/mapa", { clase: "boton", texto: "Buscar taller" }), { icono: "pedidos" }) : crear("ul", { clase: "lista" }, lista.map(crearTarjeta)));
 
 /** @param {Elemento[]} elementos */
 function pintarPedidos(elementos) {
   const activos = elementos.filter((e) => e.activo);
   const historial = elementos.filter((e) => !e.activo);
   const panelActivos = crear("div", { clase: "pedidos__panel", attrs: { role: "tabpanel", id: "panel-activos", "aria-labelledby": "pestana-activos" } }, [
-    crearLista(activos, "No tienes pedidos activos."),
-    historial.length > 0
-      ? crear("section", { clase: "seccion" }, [crear("h2", { clase: "texto-secundario pedidos__subtitulo", texto: "Terminados" }), crear("ul", { clase: "lista" }, historial.slice(0, 3).map(crearTarjeta))])
-      : null,
+    crearLista(activos, "No tienes pedidos en curso."),
   ]);
   const panelHistorial = crear("div", { clase: "pedidos__panel", attrs: { role: "tabpanel", id: "panel-historial", "aria-labelledby": "pestana-historial", hidden: true } }, [
     crearLista(historial, "Aún no tienes pedidos terminados."),
@@ -137,13 +134,13 @@ function pintarPedidos(elementos) {
   };
   const pestanaActivos = crear("button", {
     clase: "pestanas__boton",
-    texto: `Activos (${activos.length})`,
+    texto: `En curso (${activos.length})`,
     attrs: { type: "button", role: "tab", id: "pestana-activos", "aria-controls": "panel-activos", "aria-selected": "true" },
     on: { click: () => elegir("activos"), keydown: /** @type {EventListener} */ (teclas) },
   });
   const pestanaHistorial = crear("button", {
     clase: "pestanas__boton",
-    texto: "Historial",
+    texto: `Historial (${historial.length})`,
     attrs: { type: "button", role: "tab", id: "pestana-historial", "aria-controls": "panel-historial", "aria-selected": "false", tabindex: -1 },
     on: { click: () => elegir("historial"), keydown: /** @type {EventListener} */ (teclas) },
   });

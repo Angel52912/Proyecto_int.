@@ -864,3 +864,26 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
   min-height: 40px;
   padding: 0 var(--espacio-3);
 }
+
+/* ── Mis pedidos: avisos suaves dentro de la tarjeta ── */
+.pedido-tarjeta__aviso {
+  background: var(--color-aviso-suave);
+  color: var(--color-aviso);
+}
+
+.pedido-tarjeta__aviso--cenote {
+  background: var(--color-info-suave);
+  color: var(--color-cenote);
+}
+
+.pedido-tarjeta--listo {
+  border-color: var(--color-exito);
+}
+
+.pestanas {
+  background: var(--color-arena);
+}
+
+.pestanas__boton[aria-selected="true"] {
+  box-shadow: 0 1px 2px rgb(24 24 27 / 8%);
+}
