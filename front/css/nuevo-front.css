@@ -411,3 +411,117 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
   outline: 3px solid #fff;
   box-shadow: 0 0 0 5px var(--color-espresso);
 }
+
+/* ── Pedir cotización en 3 pasos ── */
+.solicitar__para {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-2);
+}
+
+.solicitar__para .tarjeta__cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.solicitar__numero {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.solicitar__progreso {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: var(--espacio-4);
+}
+
+.solicitar__progreso span {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-borde);
+  transition: background-color var(--transicion);
+}
+
+.solicitar__progreso span.hecho {
+  background: var(--color-cuero);
+}
+
+.solicitar__seccion {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.solicitar__seccion[hidden] {
+  display: none;
+}
+
+.solicitar .solicitar__leyenda {
+  margin-bottom: var(--espacio-1);
+  padding: 0;
+  font-size: var(--texto-titulo);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.solicitar__leyenda .solicitar__contador-fotos {
+  align-self: flex-end;
+  font-size: 13px;
+}
+
+.solicitar__ayuda {
+  margin-bottom: var(--espacio-3);
+  color: var(--color-texto-suave);
+  font-size: 14px;
+}
+
+.solicitar__agregar {
+  border: 2px dashed var(--color-borde-fuerte);
+  background: var(--color-superficie);
+  color: var(--color-cuero);
+}
+
+.solicitar__agregar:hover {
+  background: var(--color-cuero-suave);
+}
+
+.solicitar__consejo {
+  display: flex;
+  gap: var(--espacio-2);
+  margin: var(--espacio-3) 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radio);
+  background: var(--color-info-suave);
+  color: var(--color-cenote);
+  font-size: 13px;
+}
+
+.solicitar__consejo .icono {
+  flex: none;
+}
+
+/* Atrás y Continuar abajo, al alcance del pulgar; Continuar ocupa el doble. */
+.solicitar__acciones {
+  position: sticky;
+  bottom: 0;
+  flex-direction: row;
+  padding: var(--espacio-3) 0 calc(var(--espacio-2) + env(safe-area-inset-bottom));
+  background: var(--color-hueso);
+}
+
+.solicitar__acciones > .boton {
+  flex: 2;
+}
+
+.solicitar__acciones > .boton--secundario {
+  flex: 1;
+}
+
+.solicitar__acciones > .boton[hidden] {
+  display: none;
+}

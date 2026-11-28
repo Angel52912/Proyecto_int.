@@ -1,4 +1,5 @@
-// 10 · Solicitar cotización (CU-03): fotos del calzado, tipo de servicio, descripción y Enviar solicitud.
+// 10 · Pedir cotización (CU-03), nuevo front: 3 pasos cortos con barra de avance (servicio, fotos y nota) y
+// Enviar al final. Todo vive en un solo formulario; cada paso es un fieldset que se muestra a la vez.
 import { api as apiMapa } from "../../map/index.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
@@ -64,29 +65,6 @@ function crearFormulario(taller) {
   const rejilla = crear("div", { clase: "solicitar__fotos" });
   const contadorFotos = crear("span", { clase: "solicitar__contador-fotos", texto: `0/${MAX_FOTOS_SOLICITUD}` });
 
-  // Lista de avance: Fotos → Servicio → Detalle. Se marca cada paso al completarlo.
-  /** @param {string} texto */
-  const crearPaso = (texto) => {
-    const estado = crear("span", { clase: "oculto-visual", texto: ": pendiente" });
-    const li = crear("li", { clase: "solicitar__paso" }, [crear("span", { clase: "solicitar__paso-marca", attrs: { "aria-hidden": "true" } }), crear("span", { texto }), estado]);
-    return { li, estado };
-  };
-  const pasos = { fotos: crearPaso("Fotos"), servicio: crearPaso("Servicio"), detalle: crearPaso("Detalle") };
-  const faltante = crear("p", { clase: "solicitar__faltante", attrs: { "aria-live": "polite" } });
-  // Texto actual de la descripción (se actualiza al escribir).
-  let textoActual = "";
-
-  function actualizarAvance() {
-    for (const [paso, listo] of /** @type {[{ li: HTMLElement, estado: HTMLElement }, boolean][]} */ ([
-      [pasos.fotos, fotos.length > 0],
-      [pasos.servicio, seleccionados.size > 0],
-      [pasos.detalle, textoActual.trim().length >= MIN_DESCRIPCION],
-    ])) {
-      paso.li.classList.toggle("solicitar__paso--listo", listo);
-      paso.estado.textContent = listo ? ": listo" : ": pendiente";
-    }
-    faltante.textContent = textoFaltante({ fotos: fotos.length, servicios: seleccionados.size, texto: textoActual });
-  }
   const errorFotos = crear("p", { clase: "campo__error", attrs: { "aria-live": "polite" } });
   const entradaArchivo = /** @type {HTMLInputElement} */ (
     crear("input", { clase: "oculto-visual", attrs: { type: "file", accept: TIPOS_IMAGEN.join(","), multiple: true, id: "fotos-calzado" } })
@@ -120,7 +98,7 @@ function crearFormulario(taller) {
         : null;
     rejilla.replaceChildren(...miniaturas, agregar ?? "");
     contadorFotos.textContent = `${fotos.length}/${MAX_FOTOS_SOLICITUD}`;
-    actualizarAvance();
+    if (fotos.length > 0) errorFotos.textContent = "";
   }
 
   entradaArchivo.addEventListener("change", () => {
@@ -158,7 +136,6 @@ function crearFormulario(taller) {
               if (seleccionados.has(opcion.id)) seleccionados.delete(opcion.id);
               else seleccionados.add(opcion.id);
               chip.setAttribute("aria-pressed", String(seleccionados.has(opcion.id)));
-              actualizarAvance();
             },
           },
         },
@@ -177,8 +154,6 @@ function crearFormulario(taller) {
   const contador = crear("span", { clase: "texto-secundario contador", texto: `0/${MAX_DESCRIPCION}` });
   descripcion.addEventListener("input", () => {
     contador.textContent = `${descripcion.value.length}/${MAX_DESCRIPCION}`;
-    textoActual = descripcion.value;
-    actualizarAvance();
   });
 
   const errorGeneral = crear("div", { attrs: { "aria-live": "assertive" } });
@@ -194,15 +169,11 @@ function crearFormulario(taller) {
     evento.preventDefault();
     errorGeneral.replaceChildren();
     const texto = descripcion.value.trim();
-    if (fotos.length === 0) {
-      errorFotos.textContent = MENSAJES.photo_required;
-      return;
-    }
-    if (seleccionados.size === 0) {
-      errorServicios.textContent = "Elige al menos un tipo de servicio.";
-      return;
-    }
+    // Si falta algo de un paso anterior, se regresa a ese paso con su mensaje.
+    if (!validarPaso(1)) return irAPaso(1);
+    if (!validarPaso(2)) return irAPaso(2);
     if (texto.length < MIN_DESCRIPCION) {
+      irAPaso(3);
       errorGeneral.replaceChildren(crear("p", { clase: "aviso aviso--error", texto: `Describe el problema con al menos ${MIN_DESCRIPCION} letras.` }));
       descripcion.focus();
       return;
@@ -234,30 +205,89 @@ function crearFormulario(taller) {
     }
   }
 
-  return crear("form", { clase: "solicitar__formulario", attrs: { novalidate: true }, on: { submit: /** @type {EventListener} */ (alEnviar) } }, [
-    crear("div", { clase: "tarjeta tarjeta--enlace solicitar__para" }, [
-      crearFoto(taller.photos.find((/** @type {any} */ f) => f.kind === "profile")?.url, `Foto de ${taller.name}`, "foto--chica", taller.name),
-      crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__detalle", texto: "Para" }), crear("p", { clase: "tarjeta__titulo", texto: taller.name })]),
+  // ── Pasos ──
+  const secciones = [
+    crear("fieldset", { clase: "campo solicitar__seccion" }, [
+      crear("legend", { clase: "solicitar__leyenda", texto: "¿Qué servicio necesitas?" }),
+      crear("p", { clase: "solicitar__ayuda", texto: "Puedes elegir más de uno." }),
+      crear("div", { clase: "chips solicitar__servicios", attrs: { role: "group", "aria-label": "Tipo de servicio (puedes elegir varios)" } }, chips),
+      errorServicios,
     ]),
-    crear("ol", { clase: "solicitar__pasos", attrs: { "aria-label": "Avance de la solicitud" } }, [pasos.fotos.li, pasos.servicio.li, pasos.detalle.li]),
-    crear("fieldset", { clase: "campo" }, [
-      crear("legend", { clase: "solicitar__leyenda" }, [crear("span", { texto: "Fotos del calzado" }), contadorFotos]),
-      crear("p", { clase: "solicitar__ayuda", texto: "Toma fotos claras del daño: de frente, de lado y de la suela." }),
+    crear("fieldset", { clase: "campo solicitar__seccion" }, [
+      crear("legend", { clase: "solicitar__leyenda" }, [crear("span", { texto: "Agrega fotos del calzado" }), contadorFotos]),
+      crear("p", { clase: "solicitar__ayuda", texto: "Hasta 5 fotos: de frente, de lado y del daño." }),
       entradaArchivo,
       rejilla,
+      crear("p", { clase: "solicitar__consejo" }, [icono("escudo", { tam: 18 }), crear("span", { texto: "Con buenas fotos el taller te da un precio más exacto." })]),
       errorFotos,
     ]),
-    crear("fieldset", { clase: "campo" }, [crear("legend", { texto: "Tipo de servicio" }), crear("div", { clase: "chips solicitar__servicios", attrs: { role: "group", "aria-label": "Tipo de servicio (puedes elegir varios)" } }, chips), errorServicios]),
-    crear("div", { clase: "campo" }, [crear("label", { texto: "Describe el problema", attrs: { for: "descripcion" } }), descripcion, contador]),
+    crear("div", { clase: "campo solicitar__seccion" }, [
+      crear("label", { clase: "solicitar__leyenda", texto: "Cuéntale al taller qué pasa", attrs: { for: "descripcion" } }),
+      crear("p", { clase: "solicitar__ayuda", texto: "Qué le pasó y cómo lo quieres. Mientras más detalle, mejor." }),
+      descripcion,
+      contador,
+    ]),
+  ];
+  const TOTAL = secciones.length;
+  let paso = 1;
+  const numeroPaso = crear("p", { clase: "solicitar__numero", attrs: { "aria-live": "polite" } });
+  const progreso = crear("div", { clase: "solicitar__progreso", attrs: { "aria-hidden": "true" } }, secciones.map(() => crear("span")));
+  const atras = crearBoton("Atrás", { variante: "secundario", bloque: false, alHacerClic: () => irAPaso(paso - 1) });
+  const continuar = crearBoton("Continuar", { bloque: false, alHacerClic: () => validarPaso(paso) && irAPaso(paso + 1) });
+
+  /**
+   * ¿El paso está completo? Si no, deja el mensaje junto al campo.
+   * @param {number} n
+   */
+  function validarPaso(n) {
+    if (n === 1 && seleccionados.size === 0) {
+      errorServicios.textContent = "Elige al menos un tipo de servicio.";
+      return false;
+    }
+    if (n === 2 && fotos.length === 0) {
+      errorFotos.textContent = MENSAJES.photo_required;
+      return false;
+    }
+    return true;
+  }
+
+  /** @param {number} n */
+  function irAPaso(n) {
+    const anterior = paso;
+    paso = Math.min(TOTAL, Math.max(1, n));
+    secciones.forEach((seccion, indice) => {
+      seccion.hidden = indice !== paso - 1;
+    });
+    [...progreso.children].forEach((segmento, indice) => segmento.classList.toggle("hecho", indice < paso));
+    numeroPaso.textContent = `Paso ${paso} de ${TOTAL}`;
+    atras.hidden = paso === 1;
+    continuar.hidden = paso === TOTAL;
+    enviar.hidden = paso !== TOTAL;
+    if (paso !== anterior) {
+      window.scrollTo?.(0, 0);
+      if (paso === TOTAL) descripcion.focus({ preventScroll: true });
+    }
+  }
+
+  const formulario = crear("form", { clase: "solicitar__formulario", attrs: { novalidate: true }, on: { submit: /** @type {EventListener} */ (alEnviar) } }, [
+    crear("div", { clase: "solicitar__para" }, [
+      crearFoto(taller.photos.find((/** @type {any} */ f) => f.kind === "profile")?.url, `Foto de ${taller.name}`, "foto--chica", taller.name),
+      crear("div", { clase: "tarjeta__cuerpo" }, [crear("p", { clase: "tarjeta__detalle", texto: "Para" }), crear("p", { clase: "tarjeta__titulo", texto: taller.name })]),
+      numeroPaso,
+    ]),
+    progreso,
+    ...secciones,
     errorGeneral,
-    crear("div", { clase: "acciones solicitar__acciones" }, [faltante, enviar]),
+    crear("div", { clase: "acciones solicitar__acciones" }, [atras, continuar, enviar]),
   ]);
+  irAPaso(1);
+  return formulario;
 }
 
 /** @param {import("../../../router.js").Contexto} contexto */
 export async function renderSolicitar({ params }) {
   const contenido = crear("div", { clase: "solicitar__contenido" });
-  const pantalla = crearPantalla({ titulo: "Solicitar cotización", volver: `/taller/${params.tallerId}`, clase: "solicitar" }, [contenido]);
+  const pantalla = crearPantalla({ titulo: "Pedir cotización", volver: `/taller/${params.tallerId}`, clase: "solicitar" }, [contenido]);
   cargarEn(contenido, () => apiMapa.getWorkshopProfile(params.tallerId), crearFormulario, {
     not_found: "Este taller ya no está disponible.",
     invalid_input: "Este taller ya no está disponible.",
