@@ -130,14 +130,15 @@ Solo CSS de vista: no se tocó backend ni la rama del compañero. Se midió con 
 
 - `.mapa__asa` dejó de ser un `span` decorativo: ahora es un `button` de `56×32 px` con `aria-expanded`, `aria-controls` y etiqueta accesible («Ver/Ocultar lista de talleres»); la barrita visual queda como `::after`.
 - El texto «Ver lista» de la lámina también es un botón: abre y cierra la misma lista (`Ocultar lista` cuando está abierta). Así el control visible funciona aunque el asa pase desapercibida.
+- Todo el borde superior (`.mapa__borde`, 356 px de ancho a 390 px) es zona de arrastre: no hay que apuntar a la manecilla. El panel sigue el dedo/ratón en tiempo real (`max-height` en vivo) y al soltar se abre o cierra con un umbral de 36 px. Los toques simples en el asa y en «Ver lista» siguen funcionando después de arrastrar.
 - **Cambio:** `front/js/features/map/pages/mapa.js` conserva ambos controles y el panel al repintar la lámina; al abrir muestra una lista móvil de resultados dentro de `.mapa__desplegable` (la lista de PC sigue intacta a la izquierda). Se cierra al tocar un taller de la lista, al elegir un pin, al buscar de nuevo y al salir de la ruta (`alSalir`). El enlace a `/talleres` sigue disponible en el icono de filtros del buscador.
 - **Cambio:** `front/css/nuevo-front.css` — botones con foco visible, panel con `max-height: min(40dvh, 340px)` y scroll propio; el `bottom` de la lámina sigue siendo `calc(var(--alto-nav) + env(safe-area-inset-bottom))`.
-- **Verificación:** en la app real (API simulada inyectada solo en el navegador de prueba) a 390×844: el asa y «Ver lista» abren y cierran la lámina sin errores; `aria-expanded` pasa a `true`, la tarjeta va de `y≈589.5` a `y≈243.9` con `bottom=784`, y el panel pasa de `display:none` a `block` con 4 filas. También se verificó un tap táctil real sobre el asa. A 390×667 la lámina abierta queda por debajo de los chips. A 1024/1440 px la tarjeta sigue oculta y la lista de PC intacta.
+- **Verificación:** en la app real (API simulada inyectada solo en el navegador de prueba) a 390×844: arrastrando desde el extremo derecho del borde (lejos de la manecilla), el panel sigue el gesto (`max-height` 150 px a mitad de subida, altura 150 px) y al soltar queda abierto (`y≈239.9`, `bottom=784`, 4 filas, `aria-expanded=true`). Al arrastrar hacia abajo baja a 237.6 px y se cierra. El arrastre táctil desde el borde también abre (90 px a mitad de gesto) y, justo después, los toques en «Ver lista» y en el asa siguen abriendo y cerrando. A 390×667 la lámina abierta queda por debajo de los chips. A 1024/1440 px la tarjeta sigue oculta y la lista de PC intacta. Sin errores de consola.
 
 ## Estado final
 
 - Las dos ventanas de prueba se cerraron y sus perfiles temporales se eliminaron.
 - El servidor en `:5500` quedó intacto.
-- Los cambios se entregan en la rama `front/google-y-busquedas`: botón «Continuar con Google», vista de búsquedas en móvil y escritorio, lámina móvil desplegable y este reporte con su evidencia.
+- Los cambios se entregan en la rama `front/google-y-busquedas`: botón «Continuar con Google», vista de búsquedas en móvil y escritorio, lámina móvil desplegable y arrastrable desde todo su borde, y este reporte con su evidencia.
 - `apis/config.js` se dejó fuera del commit (cambio previo del usuario) y queda modificado en el working tree.
 - Para corregir los hallazgos 2 y 3 hace falta autorización explícita, para no afectar el trabajo del compañero.

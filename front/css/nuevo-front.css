@@ -387,12 +387,24 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
   display: none;
 }
 
+/* Todo el borde superior se puede agarrar; el asa y «Ver lista» siguen siendo controles por toque. */
+.mapa__borde {
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mapa__tarjeta--arrastrando .mapa__borde {
+  cursor: grabbing;
+}
+
 /* El asa es el control de la lámina: botón con barra visual y etiqueta para lectores de pantalla. */
 .mapa__asa {
   display: block;
   width: 56px;
   min-height: 32px;
-  margin: -10px auto 0;
+  margin: 0 auto 2px;
   padding: 14px 0 10px;
   border: 0;
   border-radius: 8px;
@@ -411,7 +423,8 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
   background: var(--color-borde-fuerte);
 }
 
-.mapa__asa[aria-expanded="true"]::after {
+.mapa__asa[aria-expanded="true"]::after,
+.mapa__tarjeta--arrastrando .mapa__asa::after {
   background: var(--color-cuero);
 }
 
@@ -428,13 +441,19 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
   -webkit-overflow-scrolling: touch;
   padding-top: var(--espacio-2);
   border-top: 1px solid var(--color-borde);
+  transition: max-height 220ms ease;
 }
 
-.mapa__tarjeta--abierta .mapa__desplegable {
+.mapa__tarjeta--abierta .mapa__desplegable,
+.mapa__tarjeta--arrastrando .mapa__desplegable {
   display: block;
 }
 
-html:not([data-escritorio]) .mapa__tarjeta--abierta .mapa__lista {
+.mapa__tarjeta--arrastrando .mapa__desplegable {
+  transition: none;
+}
+
+html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastrando) .mapa__lista {
   display: flex;
   flex-direction: column;
   gap: var(--espacio-2);

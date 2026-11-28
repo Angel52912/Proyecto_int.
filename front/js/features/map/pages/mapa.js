@@ -55,12 +55,21 @@ export async function renderMapa({ consulta }) {
       on: { click: alternarLista },
     })
   );
+  const conteoTarjeta = crear("p", { clase: "mapa__conteo" });
+  const encabezado = crear("div", { clase: "mapa__encabezado-panel" }, [conteoTarjeta, botonVerLista]);
+  // Todo el borde superior es zona de arrastre, no solo la manecilla.
+  const borde = crear("div", { clase: "mapa__borde" }, [asa, encabezado]);
   const esEscritorio = () => document.documentElement.hasAttribute("data-escritorio");
   let listaAbierta = false;
+  /** @type {{ id: number, y: number, abierta: boolean, max: number, movido: boolean } | null} */
+  let arrastre = null;
+  let ultimoArrastre = 0;
+  const topeArrastre = () => Math.min(window.innerHeight * 0.4, 340);
 
   function cerrarLista() {
     listaAbierta = false;
-    tarjeta.classList.remove("mapa__tarjeta--abierta");
+    tarjeta.classList.remove("mapa__tarjeta--abierta", "mapa__tarjeta--arrastrando");
+    desplegable.style.maxHeight = "";
     asa.setAttribute("aria-expanded", "false");
     asa.setAttribute("aria-label", "Ver lista de talleres");
     botonVerLista.setAttribute("aria-expanded", "false");
@@ -71,6 +80,8 @@ export async function renderMapa({ consulta }) {
     if (esEscritorio()) return;
     listaAbierta = true;
     tarjeta.classList.add("mapa__tarjeta--abierta");
+    tarjeta.classList.remove("mapa__tarjeta--arrastrando");
+    desplegable.style.maxHeight = "";
     asa.setAttribute("aria-expanded", "true");
     asa.setAttribute("aria-label", "Ocultar lista de talleres");
     botonVerLista.setAttribute("aria-expanded", "true");
@@ -82,12 +93,64 @@ export async function renderMapa({ consulta }) {
     else abrirLista();
   }
 
-  /** Repinta la lámina conservando el asa y el panel desplegable. */
+  // Escuchamos en window: con ratón el puntero sale del borde en el primer movimiento y el gesto no se perdería.
+  function seguirArrastre(evento) {
+    if (arrastre === null || evento.pointerId !== arrastre.id) return;
+    const subida = arrastre.y - evento.clientY;
+    if (Math.abs(subida) > 6) arrastre.movido = true;
+    const alto = arrastre.abierta ? arrastre.max + subida : subida;
+    desplegable.style.maxHeight = `${Math.max(0, Math.min(topeArrastre(), alto)).toFixed(1)}px`;
+  }
+
+  function terminarArrastre(evento, cancelado = false) {
+    if (arrastre === null || evento.pointerId !== arrastre.id) return;
+    const subida = arrastre.y - (evento.clientY ?? arrastre.y);
+    const debeAbrir = arrastre.abierta ? subida > -36 : subida > 36;
+    if (!cancelado && arrastre.movido) ultimoArrastre = performance.now();
+    window.removeEventListener("pointermove", seguirArrastre);
+    window.removeEventListener("pointerup", soltarArrastre);
+    window.removeEventListener("pointercancel", cancelarArrastre);
+    arrastre = null;
+    if (debeAbrir) abrirLista();
+    else cerrarLista();
+  }
+  function soltarArrastre(evento) {
+    terminarArrastre(evento);
+  }
+  function cancelarArrastre(evento) {
+    terminarArrastre(evento, true);
+  }
+
+  borde.addEventListener("pointerdown", (evento) => {
+    if (esEscritorio() || (evento.pointerType === "mouse" && evento.button !== 0)) return;
+    ultimoArrastre = 0;
+    arrastre = { id: evento.pointerId, y: evento.clientY, abierta: listaAbierta, max: desplegable.getBoundingClientRect().height, movido: false };
+    tarjeta.classList.add("mapa__tarjeta--arrastrando");
+    if (!listaAbierta) desplegable.style.maxHeight = "0px";
+    window.addEventListener("pointermove", seguirArrastre);
+    window.addEventListener("pointerup", soltarArrastre);
+    window.addEventListener("pointercancel", cancelarArrastre);
+  });
+
+  // Solo se ignora el click inmediato posterior a un arrastre; no se pierde el siguiente toque.
+  borde.addEventListener("click", (evento) => {
+    if (performance.now() - ultimoArrastre > 250) return;
+    evento.preventDefault();
+    evento.stopPropagation();
+    ultimoArrastre = 0;
+  }, true);
+
+  /** Repinta la lámina conservando el borde, el asa y el panel desplegable. */
   function pintarContenidoTarjeta(hijos, conLista = true) {
     if (!conLista) cerrarLista();
-    tarjeta.replaceChildren(...(conLista ? [asa, ...hijos, desplegable] : hijos));
+    tarjeta.replaceChildren(...(conLista ? [borde, ...hijos, desplegable] : hijos));
   }
-  alSalir(cerrarLista);
+  alSalir(() => {
+    window.removeEventListener("pointermove", seguirArrastre);
+    window.removeEventListener("pointerup", soltarArrastre);
+    window.removeEventListener("pointercancel", cancelarArrastre);
+    cerrarLista();
+  });
   /** @type {any} */
   let mapa = null;
   /** @type {any} */
@@ -189,13 +252,8 @@ export async function renderMapa({ consulta }) {
   /** @param {any} taller */
   function pintarTarjeta(taller) {
     estado.seleccionado = taller.id;
-    pintarContenidoTarjeta([
-      crear("div", { clase: "mapa__encabezado-panel" }, [
-        crear("p", { clase: "mapa__conteo", texto: resultados.length === 1 ? "1 taller cerca de ti" : `${resultados.length} talleres cerca de ti` }),
-        botonVerLista,
-      ]),
-      crearTarjetaTaller(taller),
-    ]);
+    conteoTarjeta.textContent = resultados.length === 1 ? "1 taller cerca de ti" : `${resultados.length} talleres cerca de ti`;
+    pintarContenidoTarjeta([borde, crearTarjetaTaller(taller)]);
     pintarLista();
   }
 
