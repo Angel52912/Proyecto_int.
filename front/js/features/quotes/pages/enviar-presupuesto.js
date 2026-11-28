@@ -6,7 +6,7 @@ import { api as apiSolicitudes } from "../../requests/index.js";
 import { folio } from "../../chat/pages/chat.js";
 import { ESTADO_SOLICITUD } from "../../orders/fases.js";
 import { formatearMxn } from "../../../lib/money.js";
-import { crear, enlace, ir } from "../../../ui/dom.js";
+import { crear, enlace, irSinRegreso } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
@@ -115,7 +115,7 @@ function pintar({ solicitud, vigente }) {
           try {
             await api.sendQuote(solicitud.id, datos);
             mostrarAvisoFlotante("Presupuesto enviado al cliente.");
-            ir(`/artesano/chat/${solicitud.id}`);
+            irSinRegreso(`/artesano/chat/${solicitud.id}`);
           } catch (error) {
             aviso.replaceChildren(
               crear("p", {

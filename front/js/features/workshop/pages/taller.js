@@ -5,7 +5,7 @@ import { geocodificarDireccion, reverseGeocodeDetallado } from "../../../lib/geo
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
-import { crear, ir } from "../../../ui/dom.js";
+import { crear, irSinRegreso } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
@@ -594,7 +594,7 @@ function pintarFormulario(tallerInicial) {
           return;
         }
         mostrarAvisoFlotante("Tu taller está publicado en el mapa.");
-        ir("/artesano/perfil");
+        irSinRegreso("/artesano/perfil");
       } catch (error) {
         aviso.replaceChildren(crear("p", { clase: "aviso aviso--error", texto: mensajeDeError(error, { forbidden: "Tu taller está suspendido y no se puede publicar." }) }));
       } finally {

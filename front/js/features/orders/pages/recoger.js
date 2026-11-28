@@ -2,7 +2,7 @@
 import { api as apiMapa } from "../../map/index.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { alSalir } from "../../../ui/ciclo.js";
-import { crear, enlace, ir } from "../../../ui/dom.js";
+import { crear, enlace, irSinRegreso } from "../../../ui/dom.js";
 import { cargarEn, crearError } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { agregarChatEnBarra, crearBoton, crearInsignia, crearPantalla } from "../../../ui/layout.js";
@@ -144,7 +144,7 @@ export async function renderRecoger({ params }) {
   });
   apiSolicitudes
     .subscribeToNotifications((aviso) => {
-      if (aviso.type === "order_delivered" && aviso.payload?.order_id === params.orderId) ir(`/pedido/${params.orderId}/calificar`);
+      if (aviso.type === "order_delivered" && aviso.payload?.order_id === params.orderId) irSinRegreso(`/pedido/${params.orderId}/calificar`);
     })
     .then((c) => {
       if (salio) c();

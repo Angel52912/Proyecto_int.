@@ -4,7 +4,7 @@ import { api as apiMapa } from "../../map/index.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
-import { crear, enlace, ir } from "../../../ui/dom.js";
+import { crear, enlace, irSinRegreso } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
@@ -192,7 +192,7 @@ function crearFormulario(taller) {
       }
       await api.submitRequest(borradorId);
       mostrarAvisoFlotante("Solicitud enviada al taller.");
-      ir(`/chat/${borradorId}`);
+      irSinRegreso(`/chat/${borradorId}`);
     } catch (error) {
       const aviso = crear("div", { clase: "aviso aviso--error", attrs: { role: "alert" } }, [
         crear("p", { texto: mensajeDeError(error, MENSAJES) }),

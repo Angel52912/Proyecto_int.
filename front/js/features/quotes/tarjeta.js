@@ -2,7 +2,7 @@
 // Nuevo front: el cliente acepta o rechaza ahí mismo, sin cambiar de pantalla; "Ver detalle" abre el desglose.
 import { formatearFecha } from "../../lib/fechas.js";
 import { formatearMxn } from "../../lib/money.js";
-import { crear, enlace, ir } from "../../ui/dom.js";
+import { crear, enlace, irSinRegreso } from "../../ui/dom.js";
 import { icono } from "../../ui/iconos.js";
 import { crearBoton, crearInsignia } from "../../ui/layout.js";
 import { mensajeDeError } from "../../ui/mensajes.js";
@@ -38,7 +38,7 @@ export async function responderPresupuesto(presupuesto, aceptar) {
     : "¿Rechazar este presupuesto? El taller podrá enviarte otro.";
   if (!window.confirm(pregunta)) return false;
   const resultado = await api.respondQuote(presupuesto.id, aceptar);
-  ir(resultado.order_id ? `/pedido/${resultado.order_id}` : `/chat/${presupuesto.request_id}`);
+  irSinRegreso(resultado.order_id ? `/pedido/${resultado.order_id}` : `/chat/${presupuesto.request_id}`);
   return true;
 }
 

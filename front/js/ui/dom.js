@@ -65,6 +65,16 @@ export function ir(ruta) {
   window.location.hash = `#${ruta}`;
 }
 
+/**
+ * Va a otra pantalla sin dejar la actual en el historial. Se usa al terminar un formulario (enviar solicitud,
+ * presupuesto, aceptar, guardar): así «Volver» (que usa el historial, ver volverConHistorial) regresa a la pantalla
+ * de antes del formulario y no al formulario vacío.
+ * @param {string} ruta
+ */
+export function irSinRegreso(ruta) {
+  window.location.replace(`#${ruta}`);
+}
+
 const CLAVE_NAVEGACIONES = "mixanab:navegaciones-internas";
 let contadorInstalado = false;
 

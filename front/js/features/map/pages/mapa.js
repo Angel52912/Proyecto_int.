@@ -313,6 +313,8 @@ export async function renderMapa({ consulta }) {
       lista.replaceChildren(crearError(texto, buscar));
       return;
     }
+    // Si la persona ya salió de Buscar, el mapa se quitó: pintar pines en él da error en Leaflet (_initIcon).
+    if (!mapaContenedor.isConnected) return;
     capa?.remove();
     capa = null;
     if (resultados.length === 0) {
@@ -346,11 +348,13 @@ export async function renderMapa({ consulta }) {
   ]);
 
   setTimeout(async () => {
+    // Al navegar rápido la pantalla puede haberse ido antes de crear el mapa.
+    if (!mapaContenedor.isConnected) return;
     mapa = crearMapaLeaflet(mapaContenedor);
     if (mapa === null) mapaContenedor.replaceChildren(crear("p", { clase: "estado-error", texto: "No se pudo cargar el mapa. Usa la lista de talleres." }));
     else alSalir(() => quitarMapa(mapa));
     estado.ubicacion = await obtenerUbicacion();
-    buscar();
+    if (mapaContenedor.isConnected) buscar();
   }, 0);
 
   return pantalla;
