@@ -321,3 +321,77 @@ html[data-escritorio] .linea-tiempo__foto {
   width: 96px;
   height: 72px;
 }
+
+/* ── Inicio: lo tuyo a la izquierda; talleres cercanos con mapa chico a la derecha ── */
+html[data-escritorio] .inicio .pantalla__cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--espacio-4) 40px;
+}
+
+html[data-escritorio] .inicio__principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+html[data-escritorio] .inicio__lateral {
+  position: sticky;
+  top: calc(var(--espacio-4) + var(--alto-franja, 0px));
+  padding-top: 52px;
+}
+
+html[data-escritorio] .pedido-destacado {
+  max-width: none;
+}
+
+.inicio__mapa-enlace {
+  display: block;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  overflow: hidden;
+}
+
+.inicio__mapa {
+  height: 200px;
+  background: var(--color-mapa-fondo);
+  pointer-events: none;
+}
+
+/* ── Tablero: tres columnas lado a lado (Nuevas, En proceso, Listos) ── */
+html[data-escritorio] .tablero .pantalla__cuerpo {
+  max-width: 1200px;
+}
+
+html[data-escritorio] .tablero__columnas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--espacio-3);
+}
+
+html[data-escritorio] .tablero__bloque {
+  min-height: 240px;
+  padding: var(--espacio-3);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-arena);
+}
+
+html[data-escritorio] .tablero__bloque--solo-pc {
+  display: flex;
+}
+
+html[data-escritorio] .tablero__sin-pendientes {
+  margin: var(--espacio-2) 0 0;
+  text-align: center;
+}
+
+/* En PC las columnas vacías ya dicen que no hay pendientes. */
+html[data-escritorio] .tablero__todo-al-dia {
+  display: none;
+}
+
+html[data-escritorio] .tablero__numeros {
+  max-width: 560px;
+}

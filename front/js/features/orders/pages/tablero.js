@@ -122,43 +122,54 @@ function crearListo(pedido, solicitud) {
  * @param {string} titulo
  * @param {Node} contenido
  * @param {Node | null} [extra]
+ * @param {boolean} [soloPc] bloque vacío que solo se muestra en PC (columna fija)
  */
-const crearBloque = (titulo, contenido, extra = null) =>
-  crear("section", { clase: "seccion" }, [crear("div", { clase: "seccion__encabezado" }, [crear("h2", { clase: "seccion__titulo", texto: titulo }), extra]), contenido]);
+const crearBloque = (titulo, contenido, extra = null, soloPc = false) =>
+  crear("section", { clase: `seccion tablero__bloque${soloPc ? " tablero__bloque--solo-pc" : ""}` }, [
+    crear("div", { clase: "seccion__encabezado" }, [crear("h2", { clase: "seccion__titulo", texto: titulo }), extra]),
+    contenido,
+  ]);
+
+/** @param {string} texto */
+const crearSinPendientes = (texto) => crear("p", { clase: "texto-secundario tablero__sin-pendientes", texto });
 
 /** @param {{ pedidos: any[], solicitudes: Map<string, any>, nuevas: any[] }} datos */
 function pintarTablero({ pedidos, solicitudes, nuevas }) {
   const columnas = columnasDelTablero(pedidos);
   const enProceso = [...columnas[1], ...columnas[2], ...columnas[3], ...columnas[4]];
+  // Tres bloques: en PC son tres columnas lado a lado (siempre visibles); en el celular van uno debajo del otro y
+  // los vacíos de Nuevas y Listos se ocultan (escritorio.css).
   const bloques = [
     crear("div", { clase: "tablero__numeros" }, [
       crearNumero("Nuevas", nuevas.length, "cuero", "/artesano/solicitudes"),
       crearNumero("En proceso", enProceso.length, "neutra", "/artesano/tablero"),
       crearNumero("Listos", columnas.listo.length, "exito", "/artesano/tablero"),
     ]),
-  ];
-  if (nuevas.length > 0) {
-    bloques.push(
+    crear("div", { clase: "tablero__columnas" }, [
       crearBloque(
         "Solicitudes nuevas",
-        crear("ul", { clase: "lista" }, nuevas.slice(0, MAX_NUEVAS).map(crearNueva)),
+        nuevas.length === 0 ? crearSinPendientes("Sin solicitudes nuevas.") : crear("ul", { clase: "lista" }, nuevas.slice(0, MAX_NUEVAS).map(crearNueva)),
         nuevas.length > MAX_NUEVAS ? enlace("/artesano/solicitudes", { clase: "boton-texto", texto: "Ver todas" }) : null,
+        nuevas.length === 0,
       ),
-    );
-  }
-  bloques.push(
-    crearBloque(
-      "En proceso",
-      enProceso.length === 0
-        ? crear("p", { clase: "texto-secundario", texto: "Sin pedidos en proceso. Aparecen aquí cuando un cliente acepta tu presupuesto." })
-        : crear("ul", { clase: "lista" }, enProceso.map((p) => crearEnProceso(p, solicitudes.get(p.request_id)))),
-    ),
-  );
-  if (columnas.listo.length > 0) {
-    bloques.push(crearBloque("Listos para entregar", crear("ul", { clase: "lista" }, columnas.listo.map((p) => crearListo(p, solicitudes.get(p.request_id))))));
-  }
+      crearBloque(
+        "En proceso",
+        enProceso.length === 0
+          ? crearSinPendientes("Sin pedidos en proceso. Aparecen aquí cuando un cliente acepta tu presupuesto.")
+          : crear("ul", { clase: "lista" }, enProceso.map((p) => crearEnProceso(p, solicitudes.get(p.request_id)))),
+      ),
+      crearBloque(
+        "Listos para entregar",
+        columnas.listo.length === 0 ? crearSinPendientes("Nada por entregar.") : crear("ul", { clase: "lista" }, columnas.listo.map((p) => crearListo(p, solicitudes.get(p.request_id)))),
+        null,
+        columnas.listo.length === 0,
+      ),
+    ]),
+  ];
   if (nuevas.length === 0 && pedidos.length === 0) {
-    bloques.push(crearVacio("Todo al día. Te avisamos cuando llegue una solicitud.", enlace("/artesano/solicitudes", { clase: "boton boton--secundario", texto: "Ver solicitudes" }), { icono: "tablero" }));
+    const vacio = crearVacio("Todo al día. Te avisamos cuando llegue una solicitud.", enlace("/artesano/solicitudes", { clase: "boton boton--secundario", texto: "Ver solicitudes" }), { icono: "tablero" });
+    vacio.classList.add("tablero__todo-al-dia");
+    bloques.push(vacio);
   }
   return bloques;
 }

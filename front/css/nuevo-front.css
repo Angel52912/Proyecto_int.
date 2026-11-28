@@ -903,3 +903,14 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
 .seguimiento__resumen {
   order: -1;
 }
+
+/* Inicio y Tablero en el celular: los grupos de PC no cambian nada (una sola columna, como antes). */
+.inicio__principal,
+.tablero__columnas {
+  display: contents;
+}
+
+/* En el celular, Nuevas y Listos vacíos no se muestran (en PC son columnas fijas). */
+.tablero__bloque--solo-pc {
+  display: none;
+}

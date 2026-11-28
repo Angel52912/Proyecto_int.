@@ -1,14 +1,16 @@
 // 06 · Inicio (Cliente), nuevo front: lo primero es el pedido en curso; luego la acción principal (Buscar taller),
-// los accesos Reparación y Limpieza y los talleres más cercanos en lista (CU-02, CU-05, CU-06 A2).
+// los accesos Reparación y Limpieza y los talleres más cercanos en lista (CU-02, CU-05, CU-06 A2). En PC son dos
+// columnas: lo tuyo a la izquierda y los talleres cercanos, con un mapa chico, a la derecha.
 import { api as apiAuth } from "../../auth/index.js";
 import { api as apiPedidos } from "../../orders/index.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { crearCampana } from "../../requests/avisos.js";
+import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn, crearCargando } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearInsignia, crearPantalla, iniciales } from "../../../ui/layout.js";
-import { NOMBRE_SERVICIO, buscarTalleres, crearTarjetaTaller, obtenerUbicacion } from "../componentes.js";
+import { NOMBRE_SERVICIO, buscarTalleres, crearMapaLeaflet, crearTarjetaTaller, obtenerUbicacion, pintarPines, quitarMapa } from "../componentes.js";
 import { api as apiMapa } from "../index.js";
 import { crearPasos, textoDeAvance } from "../../orders/pasos.js";
 
@@ -100,25 +102,32 @@ export async function renderPrincipal() {
 
   const pedidoEnCurso = crear("div", { clase: "inicio__pedido" });
   const cercanos = crear("div", { clase: "lista" }, [crearCargando()]);
+  // PC: mapa chico arriba de los talleres cercanos (en el celular el mapa está en Buscar).
+  const enPc = document.documentElement.hasAttribute("data-escritorio");
+  const mapaChico = enPc ? crear("div", { clase: "inicio__mapa", attrs: { role: "img", "aria-label": "Mapa de talleres cercanos" } }) : null;
 
+  // Dos grupos: en PC son dos columnas; en el celular se ven seguidos en una sola (display: contents).
   const pantalla = crearPantalla({ rol: "client", activa: "principal", clase: "inicio" }, [
-    crear("header", { clase: "inicio__encabezado" }, [
-      crear("div", {}, [saludo, crear("h1", { clase: "inicio__titulo", texto: "¿Qué restauramos hoy?" })]),
-      crear("div", { clase: "inicio__acciones" }, [campana, avatar]),
+    crear("div", { clase: "inicio__principal" }, [
+      crear("header", { clase: "inicio__encabezado" }, [
+        crear("div", {}, [saludo, crear("h1", { clase: "inicio__titulo", texto: "¿Qué restauramos hoy?" })]),
+        crear("div", { clase: "inicio__acciones" }, [campana, avatar]),
+      ]),
+      pedidoEnCurso,
+      // Acción principal de la pantalla (la única en el acento).
+      enlace("/mapa", { clase: "boton boton--bloque inicio__buscar" }, [icono("buscar", { tam: 18 }), crear("span", { texto: "Buscar taller" })]),
+      recordatorio,
+      crear("section", { clase: "seccion", attrs: { "aria-labelledby": "inicio-necesitas" } }, [
+        crear("h2", { clase: "seccion__titulo", texto: "¿Qué necesitas?", attrs: { id: "inicio-necesitas" } }),
+        crear("div", { clase: "categorias" }, [crearCategoria("repair", "Suelas, costuras, tacones"), crearCategoria("cleaning", "Lavado, desinfección, tinte")]),
+      ]),
     ]),
-    pedidoEnCurso,
-    // Acción principal de la pantalla (la única en el acento).
-    enlace("/mapa", { clase: "boton boton--bloque inicio__buscar" }, [icono("buscar", { tam: 18 }), crear("span", { texto: "Buscar taller" })]),
-    recordatorio,
-    crear("section", { clase: "seccion", attrs: { "aria-labelledby": "inicio-necesitas" } }, [
-      crear("h2", { clase: "seccion__titulo", texto: "¿Qué necesitas?", attrs: { id: "inicio-necesitas" } }),
-      crear("div", { clase: "categorias" }, [crearCategoria("repair", "Suelas, costuras, tacones"), crearCategoria("cleaning", "Lavado, desinfección, tinte")]),
-    ]),
-    crear("section", { clase: "seccion", attrs: { "aria-labelledby": "inicio-cerca" } }, [
+    crear("section", { clase: "seccion inicio__lateral", attrs: { "aria-labelledby": "inicio-cerca" } }, [
       crear("div", { clase: "seccion__encabezado" }, [
         crear("h2", { clase: "seccion__titulo", texto: "Talleres cerca de ti", attrs: { id: "inicio-cerca" } }),
         enlace("/mapa", { clase: "boton-texto", texto: "Ver mapa" }),
       ]),
+      mapaChico ? enlace("/mapa", { clase: "inicio__mapa-enlace", attrs: { "aria-label": "Abrir el mapa de talleres" } }, [mapaChico]) : null,
       cercanos,
     ]),
   ]);
@@ -131,6 +140,13 @@ export async function renderPrincipal() {
       cercanos.replaceChildren(
         ...(talleres.length > 0 ? talleres.slice(0, 3).map((t) => crearTarjetaTaller(t)) : [crear("p", { clase: "texto-secundario", texto: "Aún no hay talleres publicados cerca." })]),
       );
+      if (mapaChico?.isConnected) {
+        const mapa = crearMapaLeaflet(mapaChico, { interactivo: false, zoom: 12 });
+        if (mapa) {
+          alSalir(() => quitarMapa(mapa));
+          pintarPines(mapa, talleres, { ubicacion });
+        }
+      }
     } catch {
       cercanos.replaceChildren(crear("p", { clase: "texto-secundario", texto: "No pudimos cargar los talleres." }));
     }
