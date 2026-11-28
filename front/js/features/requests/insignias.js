@@ -3,7 +3,6 @@
 // llega una novedad mientras la persona usa la app. La campana y la pantalla Avisos siguen igual.
 import { obtenerPerfilActual } from "../auth/guardia.js";
 import { mostrarAvisoFlotante } from "../../ui/aviso-flotante.js";
-import { mostrarAvisoSistema } from "../../ui/avisos-sistema.js";
 import { crear } from "../../ui/dom.js";
 import { textoContador, textoDelAviso } from "./avisos.js";
 import { api } from "./index.js";
@@ -85,10 +84,7 @@ async function actualizar() {
       dejarDeEscuchar = await api
         .subscribeToNotifications((/** @type {any} */ aviso) => {
           const texto = textoDelAviso(aviso);
-          // Si la persona no está viendo la app (otra pestaña o minimizada), aviso del sistema; si no, el flotante.
-          void mostrarAvisoSistema({ titulo: texto.titulo, detalle: texto.detalle, ruta: texto.ruta, tag: aviso.id }).then((mostrado) => {
-            if (!mostrado) mostrarAvisoFlotante(texto.titulo, { tono: "info", detalle: texto.detalle, ruta: texto.ruta, duracion: 6000 });
-          });
+          mostrarAvisoFlotante(texto.titulo, { tono: "info", detalle: texto.detalle, ruta: texto.ruta, duracion: 6000 });
           void refrescar();
         })
         .catch(() => null);

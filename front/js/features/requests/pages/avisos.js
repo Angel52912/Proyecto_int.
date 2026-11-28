@@ -6,7 +6,6 @@ import { cargarEn, crearVacio } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
-import { crearActivarAvisos } from "../../../ui/avisos-sistema.js";
 import { textoDelAviso, tonoDelAviso } from "../avisos.js";
 import { api } from "../index.js";
 
@@ -139,7 +138,6 @@ export function renderAvisos(rol) {
 
     // history.back() lleva a la pantalla real de origen; el href solo es el respaldo si se abrió en directo.
     return crearPantalla({ titulo: "Avisos", volver: rol === "client" ? "/principal" : "/artesano/solicitudes", clase: "avisos" }, [
-      crearActivarAvisos(),
       crear("div", { clase: "avisos__acciones" }, [marcarTodas]),
       aviso,
       contenido,

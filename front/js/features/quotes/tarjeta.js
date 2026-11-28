@@ -2,6 +2,7 @@
 // Nuevo front: el cliente acepta o rechaza ahí mismo, sin cambiar de pantalla; "Ver detalle" abre el desglose.
 import { formatearFecha } from "../../lib/fechas.js";
 import { formatearMxn } from "../../lib/money.js";
+import { confirmar } from "../../ui/confirmar.js";
 import { crear, enlace, irSinRegreso } from "../../ui/dom.js";
 import { icono } from "../../ui/iconos.js";
 import { crearBoton, crearInsignia } from "../../ui/layout.js";
@@ -33,10 +34,10 @@ export function descripcionDelDetalle(detalle) {
  * @returns {Promise<boolean>} false si la persona canceló la confirmación.
  */
 export async function responderPresupuesto(presupuesto, aceptar) {
-  const pregunta = aceptar
-    ? `¿Aceptar el presupuesto de ${formatearMxn(presupuesto.amount_mxn)}? Pagas al recoger tu calzado.`
-    : "¿Rechazar este presupuesto? El taller podrá enviarte otro.";
-  if (!window.confirm(pregunta)) return false;
+  const seguro = aceptar
+    ? await confirmar({ titulo: "¿Aceptar el presupuesto?", mensaje: `${formatearMxn(presupuesto.amount_mxn)}. Pagas al recoger tu calzado.`, aceptar: "Aceptar" })
+    : await confirmar({ titulo: "¿Rechazar el presupuesto?", mensaje: "El taller podrá enviarte otro.", aceptar: "Rechazar", cancelar: "Volver", peligro: true });
+  if (!seguro) return false;
   const resultado = await api.respondQuote(presupuesto.id, aceptar);
   irSinRegreso(resultado.order_id ? `/pedido/${resultado.order_id}` : `/chat/${presupuesto.request_id}`);
   return true;

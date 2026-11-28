@@ -1355,63 +1355,76 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
   box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
 }
 
-/* ── Avisos en este dispositivo (pantalla Avisos) ── */
-.avisos-dispositivo {
-  display: flex;
-  align-items: center;
-  gap: var(--espacio-3);
-  padding: 12px 14px;
+/* ── Ventana de confirmación (ui/confirmar.js): con los colores del tema, no la del navegador ── */
+.confirmar {
+  width: min(400px, calc(100vw - 32px));
+  max-width: none;
+  margin: auto;
+  padding: var(--espacio-4);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radio-tarjeta);
+  border-radius: var(--radio-grande);
   background: var(--color-superficie);
+  box-shadow: var(--sombra-2);
   color: var(--color-espresso);
-  font-size: 14px;
 }
 
-.avisos-dispositivo > .icono {
-  flex: none;
-  color: var(--color-cuero);
+.confirmar::backdrop {
+  background: rgb(10 10 12 / 55%);
 }
 
-.avisos-dispositivo p {
-  margin: 0;
+.confirmar[open] {
+  animation: confirmar-entra 160ms ease-out both;
 }
 
-.avisos-dispositivo__texto {
-  flex: 1;
-  min-width: 0;
-  color: var(--color-texto-suave);
-  font-size: 13px;
+@keyframes confirmar-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
 }
 
-.avisos-dispositivo .avisos-dispositivo__titulo {
-  color: var(--color-espresso);
-  font-size: 14px;
+@media (prefers-reduced-motion: reduce) {
+  .confirmar[open] {
+    animation: none;
+  }
+}
+
+.confirmar__titulo {
+  margin: 0 0 var(--espacio-2);
+  font-size: 18px;
   font-weight: 700;
 }
 
-.avisos-dispositivo .boton {
-  flex: none;
-  min-height: 40px;
-  padding: 0 var(--espacio-3);
-}
-
-.avisos-dispositivo--activo {
-  border-color: transparent;
-  background: var(--color-exito-suave);
-  color: var(--color-exito);
-}
-
-.avisos-dispositivo--activo > .icono {
-  color: var(--color-exito);
-}
-
-.avisos-dispositivo--bloqueado {
-  border-color: transparent;
-  background: var(--color-arena);
+.confirmar__mensaje {
+  margin: 0;
   color: var(--color-texto-suave);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.avisos-dispositivo--bloqueado > .icono {
-  color: var(--color-texto-suave);
+.confirmar__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-4);
+}
+
+.confirmar__acciones .boton {
+  min-height: 44px;
+  padding: 0 var(--espacio-4);
+}
+
+/* Acción que no se puede deshacer (cancelar una solicitud, rechazar un presupuesto). */
+.boton--peligro {
+  border-color: var(--color-error);
+  background: var(--color-error);
+  color: var(--color-sobre-color);
+}
+
+@media (hover: hover) {
+  .boton--peligro:not(:disabled):hover {
+    border-color: var(--color-error);
+    background: var(--color-error);
+    filter: brightness(0.92);
+  }
 }

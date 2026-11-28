@@ -52,17 +52,6 @@ test("modo simulado: entrar como cliente también abre la sesión de Mi perfil",
   await expect(acceso.getMyProfile()).rejects.toMatchObject({ code: "not_authenticated" });
 });
 
-test("aviso del sistema solo con permiso y si la app no está a la vista", async () => {
-  const { debeAvisarAlSistema, permisoAvisos, crearActivarAvisos } = await import("../../js/ui/avisos-sistema.js");
-  expect(debeAvisarAlSistema("granted", "hidden")).toBe(true);
-  expect(debeAvisarAlSistema("granted", "visible")).toBe(false); // a la vista: aviso flotante
-  expect(debeAvisarAlSistema("default", "hidden")).toBe(false);
-  expect(debeAvisarAlSistema("denied", "hidden")).toBe(false);
-  // jsdom no tiene Notification: sin soporte no se muestra la tarjeta para activarlos.
-  expect(permisoAvisos()).toBe("sin-soporte");
-  expect(crearActivarAvisos()).toBeNull();
-});
-
 test("la política de seguridad deja registrar el service worker de la app (PWA sin conexión)", async () => {
   const { readFileSync } = await import("node:fs");
   const html = readFileSync(new URL("../../../index.html", import.meta.url), "utf8");

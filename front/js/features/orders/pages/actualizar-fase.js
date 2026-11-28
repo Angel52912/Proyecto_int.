@@ -6,6 +6,7 @@ import { folio } from "../../chat/pages/chat.js";
 import { comprimirImagen } from "../../../lib/imagen.js";
 import { TIPOS_IMAGEN, validarImagen } from "../../../../../apis/lib/validate.js";
 import { alSalir } from "../../../ui/ciclo.js";
+import { confirmar } from "../../../ui/confirmar.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
@@ -103,7 +104,7 @@ function pintar({ pedido, solicitud }) {
           variante: "cenote",
           icono: "check",
           alHacerClic: async () => {
-            if (!window.confirm("¿Avisar al cliente que su pedido está listo para recoger?")) return;
+            if (!(await confirmar({ titulo: "¿Avisar al cliente?", mensaje: "Le diremos que su pedido está listo para recoger.", aceptar: "Avisar" }))) return;
             try {
               await api.markOrderReady(pedido.id);
               raiz.replaceWith(pintar({ pedido: await api.getOrder(pedido.id), solicitud }));
@@ -140,7 +141,8 @@ function pintar({ pedido, solicitud }) {
               nota.focus();
               return;
             }
-            if (!window.confirm(`El pedido pasará de "${NOMBRE_FASE[pedido.phase]}" a "${NOMBRE_FASE[fase]}". ¿Confirmas la corrección?`)) return;
+            const seguro = await confirmar({ titulo: "¿Corregir la fase?", mensaje: `El pedido pasará de "${NOMBRE_FASE[pedido.phase]}" a "${NOMBRE_FASE[fase]}".`, aceptar: "Corregir" });
+            if (!seguro) return;
           }
           guardar.disabled = true;
           try {

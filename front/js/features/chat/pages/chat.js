@@ -6,6 +6,7 @@ import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { crearTarjetaPresupuesto } from "../../quotes/tarjeta.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { alSalir } from "../../../ui/ciclo.js";
+import { confirmar } from "../../../ui/confirmar.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
@@ -61,8 +62,10 @@ function pintarConversacion(rol, solicitud, pantalla) {
         attrs: { type: "button" },
         on: {
           click: async (evento) => {
-            if (!window.confirm("¿Cancelar esta solicitud? El taller ya no podrá enviarte presupuesto.")) return;
+            // currentTarget se pierde después de un await: se guarda antes de preguntar.
             const boton = /** @type {HTMLButtonElement} */ (evento.currentTarget);
+            const seguro = await confirmar({ titulo: "¿Cancelar esta solicitud?", mensaje: "El taller ya no podrá enviarte presupuesto.", aceptar: "Cancelar solicitud", cancelar: "Volver", peligro: true });
+            if (!seguro) return;
             boton.disabled = true;
             try {
               await apiSolicitudes.cancelRequest(solicitud.id);

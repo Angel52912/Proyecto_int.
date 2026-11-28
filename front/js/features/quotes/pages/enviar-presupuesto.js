@@ -6,6 +6,7 @@ import { api as apiSolicitudes } from "../../requests/index.js";
 import { folio } from "../../chat/pages/chat.js";
 import { ESTADO_SOLICITUD } from "../../orders/fases.js";
 import { formatearMxn } from "../../../lib/money.js";
+import { confirmar } from "../../../ui/confirmar.js";
 import { crear, enlace, irSinRegreso } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
@@ -110,7 +111,7 @@ function pintar({ solicitud, vigente }) {
             if (salida) salida.textContent = errores[nombre] ?? "";
           }
           if (datos === null) return;
-          if (vigente && !window.confirm(`Se reemplazará el presupuesto de ${formatearMxn(vigente.amount_mxn)}. ¿Continuar?`)) return;
+          if (vigente && !(await confirmar({ titulo: "¿Reemplazar el presupuesto?", mensaje: `El de ${formatearMxn(vigente.amount_mxn)} dejará de estar vigente y el cliente verá el nuevo.`, aceptar: "Reemplazar" }))) return;
           enviar.disabled = true;
           try {
             await api.sendQuote(solicitud.id, datos);
