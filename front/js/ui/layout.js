@@ -61,11 +61,23 @@ export function crearNavegacion(rol, activa) {
       ]),
     ]),
   );
-  // Logo de la marca: solo se ve en la barra lateral de escritorio (layout.css); decorativo.
-  const marca = crear("span", { clase: "nav-inferior__marca", attrs: { "aria-hidden": "true" } }, [icono("destello", { tam: 22 })]);
+  // Logo y nombre de la marca: solo se ven en la barra lateral de escritorio (layout.css); decorativos.
+  const marca = crear("span", { clase: "nav-inferior__marca", attrs: { "aria-hidden": "true" } }, [
+    crear("span", { clase: "nav-inferior__logo" }, [icono("destello", { tam: 20 })]),
+    crear("span", { clase: "nav-inferior__nombre", texto: "MiXanab" }),
+  ]);
   const lista = crear("ul", {}, elementos);
   lista.style.setProperty("--nav-elementos", String(elementos.length));
-  return crear("nav", { clase: "nav-inferior", attrs: { "aria-label": "Navegación principal" } }, [marca, lista]);
+  // Escritorio: el Perfil (cliente) o Mi taller (artesano) va abajo de la barra lateral; en el celular está oculto
+  // porque se abre desde el avatar de la barra superior.
+  const perfil =
+    rol === "client" || rol === "craftsman"
+      ? enlace(PERFIL[rol].ruta, { clase: "nav-inferior__perfil", attrs: { "data-pestana": "perfil", "aria-current": activa === "perfil" ? "page" : null } }, [
+          crear("span", { clase: "avatar avatar--chico", attrs: { "aria-hidden": "true" } }, [icono("perfil", { tam: 16 })]),
+          crear("span", { texto: PERFIL[rol].texto }),
+        ])
+      : null;
+  return crear("nav", { clase: "nav-inferior", attrs: { "aria-label": "Navegación principal" } }, [marca, lista, perfil]);
 }
 
 /**

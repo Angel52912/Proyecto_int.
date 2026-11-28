@@ -80,7 +80,9 @@ describe("layout", () => {
     expect(pantalla.querySelector("h1")?.textContent).toBe("T");
     expect(pantalla.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe("#/pedidos");
     // Nuevo front: 4 pestañas; el Perfil se abre desde el avatar de la barra superior.
-    expect([...pantalla.querySelectorAll(".nav-inferior a")].map((a) => a.textContent)).toEqual(["Inicio", "Buscar", "Pedidos", "Chats"]);
+    expect([...pantalla.querySelectorAll(".nav-inferior__enlace")].map((a) => a.textContent)).toEqual(["Inicio", "Buscar", "Pedidos", "Chats"]);
+    // En PC el perfil va abajo de la barra lateral (en el celular está oculto por CSS).
+    expect(pantalla.querySelector(".nav-inferior__perfil")?.getAttribute("href")).toBe("#/perfil");
     expect(/** @type {HTMLElement} */ (pantalla.querySelector(".nav-inferior ul")).style.getPropertyValue("--nav-elementos")).toBe("4");
     // Con Volver no es pantalla raíz: no lleva avatar.
     expect(pantalla.querySelector(".barra__perfil")).toBeNull();
@@ -88,7 +90,8 @@ describe("layout", () => {
   test("navegación del artesano", () => {
     const pantalla = crearPantalla({ rol: "craftsman", activa: "tablero" }, []);
     expect(pantalla.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe("#/artesano/tablero");
-    expect([...pantalla.querySelectorAll(".nav-inferior a")].map((a) => a.textContent)).toEqual(["Tablero", "Solicitudes", "Chats", "Historial"]);
+    expect([...pantalla.querySelectorAll(".nav-inferior__enlace")].map((a) => a.textContent)).toEqual(["Tablero", "Solicitudes", "Chats", "Historial"]);
+    expect(pantalla.querySelector(".nav-inferior__perfil")?.textContent).toBe("Mi taller");
   });
   test("pantalla raíz de pestaña: título grande y avatar que abre el perfil", () => {
     const cliente = crearPantalla({ rol: "client", activa: "pedidos", titulo: "Mis pedidos", perfil: true }, []);

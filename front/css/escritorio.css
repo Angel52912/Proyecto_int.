@@ -1,0 +1,323 @@
+/* Nuevo front en PC (1024px o más, `html[data-escritorio]`): barra lateral con nombres y dos paneles en las
+   pantallas clave (Buscar, Chats y Seguimiento). Todo va bajo `html[data-escritorio]`: el celular no cambia. */
+
+/* ── Barra lateral: logo, nombres de las pestañas y el perfil abajo ── */
+html[data-escritorio] {
+  --nav-ancho: 232px;
+  /* El contenido se centra en el espacio que deja la barra lateral. */
+  --pantalla-margen-izquierdo: calc(var(--nav-ancho) + max(0px, (100vw - var(--nav-ancho) - var(--ancho-pantalla)) / 2));
+}
+
+html[data-escritorio] .nav-inferior {
+  display: flex;
+  flex-direction: column;
+  padding: var(--espacio-4) var(--espacio-3);
+}
+
+html[data-escritorio] .nav-inferior__marca {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  height: auto;
+  margin: 0 var(--espacio-2) var(--espacio-4);
+  border-radius: 0;
+  background: none;
+  color: var(--color-espresso);
+}
+
+.nav-inferior__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--color-cuero);
+  color: #fff;
+}
+
+.nav-inferior__nombre {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+html[data-escritorio] .nav-inferior ul {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  max-width: none;
+  margin: 0;
+}
+
+html[data-escritorio] .nav-inferior__enlace {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+html[data-escritorio] .nav-inferior__contador {
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+}
+
+/* Perfil o Mi taller: abajo de la barra, con avatar y nombre. En el celular se abre desde el avatar de arriba. */
+.nav-inferior__perfil {
+  display: none;
+}
+
+html[data-escritorio] .nav-inferior__perfil {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--color-borde);
+  color: var(--color-espresso);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+html[data-escritorio] .nav-inferior__perfil:hover,
+html[data-escritorio] .nav-inferior__perfil[aria-current="page"] {
+  border-radius: var(--radio-chico);
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero-oscuro);
+}
+
+html[data-escritorio] .nav-inferior__perfil:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+/* El avatar de arriba sobra en PC: el perfil ya está en la barra lateral. */
+html[data-escritorio] :is(.barra__perfil, .inicio__avatar) {
+  display: none;
+}
+
+/* Efecto al pasar el ratón por tarjetas que llevan a otra pantalla. */
+html[data-escritorio] .tarjeta--enlace {
+  transition: border-color var(--transicion), transform var(--transicion);
+}
+
+html[data-escritorio] .tarjeta--enlace:hover {
+  transform: translateY(-1px);
+}
+
+/* ── Buscar: lista a la izquierda y mapa grande a la derecha ── */
+/* En el celular el panel lateral no existe: el buscador flota sobre el mapa y la lista no se muestra. */
+.mapa__lateral {
+  display: contents;
+}
+
+.mapa__lista {
+  display: none;
+}
+
+html[data-escritorio] .mapa {
+  max-width: none;
+  margin-left: var(--nav-ancho);
+}
+
+html[data-escritorio] .mapa__lateral {
+  position: fixed;
+  top: var(--alto-franja, 0px);
+  bottom: 0;
+  left: var(--nav-ancho);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  border-right: 1px solid var(--color-borde);
+  background: var(--color-superficie);
+}
+
+html[data-escritorio] .mapa__superior {
+  padding: var(--espacio-3);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+html[data-escritorio] .mapa__superior .buscador input {
+  box-shadow: none;
+}
+
+html[data-escritorio] .mapa__superior .chip,
+html[data-escritorio] .mapa__superior .chip[aria-pressed="true"] {
+  box-shadow: none;
+}
+
+html[data-escritorio] .mapa__superior .chip:not([aria-pressed="true"]) {
+  border-color: var(--color-borde);
+}
+
+html[data-escritorio] .mapa__lista {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: var(--espacio-3) var(--espacio-3) var(--espacio-4);
+  overflow-y: auto;
+}
+
+.mapa__fila--elegida .tarjeta {
+  border-color: var(--color-cuero);
+  box-shadow: 0 0 0 1px var(--color-cuero);
+}
+
+html[data-escritorio] .mapa__lienzo {
+  left: calc(var(--nav-ancho) + 380px);
+  right: 0;
+  max-width: none;
+  margin: 0;
+}
+
+html[data-escritorio] .mapa__tarjeta {
+  display: none;
+}
+
+html[data-escritorio] .mapa__ubicar {
+  right: var(--espacio-4);
+  bottom: var(--espacio-4);
+}
+
+/* ── Chats: lista a la izquierda y la conversación abierta a la derecha (como WhatsApp Web) ── */
+html[data-escritorio] .chats--dos-paneles {
+  --ancho-pantalla: 1200px;
+}
+
+html[data-escritorio] .chats.chats--dos-paneles > .pantalla__cuerpo {
+  max-width: none;
+  padding-top: 0;
+}
+
+.chats__paneles {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  height: calc(100dvh - 64px - var(--espacio-4) - var(--alto-franja, 0px));
+  min-height: 480px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  overflow: hidden;
+}
+
+.chats__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  padding: var(--espacio-3);
+  border-right: 1px solid var(--color-borde);
+  overflow-y: auto;
+}
+
+.chats__lista .conversacion {
+  padding: 10px var(--espacio-2);
+  border-radius: var(--radio-chico);
+}
+
+.chats__lista .conversacion:hover {
+  background: var(--color-arena);
+}
+
+.conversacion--activa,
+.chats__lista .conversacion--activa:hover {
+  background: var(--color-cuero-suave);
+}
+
+.chats__elige {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-2);
+  color: var(--color-texto-tenue);
+  text-align: center;
+}
+
+/* La conversación abierta ocupa el panel derecho: sin márgenes de pantalla ni botón Volver. */
+.chats__paneles > .chat-pantalla {
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  background: var(--color-hueso);
+  box-shadow: none;
+  animation: none;
+}
+
+html[data-escritorio] .chats__paneles > .chat-pantalla .barra {
+  position: static;
+  max-width: none;
+  margin: 0;
+  border-bottom: 1px solid var(--color-borde);
+  background: var(--color-superficie);
+}
+
+.chats__paneles > .chat-pantalla .barra__volver {
+  display: none;
+}
+
+html[data-escritorio] .chats__paneles > .chat-pantalla .pantalla__cuerpo {
+  max-width: none;
+  margin: 0;
+  padding: var(--espacio-3) var(--espacio-4) 0;
+}
+
+/* ── Seguimiento: avance a la izquierda; taller, total y botones fijos a la derecha ── */
+html[data-escritorio] .seguimiento .pantalla__cuerpo,
+html[data-escritorio] .seguimiento .barra {
+  max-width: 1040px;
+}
+
+html[data-escritorio] .seguimiento__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: var(--espacio-4);
+}
+
+html[data-escritorio] .seguimiento__principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+html[data-escritorio] .seguimiento__lateral {
+  position: sticky;
+  top: calc(72px + var(--alto-franja, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+}
+
+html[data-escritorio] .seguimiento__lateral .seguimiento__resumen {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: 0;
+}
+
+html[data-escritorio] .seguimiento__lateral .seguimiento__resumen > .foto {
+  width: 100%;
+  height: 140px;
+}
+
+html[data-escritorio] .seguimiento__lateral .seguimiento__total {
+  padding-top: var(--espacio-3);
+}
+
+html[data-escritorio] .linea-tiempo__foto {
+  width: 96px;
+  height: 72px;
+}

@@ -1,5 +1,6 @@
 // 24 · Chats: lista de conversaciones con búsqueda y último mensaje. La usan el artesano (con cada cliente)
-// y el cliente (con cada taller); la pestaña Chats de la barra lleva aquí.
+// y el cliente (con cada taller); la pestaña Chats de la barra lleva aquí. En PC la lista queda a la izquierda y la
+// conversación abierta a la derecha, como en WhatsApp Web (ver chat.js).
 import { crearAvatar } from "../../auth/avatar.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { formatearHace } from "../../../lib/fechas.js";
@@ -28,10 +29,11 @@ export function filtrarConversaciones(conversaciones, texto) {
 /**
  * @param {Conversacion} c
  * @param {string} base ruta del chat según el rol
+ * @param {string | null} [activa] id de la conversación abierta (PC), que queda marcada
  */
-function crearFila(c, base) {
+function crearFila(c, base, activa = null) {
   return crear("li", {}, [
-    enlace(`${base}/${c.id}`, { clase: "conversacion" }, [
+    enlace(`${base}/${c.id}`, { clase: `conversacion${c.id === activa ? " conversacion--activa" : ""}`, attrs: { "aria-current": c.id === activa ? "page" : null } }, [
       crearAvatar({ nombre: c.nombre, avatarPath: c.avatarPath }),
       crear("div", { clase: "tarjeta__cuerpo" }, [
         crear("div", { clase: "fila-entre" }, [crear("p", { clase: "tarjeta__titulo", texto: c.nombre }), crear("span", { clase: "texto-secundario", texto: formatearHace(c.fecha) })]),
@@ -55,18 +57,47 @@ export function renderChats(rol = "craftsman") {
   return () => pintarChats(rol);
 }
 
+/** @returns {boolean} si la app se ve en modo PC (ui/escritorio.js) */
+export const enEscritorio = () => document.documentElement.hasAttribute("data-escritorio");
+
+/**
+ * Pantalla con la barra de navegación y, en PC, la lista de conversaciones a la izquierda y `derecha` al lado.
+ * @param {"craftsman" | "client"} rol
+ * @param {string | null} activa id de la conversación abierta
+ * @param {Node} derecha conversación abierta o el aviso "Elige una conversación"
+ * @returns {HTMLElement}
+ */
+export function crearChatsEnDosPaneles(rol, activa, derecha) {
+  return crearPantalla({ rol, activa: "chats", clase: "chats chats--dos-paneles", titulo: "Chats", perfil: true }, [
+    crear("div", { clase: "chats__paneles" }, [crear("aside", { clase: "chats__lista", attrs: { "aria-label": "Conversaciones" } }, crearPanelConversaciones(rol, activa)), derecha]),
+  ]);
+}
+
 /**
  * @param {"craftsman" | "client"} rol
  * @returns {Promise<Node>}
  */
 async function pintarChats(rol) {
+  if (enEscritorio()) {
+    return crearChatsEnDosPaneles(
+      rol,
+      null,
+      crear("div", { clase: "chats__elige" }, [icono("chat", { tam: 32 }), crear("p", { texto: "Elige una conversación para verla aquí." })]),
+    );
+  }
+  return crearPantalla({ rol, activa: "chats", clase: "chats", titulo: "Chats", perfil: true }, crearPanelConversaciones(rol, null));
+}
+
+/**
+ * Buscador y lista de conversaciones (se cargan al crearse).
+ * @param {"craftsman" | "client"} rol
+ * @param {string | null} activa id de la conversación abierta (PC)
+ * @returns {Node[]}
+ */
+function crearPanelConversaciones(rol, activa) {
   const textos = POR_ROL[rol];
   const entrada = /** @type {HTMLInputElement} */ (crear("input", { attrs: { type: "search", placeholder: "Buscar conversación", "aria-label": "Buscar conversación" } }));
   const lista = crear("div");
-  const pantalla = crearPantalla({ rol, activa: "chats", clase: "chats", titulo: "Chats", perfil: true }, [
-    crear("div", { clase: "campo campo--icono buscador" }, [icono("buscar", { tam: 18 }), entrada]),
-    lista,
-  ]);
 
   /** @type {Conversacion[]} */
   let todas = [];
@@ -74,7 +105,7 @@ async function pintarChats(rol) {
     const visibles = filtrarConversaciones(todas, entrada.value);
     return visibles.length === 0
       ? crearVacio(todas.length === 0 ? textos.vacio : "Ninguna conversación coincide.", null, { icono: "chat" })
-      : crear("ul", { clase: "lista lista--separada" }, visibles.map((c) => crearFila(c, textos.base)));
+      : crear("ul", { clase: "lista lista--separada" }, visibles.map((c) => crearFila(c, textos.base, activa)));
   };
   entrada.addEventListener("input", () => lista.replaceChildren(pintarLista()));
 
@@ -94,5 +125,5 @@ async function pintarChats(rol) {
     },
     pintarLista,
   );
-  return pantalla;
+  return [crear("div", { clase: "campo campo--icono buscador" }, [icono("buscar", { tam: 18 }), entrada]), lista];
 }

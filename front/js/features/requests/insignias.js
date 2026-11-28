@@ -49,7 +49,7 @@ export function contarPorPestana(rol, avisos) {
  * @param {Record<string, number>} conteo
  */
 export function pintarContadores(conteo) {
-  document.querySelectorAll(".nav-inferior__enlace[data-pestana], .barra__perfil[data-pestana]").forEach((enlace) => {
+  document.querySelectorAll(".nav-inferior__enlace[data-pestana], .barra__perfil[data-pestana], .nav-inferior__perfil[data-pestana]").forEach((enlace) => {
     const cantidad = conteo[/** @type {HTMLElement} */ (enlace).dataset.pestana ?? ""] ?? 0;
     let contador = enlace.querySelector(".nav-inferior__contador");
     if (cantidad === 0) {

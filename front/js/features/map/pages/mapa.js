@@ -1,5 +1,6 @@
 // 07 · Buscar taller (CU-02), nuevo front: mapa casi a pantalla completa con buscador y filtros flotando arriba y un
-// panel abajo con el taller elegido y el acceso a la lista completa.
+// panel abajo con el taller elegido y el acceso a la lista completa. En PC: lista de talleres a la izquierda y el
+// mapa a la derecha; al pasar el ratón por un taller se marca su pin.
 import { alSalir } from "../../../ui/ciclo.js";
 import { crear, enlace } from "../../../ui/dom.js";
 import { crearCargando, crearError, crearVacio } from "../../../ui/estados.js";
@@ -34,6 +35,9 @@ export async function renderMapa({ consulta }) {
 
   const mapaContenedor = crear("div", { clase: "mapa__lienzo", attrs: { role: "region", "aria-label": "Mapa de talleres" } });
   const tarjeta = crear("div", { clase: "mapa__tarjeta", attrs: { "aria-live": "polite" } });
+  // Lista completa de resultados: solo se ve en PC (escritorio.css), a la izquierda del mapa.
+  const lista = crear("div", { clase: "mapa__lista" });
+  const esEscritorio = () => document.documentElement.hasAttribute("data-escritorio");
   /** @type {any} */
   let mapa = null;
   /** @type {any} */
@@ -124,6 +128,8 @@ export async function renderMapa({ consulta }) {
 
   /** Lo que tapan el buscador con filtros (arriba) y la tarjeta con la navegación (abajo). */
   function margenDelMapa() {
+    // En PC el buscador y la lista están a un lado del mapa: no tapan nada.
+    if (esEscritorio()) return { arriba: 0, abajo: 0 };
     const alto = window.innerHeight;
     const arriba = superior.getBoundingClientRect().bottom;
     const abajo = alto - tarjeta.getBoundingClientRect().top;
@@ -141,6 +147,25 @@ export async function renderMapa({ consulta }) {
       ]),
       crearTarjetaTaller(taller),
     );
+    pintarLista();
+  }
+
+  /** Lista de PC: todos los resultados; el elegido queda marcado y, al pasar el ratón, se marca su pin. */
+  function pintarLista() {
+    lista.replaceChildren(
+      crear("p", { clase: "mapa__conteo", texto: resultados.length === 1 ? "1 taller" : `${resultados.length} talleres` }),
+      crear(
+        "ul",
+        { clase: "lista" },
+        resultados.map((t) => {
+          const fila = crear("li", { clase: t.id === estado.seleccionado ? "mapa__fila mapa__fila--elegida" : "mapa__fila" }, [crearTarjetaTaller(t)]);
+          fila.addEventListener("mouseenter", () => {
+            if (t.id !== estado.seleccionado) elegir(t);
+          });
+          return fila;
+        }),
+      ),
+    );
   }
 
   /** @param {any} taller */
@@ -156,6 +181,7 @@ export async function renderMapa({ consulta }) {
 
   async function buscar() {
     tarjeta.replaceChildren(crearCargando("Buscando talleres…"));
+    lista.replaceChildren(crearCargando("Buscando talleres…"));
     try {
       resultados = await buscarTalleres({
         service: estado.servicio,
@@ -165,7 +191,9 @@ export async function renderMapa({ consulta }) {
         ...(estado.abierto ? { open_now: true } : {}),
       });
     } catch (error) {
-      tarjeta.replaceChildren(crearError(mensajeDeError(error, { invalid_input: "Revisa la colonia o el código postal." }), buscar));
+      const texto = mensajeDeError(error, { invalid_input: "Revisa la colonia o el código postal." });
+      tarjeta.replaceChildren(crearError(texto, buscar));
+      lista.replaceChildren(crearError(texto, buscar));
       return;
     }
     capa?.remove();
@@ -173,6 +201,7 @@ export async function renderMapa({ consulta }) {
     if (resultados.length === 0) {
       // A2: aviso sin resultados.
       tarjeta.replaceChildren(crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros."));
+      lista.replaceChildren(crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros."));
       return;
     }
     // Primero la tarjeta, para medir cuánto tapa antes de encuadrar los pines.
@@ -194,7 +223,7 @@ export async function renderMapa({ consulta }) {
   const pantalla = crearPantalla({ rol: "client", activa: "mapa", clase: "mapa" }, [
     crear("h1", { clase: "oculto-visual", texto: "Mapa de talleres" }),
     mapaContenedor,
-    superior,
+    crear("div", { clase: "mapa__lateral" }, [superior, lista]),
     botonUbicacion,
     tarjeta,
   ]);

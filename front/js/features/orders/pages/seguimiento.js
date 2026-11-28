@@ -78,8 +78,7 @@ function pintarSeguimiento({ pedido, avances, solicitud, taller, presupuesto }) 
     acciones = [enlace(`/pedido/${pedido.id}/calificar`, { clase: "boton boton--bloque" }, [icono("estrella", { tam: 18 }), crear("span", { texto: "Calificar al taller" })]), escribir(false)];
   }
 
-  return [
-    crear("article", { clase: "tarjeta seguimiento__resumen" }, [
+  const resumen = crear("article", { clase: "tarjeta seguimiento__resumen" }, [
       crearFoto(solicitud?.photos?.[0]?.url, "Foto del calzado"),
       crear("div", { clase: "tarjeta__cuerpo" }, [
         crear("p", { clase: "tarjeta__titulo", texto: servicio }),
@@ -89,35 +88,44 @@ function pintarSeguimiento({ pedido, avances, solicitud, taller, presupuesto }) 
           : null,
       ]),
       crearInsignia(estado.texto, pedido.status === "in_progress" ? "cenote" : estado.tono),
-    ]),
-    crearAvisoDeFase(pedido),
-    // Misma barra de 4 pasos que en Inicio y Mis pedidos.
-    crearPasos(pedido),
-    crear(
-      "ol",
-      { clase: "linea-tiempo", attrs: { "aria-label": "Fases del pedido" } },
-      lineaDeTiempo(pedido, avances).map((paso) =>
-        crear("li", { clase: `linea-tiempo__paso linea-tiempo__paso--${paso.estado}`, attrs: { "aria-current": paso.estado === "actual" ? "step" : null } }, [
-          crear("span", { clase: "linea-tiempo__marca", attrs: { "aria-hidden": "true" } }, [paso.estado === "hecha" ? icono("check", { tam: 14 }) : crear("span", { texto: String(paso.fase) })]),
-          crear("div", { clase: "linea-tiempo__texto" }, [
-            crear("p", { clase: "linea-tiempo__nombre", texto: paso.estado === "actual" ? `${paso.nombre} · en curso` : paso.nombre }),
-            paso.detalle
-              ? crear("p", { clase: "tarjeta__detalle", texto: paso.detalle })
-              : paso.estado === "pendiente"
-                ? crear("p", { clase: "tarjeta__detalle", texto: "Pendiente" })
-                : null,
-            paso.nota ? crear("p", { clase: "tarjeta__detalle linea-tiempo__nota", texto: `${paso.corregida ? "Corrección: " : ""}${paso.nota}` }) : null,
-            paso.foto ? crearFoto(paso.foto, `Avance de la fase ${paso.fase}: ${paso.nombre}`, "linea-tiempo__foto") : null,
+  ]);
+
+  // Dos grupos: en PC son dos columnas (avance a la izquierda; taller, total y botones a la derecha). En el celular
+  // se ven en una sola columna con el resumen hasta arriba (nuevo-front.css y escritorio.css).
+  return [
+    crear("div", { clase: "seguimiento__principal" }, [
+      crearAvisoDeFase(pedido),
+      // Misma barra de 4 pasos que en Inicio y Mis pedidos.
+      crearPasos(pedido),
+      crear(
+        "ol",
+        { clase: "linea-tiempo", attrs: { "aria-label": "Fases del pedido" } },
+        lineaDeTiempo(pedido, avances).map((paso) =>
+          crear("li", { clase: `linea-tiempo__paso linea-tiempo__paso--${paso.estado}`, attrs: { "aria-current": paso.estado === "actual" ? "step" : null } }, [
+            crear("span", { clase: "linea-tiempo__marca", attrs: { "aria-hidden": "true" } }, [paso.estado === "hecha" ? icono("check", { tam: 14 }) : crear("span", { texto: String(paso.fase) })]),
+            crear("div", { clase: "linea-tiempo__texto" }, [
+              crear("p", { clase: "linea-tiempo__nombre", texto: paso.estado === "actual" ? `${paso.nombre} · en curso` : paso.nombre }),
+              paso.detalle
+                ? crear("p", { clase: "tarjeta__detalle", texto: paso.detalle })
+                : paso.estado === "pendiente"
+                  ? crear("p", { clase: "tarjeta__detalle", texto: "Pendiente" })
+                  : null,
+              paso.nota ? crear("p", { clase: "tarjeta__detalle linea-tiempo__nota", texto: `${paso.corregida ? "Corrección: " : ""}${paso.nota}` }) : null,
+              paso.foto ? crearFoto(paso.foto, `Avance de la fase ${paso.fase}: ${paso.nombre}`, "linea-tiempo__foto") : null,
+            ]),
+            crear("span", { clase: "oculto-visual", texto: paso.estado === "hecha" ? "Completada" : paso.estado === "actual" ? "En curso" : "Pendiente" }),
           ]),
-          crear("span", { clase: "oculto-visual", texto: paso.estado === "hecha" ? "Completada" : paso.estado === "actual" ? "En curso" : "Pendiente" }),
-        ]),
+        ),
       ),
-    ),
-    avances.length === 0 ? crear("p", { clase: "texto-secundario", texto: "El taller subirá una foto en cada cambio de fase." }) : null,
-    presupuesto
-      ? crear("div", { clase: "fila-entre seguimiento__total" }, [crear("span", { texto: "Total a pagar al recoger" }), crear("strong", { texto: formatearMxn(presupuesto.amount_mxn) })])
-      : null,
-    crear("div", { clase: "acciones acciones--columna" }, acciones),
+      avances.length === 0 ? crear("p", { clase: "texto-secundario", texto: "El taller subirá una foto en cada cambio de fase." }) : null,
+    ]),
+    crear("aside", { clase: "seguimiento__lateral" }, [
+      resumen,
+      presupuesto
+        ? crear("div", { clase: "fila-entre seguimiento__total" }, [crear("span", { texto: "Total a pagar al recoger" }), crear("strong", { texto: formatearMxn(presupuesto.amount_mxn) })])
+        : null,
+      crear("div", { clase: "acciones acciones--columna" }, acciones),
+    ]),
   ];
 }
 

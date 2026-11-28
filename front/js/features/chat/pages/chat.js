@@ -12,6 +12,7 @@ import { crearFoto } from "../../../ui/foto.js";
 import { crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { crearChat } from "../componente.js";
+import { crearChatsEnDosPaneles, enEscritorio } from "./chats.js";
 
 const ADMITE_MENSAJES = ["open", "quoted", "accepted"];
 
@@ -129,7 +130,8 @@ export function renderChat(rol) {
       not_found: "No encontramos esta conversación.",
       invalid_input: "No encontramos esta conversación.",
     });
-    return pantalla;
+    // PC: la lista de conversaciones a la izquierda y esta conversación a la derecha.
+    return enEscritorio() ? crearChatsEnDosPaneles(rol, params.requestId, pantalla) : pantalla;
   };
 }
 

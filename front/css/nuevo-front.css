@@ -887,3 +887,19 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
 .pestanas__boton[aria-selected="true"] {
   box-shadow: 0 1px 2px rgb(24 24 27 / 8%);
 }
+
+/* Los mensajes nunca se desplazan de lado (un desborde de 1px mostraba una barra horizontal sobre el campo de escribir). */
+.chat__zona {
+  overflow-x: hidden;
+}
+
+/* Seguimiento en el celular: una sola columna con el resumen del pedido hasta arriba
+   (en PC los dos grupos son columnas, ver escritorio.css). */
+.seguimiento__principal,
+.seguimiento__lateral {
+  display: contents;
+}
+
+.seguimiento__resumen {
+  order: -1;
+}
