@@ -114,6 +114,10 @@ test("pedido completo por las pantallas: solicitud → chat → presupuesto → 
   // 3) Cliente: ve la tarjeta del presupuesto en el chat, la abre y acepta.
   comoCliente();
   await ir(`/chat/${solicitudId}`);
+  // Chat en pantalla completa: la barra dice con quién se habla y Volver lleva a la lista de Chats.
+  expect(elemento(".barra__titulo").textContent).toBe("Calzado El Buen Paso");
+  expect(elemento(".barra__volver").getAttribute("href")).toBe("#/chats");
+  expect(app().querySelector(".nav-inferior")).toBeNull();
   const enlacePresupuesto = /** @type {HTMLAnchorElement} */ (elemento('a[href^="#/presupuesto/"]'));
   await ir(enlacePresupuesto.getAttribute("href")?.slice(1) ?? "");
   expect(texto()).toContain("$450");

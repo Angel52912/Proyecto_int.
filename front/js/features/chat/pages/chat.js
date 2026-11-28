@@ -27,8 +27,9 @@ export function folio(id) {
 /**
  * @param {"client" | "craftsman"} rol
  * @param {any} solicitud SolicitudDetalle
+ * @param {HTMLElement} pantalla para poner el nombre de la contraparte en la barra superior
  */
-function pintarConversacion(rol, solicitud) {
+function pintarConversacion(rol, solicitud, pantalla) {
   const esCliente = rol === "client";
   const nombre = solicitud.counterpart?.full_name ?? (esCliente ? "Taller no disponible" : "Cliente");
   // Para el cliente una solicitud abierta está "Enviada"; para el artesano es "Nueva".
@@ -88,22 +89,24 @@ function pintarConversacion(rol, solicitud) {
   }
   if (!ADMITE_MENSAJES.includes(solicitud.status)) chat.permitirEscritura(false, solicitud.status === "draft" ? "Esta solicitud aún no se envía." : "Esta solicitud está cerrada.");
 
-  const contraparte = crear("div", { clase: "chat-contraparte" }, [
-    crearAvatar({ nombre, avatarPath: solicitud.counterpart?.avatar_path }),
-    crear("div", {}, [crear("p", { clase: "chat-contraparte__nombre", texto: nombre }), crearInsignia(estado.texto, estado.tono)]),
-  ]);
+  // La barra superior muestra con quién se habla (como en las apps de mensajería): avatar, nombre y estado.
+  const titulo = pantalla.querySelector(".barra__titulo");
+  if (titulo) {
+    titulo.textContent = nombre;
+    titulo.before(crearAvatar({ nombre, avatarPath: solicitud.counterpart?.avatar_path, clase: "avatar--chico" }));
+    titulo.after(crearInsignia(estado.texto, estado.tono));
+  }
 
   return [
-    contraparte,
+    // Resumen compacto de la solicitud en un renglón, con sus acciones a la derecha.
     crear("div", { clase: "chat-solicitud" }, [
       crearFoto(solicitud.photos[0]?.url, "Foto del calzado", "foto--chica"),
-      crear("div", { clase: "tarjeta__cuerpo" }, [
-        crear("p", { clase: "tarjeta__detalle", texto: `Solicitud ${folio(solicitud.id)}` }),
-        crear("p", { clase: "tarjeta__titulo", texto: NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud.service_type)] }),
+      crear("div", { clase: "chat-solicitud__texto" }, [
+        crear("p", { clase: "chat-solicitud__titulo", texto: `${NOMBRE_SERVICIO[/** @type {"repair" | "cleaning"} */ (solicitud.service_type)]} · ${folio(solicitud.id)}` }),
         crear("p", { clase: "tarjeta__detalle chat-solicitud__descripcion", texto: solicitud.description }),
       ]),
+      acciones,
     ]),
-    acciones,
     avisoAccion,
     chat.elemento,
   ];
@@ -117,13 +120,29 @@ export function renderChat(rol) {
   return async ({ params }) => {
     const contenido = crear("div", { clase: "chat-pantalla__contenido" });
     const pantalla = crearPantalla(
-      { titulo: "Chat", volver: rol === "client" ? "/pedidos" : "/artesano/chats", clase: "chat-pantalla" },
+      { titulo: "Chat", volver: rol === "client" ? "/chats" : "/artesano/chats", clase: "chat-pantalla" },
       [contenido],
     );
-    cargarEn(contenido, () => apiSolicitudes.getRequest(params.requestId), (s) => pintarConversacion(rol, s), {
+    ajustarAlTecladoVisible(pantalla);
+    cargarEn(contenido, () => apiSolicitudes.getRequest(params.requestId), (s) => pintarConversacion(rol, s, pantalla), {
       not_found: "No encontramos esta conversación.",
       invalid_input: "No encontramos esta conversación.",
     });
     return pantalla;
   };
 }
+
+/**
+ * El chat ocupa justo el alto visible. En celulares, al abrir el teclado el área visible se achica
+ * (visualViewport): se ajusta el alto para que el campo de escribir quede arriba del teclado.
+ * @param {HTMLElement} pantalla
+ */
+function ajustarAlTecladoVisible(pantalla) {
+  const vista = window.visualViewport;
+  if (!vista) return;
+  const ajustar = () => pantalla.style.setProperty("--alto-visible", `${Math.round(vista.height)}px`);
+  vista.addEventListener("resize", ajustar);
+  alSalir(() => vista.removeEventListener("resize", ajustar));
+  ajustar();
+}
+

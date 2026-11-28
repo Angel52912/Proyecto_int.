@@ -1,6 +1,33 @@
 /* 11 · Chat y 24 · Chats (componente reutilizable) */
+/* Chat en pantalla completa: ocupa justo el alto visible (con el teclado abierto, el que queda libre),
+   sin barra de navegación. Arriba, con quién se habla; abajo, el campo de escribir; en medio, solo los
+   mensajes se desplazan. */
+.chat-pantalla {
+  height: var(--alto-visible, 100dvh);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-pantalla .barra {
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.chat-pantalla .barra__titulo {
+  overflow: hidden;
+  font-size: var(--texto-base);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-pantalla .barra .insignia {
+  flex: none;
+}
+
 .chat-pantalla .pantalla__cuerpo {
+  min-height: 0;
+  padding-top: var(--espacio-2);
   padding-bottom: 0;
+  overflow: hidden;
 }
 
 .chat-pantalla__contenido {
@@ -11,27 +38,41 @@
   min-height: 0;
 }
 
+/* Avatar + nombre en una fila (también lo usa Enviar presupuesto). */
 .chat-contraparte {
   display: flex;
   align-items: center;
   gap: var(--espacio-2);
 }
 
-.chat-contraparte__nombre {
-  margin: 0;
-  font-weight: 600;
-}
-
+/* Resumen de la solicitud en un renglón: foto, servicio y folio, descripción cortada y acciones. */
 .chat-solicitud {
   display: flex;
   align-items: center;
   gap: var(--espacio-2);
-  padding: var(--espacio-2) var(--espacio-3);
+  flex: none;
+  padding: var(--espacio-2);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radio);
-  background: var(--color-aviso-suave);
+  background: var(--color-superficie);
+}
+
+.chat-solicitud__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-solicitud__titulo {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--texto-secundario);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat-solicitud__descripcion {
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -39,8 +80,15 @@
 
 .chat-solicitud__acciones {
   display: flex;
-  justify-content: flex-end;
-  gap: var(--espacio-2);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: none;
+}
+
+.chat-solicitud__acciones .boton-texto {
+  font-size: var(--texto-secundario);
+  white-space: nowrap;
 }
 
 .chat-solicitud__acciones:empty {
@@ -51,12 +99,14 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 320px;
-  height: calc(100dvh - 240px);
+  min-height: 0;
 }
 
 .chat__zona {
+  /* Contiene los textos solo para lector de pantalla (posición absoluta): si no, alargan la página. */
+  position: relative;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
