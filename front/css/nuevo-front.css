@@ -1354,3 +1354,64 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
   color: var(--color-espresso);
   box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
 }
+
+/* ── Avisos en este dispositivo (pantalla Avisos) ── */
+.avisos-dispositivo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: 12px 14px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  color: var(--color-espresso);
+  font-size: 14px;
+}
+
+.avisos-dispositivo > .icono {
+  flex: none;
+  color: var(--color-cuero);
+}
+
+.avisos-dispositivo p {
+  margin: 0;
+}
+
+.avisos-dispositivo__texto {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-texto-suave);
+  font-size: 13px;
+}
+
+.avisos-dispositivo .avisos-dispositivo__titulo {
+  color: var(--color-espresso);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.avisos-dispositivo .boton {
+  flex: none;
+  min-height: 40px;
+  padding: 0 var(--espacio-3);
+}
+
+.avisos-dispositivo--activo {
+  border-color: transparent;
+  background: var(--color-exito-suave);
+  color: var(--color-exito);
+}
+
+.avisos-dispositivo--activo > .icono {
+  color: var(--color-exito);
+}
+
+.avisos-dispositivo--bloqueado {
+  border-color: transparent;
+  background: var(--color-arena);
+  color: var(--color-texto-suave);
+}
+
+.avisos-dispositivo--bloqueado > .icono {
+  color: var(--color-texto-suave);
+}

@@ -1,6 +1,6 @@
 // Service worker: solo cachea la interfaz (HTML, CSS, JS, íconos).
 // Nunca cachea Supabase, tiles del mapa ni fotos. Ignora todo lo que no sea GET del mismo origen.
-const CACHE_VERSION = "mixanab-ui-475f9e5f55";
+const CACHE_VERSION = "mixanab-ui-d202980c15";
 
 // Toda la interfaz: los módulos ES se cargan por import, así que cada archivo debe estar aquí para funcionar sin red.
 const INTERFAZ = [
@@ -145,6 +145,7 @@ const INTERFAZ = [
   "./apis/supabaseClient.js",
   "./front/js/ui/ampliar-foto.js",
   "./front/js/ui/aviso-flotante.js",
+  "./front/js/ui/avisos-sistema.js",
   "./front/js/ui/ciclo.js",
   "./front/js/ui/conexion.js",
   "./front/js/ui/dom.js",
@@ -203,6 +204,44 @@ self.addEventListener("fetch", (evento) => {
     evento.respondWith(cacheLuegoRed(peticion));
   }
   // Cualquier otra ruta va directo a la red y no se guarda.
+});
+
+// Avisos del sistema (front/js/ui/avisos-sistema.js y docs/notificaciones-push.md): al tocar uno se abre la app en la
+// pantalla de esa novedad, reusando la ventana abierta si la hay.
+self.addEventListener("notificationclick", (evento) => {
+  evento.notification.close();
+  const ruta = evento.notification.data?.ruta ?? "/";
+  const destino = new URL(`./#${ruta}`, self.location).href;
+  evento.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (ventanas) => {
+      const abierta = ventanas[0];
+      if (!abierta) return self.clients.openWindow(destino);
+      await abierta.focus();
+      return abierta.navigate?.(destino);
+    }),
+  );
+});
+
+// Push del servidor con la app cerrada (lo prepara el backend, ver docs/notificaciones-push.md). Contenido esperado:
+// JSON { titulo, detalle, ruta, tag? }. Sin push configurado este evento nunca llega.
+self.addEventListener("push", (evento) => {
+  /** @type {{ titulo?: string, detalle?: string, ruta?: string, tag?: string }} */
+  let datos = {};
+  try {
+    datos = evento.data?.json() ?? {};
+  } catch {
+    datos = { detalle: evento.data?.text() ?? "" };
+  }
+  evento.waitUntil(
+    self.registration.showNotification(datos.titulo || "MiXanab", {
+      body: datos.detalle ?? "",
+      icon: "front/icons/icon-192.png",
+      badge: "front/icons/icon-192.png",
+      tag: datos.tag,
+      lang: "es",
+      data: { ruta: datos.ruta ?? "/" },
+    }),
+  );
 });
 
 /**
