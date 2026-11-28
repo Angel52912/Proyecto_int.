@@ -171,9 +171,12 @@ export function crearChat(opciones) {
 
   formulario.addEventListener("submit", alEnviar);
   entrada.addEventListener("input", ajustarAltura);
+  // PC: Enter envía y Shift+Enter hace salto de línea. En pantallas táctiles Enter es salto de línea (como en
+  // WhatsApp) y se envía con el botón, para no mandar mensajes a medias.
+  const tactil = window.matchMedia?.("(pointer: coarse)").matches === true;
+  if (!tactil) entrada.setAttribute("placeholder", "Escribe un mensaje · Enter para enviar");
   entrada.addEventListener("keydown", (evento) => {
-    // Enter envía; Shift+Enter hace salto de línea.
-    if (evento.key === "Enter" && !evento.shiftKey && !evento.isComposing) {
+    if (!tactil && evento.key === "Enter" && !evento.shiftKey && !evento.isComposing) {
       evento.preventDefault();
       formulario.requestSubmit();
     }

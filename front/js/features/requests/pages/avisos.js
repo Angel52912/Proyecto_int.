@@ -94,7 +94,7 @@ export function renderAvisos(rol) {
     let lista = null;
     const seccionNuevos = crear("section", { clase: "avisos__grupo", attrs: { "aria-labelledby": "avisos-nuevos" } });
     const pintar = (/** @type {any[]} */ avisos) => {
-      if (avisos.length === 0) return crearVacio("No tienes avisos todavía. Aquí verás presupuestos, avances y entregas.", null, { icono: "campana" });
+      if (avisos.length === 0) return crearVacio("Aquí verás presupuestos, avances de tus pedidos y entregas.", null, { icono: "campana", titulo: "Sin avisos por ahora" });
       const { nuevos, anteriores } = agruparAvisos(avisos);
       marcarTodas.hidden = nuevos.length === 0;
       lista = /** @type {HTMLUListElement} */ (crear("ul", { clase: "lista avisos__lista" }, nuevos.map(crearFila)));

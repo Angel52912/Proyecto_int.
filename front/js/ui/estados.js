@@ -32,14 +32,16 @@ export function crearEsqueleto(filas = 3, texto = "Cargando…") {
 }
 
 /**
+ * Pantalla o lista vacía: ícono, título que nombra el espacio, una frase y la acción que sigue (si hay).
  * @param {string} texto
  * @param {Node | null} [accion] Botón o enlace opcional.
- * @param {{ icono?: string }} [opciones] Ícono del círculo (por defecto, la lupa).
+ * @param {{ icono?: string, titulo?: string }} [opciones] Ícono del círculo (por defecto, la lupa) y título.
  * @returns {HTMLElement}
  */
 export function crearVacio(texto, accion = null, opciones = {}) {
   return crear("div", { clase: "estado-vacio" }, [
     crear("span", { clase: "estado-vacio__icono", attrs: { "aria-hidden": "true" } }, [icono(opciones.icono ?? "buscar", { tam: 28 })]),
+    opciones.titulo ? crear("p", { clase: "estado-vacio__titulo", texto: opciones.titulo }) : null,
     crear("p", { texto }),
     accion,
   ]);

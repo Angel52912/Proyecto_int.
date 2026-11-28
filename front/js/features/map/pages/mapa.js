@@ -319,8 +319,8 @@ export async function renderMapa({ consulta }) {
     capa = null;
     if (resultados.length === 0) {
       // A2: aviso sin resultados.
-      pintarContenidoTarjeta([crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros.")], false);
-      lista.replaceChildren(crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros."));
+      pintarContenidoTarjeta([crearVacio("Prueba con otra colonia o quita algún filtro.", null, { titulo: "Sin talleres con esos filtros" })], false);
+      lista.replaceChildren(crearVacio("Prueba con otra colonia o quita algún filtro.", null, { titulo: "Sin talleres con esos filtros" }));
       return;
     }
     // Primero la tarjeta, para medir cuánto tapa antes de encuadrar los pines.

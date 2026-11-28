@@ -167,7 +167,7 @@ function pintarTablero({ pedidos, solicitudes, nuevas }) {
     ]),
   ];
   if (nuevas.length === 0 && pedidos.length === 0) {
-    const vacio = crearVacio("Todo al día. Te avisamos cuando llegue una solicitud.", enlace("/artesano/solicitudes", { clase: "boton boton--secundario", texto: "Ver solicitudes" }), { icono: "tablero" });
+    const vacio = crearVacio("Te avisamos cuando llegue una solicitud.", enlace("/artesano/solicitudes", { clase: "boton boton--secundario", texto: "Ver solicitudes" }), { icono: "tablero", titulo: "Todo al día" });
     vacio.classList.add("tablero__todo-al-dia");
     bloques.push(vacio);
   }

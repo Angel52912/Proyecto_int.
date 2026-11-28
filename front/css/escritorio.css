@@ -557,3 +557,39 @@ html[data-escritorio] :where(.pantalla:not(.pantalla--con-nav)) > :is(.pantalla_
     box-shadow: none;
   }
 }
+
+/* ── Mi taller en PC: el taller y sus números a la izquierda; reputación y reseñas a la derecha ── */
+html[data-escritorio] .mi-taller .pantalla__cuerpo {
+  max-width: 1040px;
+}
+
+html[data-escritorio] .mi-taller__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "perfil reputacion"
+    "cifras resenas";
+  align-items: start;
+  gap: var(--espacio-3) var(--espacio-4);
+}
+
+html[data-escritorio] .mi-taller__contenido > .mi-taller__perfil {
+  grid-area: perfil;
+}
+
+html[data-escritorio] .mi-taller__contenido > .reputacion {
+  grid-area: reputacion;
+}
+
+html[data-escritorio] .mi-taller__contenido > .mi-taller__cifras {
+  grid-area: cifras;
+}
+
+html[data-escritorio] .mi-taller__contenido > .mi-taller__resenas {
+  grid-area: resenas;
+}
+
+/* Las acciones del final (Editar mi perfil, Cerrar sesión) a la mitad del ancho, no estiradas. */
+html[data-escritorio] .mi-taller .pantalla__cuerpo > :is(.boton, a.boton) {
+  max-width: 320px;
+}

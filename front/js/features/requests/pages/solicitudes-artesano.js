@@ -75,7 +75,7 @@ export async function renderSolicitudesArtesano() {
         const visibles = [...detalles].sort((a, b) => (orden[a.status] ?? 3) - (orden[b.status] ?? 3));
         const contenido =
           visibles.length === 0
-            ? crearVacio("Aún no tienes solicitudes. Te avisaremos cuando un cliente te escriba.")
+            ? crearVacio("Te avisamos cuando un cliente te pida una cotización. Mientras, revisa que tu taller tenga fotos y horario.", enlace("/artesano/perfil", { clase: "boton boton--secundario", texto: "Ver mi taller" }), { icono: "solicitudes", titulo: "Aún no tienes solicitudes" })
             : crear("ul", { clase: "lista" }, visibles.map(crearTarjetaSolicitud));
         return sinPublicar ? [sinPublicar, contenido] : contenido;
       },

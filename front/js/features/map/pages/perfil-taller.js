@@ -47,6 +47,42 @@ export function indiceDeHoy(ahora = new Date()) {
 // Vive en recoger.js junto a textoHorarioHoy; se reexporta para las pruebas y otros usos.
 export { estadoDeHoy };
 
+const CLAVES_POR_DIA = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+const NOMBRE_POR_CLAVE = Object.fromEntries(DIAS.map(([clave, dia]) => [clave, dia.toLowerCase()]));
+
+/**
+ * Cuándo vuelve a abrir un taller cerrado: "Abre hoy a las 16:00", "Abre mañana a las 09:00" o
+ * "Abre el lunes a las 09:00". null si no tiene horario o si está abierto ahora.
+ * @param {Record<string, { open: string, close: string }[]> | null} horario
+ * @param {Date} [ahora]
+ * @returns {string | null}
+ */
+export function proximaApertura(horario, ahora = new Date()) {
+  const hora = `${String(ahora.getHours()).padStart(2, "0")}:${String(ahora.getMinutes()).padStart(2, "0")}`;
+  for (let dias = 0; dias < 7; dias += 1) {
+    const clave = CLAVES_POR_DIA[(ahora.getDay() + dias) % 7];
+    const rangos = horario?.[clave] ?? [];
+    if (dias === 0 && rangos.some((r) => r.open <= hora && hora < r.close)) return null;
+    const siguiente = rangos.find((r) => dias > 0 || hora < r.open);
+    if (siguiente) {
+      const cuando = dias === 0 ? "hoy" : dias === 1 ? "mañana" : `el ${NOMBRE_POR_CLAVE[clave]}`;
+      return `Abre ${cuando} a las ${siguiente.open}`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Dirección sin repetir la colonia cuando ya viene en la calle ("Calle 60 #500, Centro" + "Centro").
+ * @param {string} direccion
+ * @param {string} colonia
+ * @returns {string}
+ */
+export function direccionCompleta(direccion, colonia) {
+  const yaIncluye = colonia !== "" && direccion.toLowerCase().includes(colonia.toLowerCase());
+  return [direccion, yaIncluye ? "" : colonia, "Mérida"].filter(Boolean).join(", ");
+}
+
 /** @param {"repair" | "cleaning"} servicio */
 function crearServicio(servicio) {
   return crear("li", { clase: `servicio servicio--${servicio}` }, [
@@ -124,6 +160,7 @@ function pintarPerfil(taller) {
   const resenas = taller.rating_count === 1 ? "1 reseña" : `${taller.rating_count} reseñas`;
   const distancia = taller.distance_km === null ? "" : ` · ${taller.distance_km.toFixed(1)} km`;
   const estado = estadoDeHoy(taller);
+  const abre = taller.is_open ? null : proximaApertura(taller.hours);
 
   const accionesRapidas = crearAccionesRapidas(taller);
   const acciones = crear("div", { clase: "acciones perfil-taller__acciones" }, [
@@ -152,8 +189,12 @@ function pintarPerfil(taller) {
           crearEstrellas(taller.rating_avg),
           crear("span", { texto: taller.rating_avg === null ? `Nuevo${distancia}` : `${taller.rating_avg.toFixed(1)} (${resenas})${distancia}` }),
         ]),
-        crear("p", { clase: "tarjeta__detalle linea-icono" }, [icono("mapa", { tam: 14 }), crear("span", { texto: `${taller.address}, ${taller.colonia}, Mérida` })]),
-        crear("div", { clase: "perfil-taller__estado" }, [crearInsignia(estado.texto, estado.tono)]),
+        crear("p", { clase: "tarjeta__detalle linea-icono" }, [icono("mapa", { tam: 14 }), crear("span", { texto: direccionCompleta(taller.address, taller.colonia) })]),
+        crear("div", { clase: "perfil-taller__estado" }, [
+          crearInsignia(estado.texto, estado.tono),
+          // Si está cerrado, cuándo vuelve a abrir (salvo que la etiqueta ya lo diga: "Abre a las 16:00").
+          abre && !estado.texto.startsWith("Abre") ? crear("span", { clase: "perfil-taller__abre", texto: abre }) : null,
+        ]),
       ]),
       crear("section", { clase: "seccion perfil-taller__seccion perfil-taller__servicios" }, [
         crear("h2", { clase: "seccion__titulo", texto: "Servicios" }),

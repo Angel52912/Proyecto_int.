@@ -100,19 +100,22 @@ function crearTarjeta(e) {
 
 /**
  * @param {Elemento[]} lista
- * @param {string} vacio
+ * @param {{ titulo: string, texto: string }} vacio
  */
-const crearLista = (lista, vacio) => (lista.length === 0 ? crearVacio(vacio, enlace("/mapa", { clase: "boton", texto: "Buscar taller" }), { icono: "pedidos" }) : crear("ul", { clase: "lista" }, lista.map(crearTarjeta)));
+const crearLista = (lista, vacio) =>
+  lista.length === 0
+    ? crearVacio(vacio.texto, enlace("/mapa", { clase: "boton", texto: "Buscar taller" }), { icono: "pedidos", titulo: vacio.titulo })
+    : crear("ul", { clase: "lista" }, lista.map(crearTarjeta));
 
 /** @param {Elemento[]} elementos */
 function pintarPedidos(elementos) {
   const activos = elementos.filter((e) => e.activo);
   const historial = elementos.filter((e) => !e.activo);
   const panelActivos = crear("div", { clase: "pedidos__panel", attrs: { role: "tabpanel", id: "panel-activos", "aria-labelledby": "pestana-activos" } }, [
-    crearLista(activos, "No tienes pedidos en curso."),
+    crearLista(activos, { titulo: "Sin pedidos en curso", texto: "Busca un taller, pide una cotización y aquí verás el avance de tu calzado." }),
   ]);
   const panelHistorial = crear("div", { clase: "pedidos__panel", attrs: { role: "tabpanel", id: "panel-historial", "aria-labelledby": "pestana-historial", hidden: true } }, [
-    crearLista(historial, "Aún no tienes pedidos terminados."),
+    crearLista(historial, { titulo: "Aún no tienes pedidos terminados", texto: "Cuando recojas un pedido, quedará guardado aquí." }),
   ]);
 
   /** @param {"activos" | "historial"} cual */

@@ -79,7 +79,7 @@ function crearListaResenas(items) {
 /** @param {{ taller: any | null, stats: any | null, resenas: { total: number, items: any[] } }} datos */
 function pintar({ taller, stats, resenas }) {
   if (taller === null || stats === null) {
-    return crearVacio("Aún no configuras tu taller.", enlace("/artesano/taller", { clase: "boton", texto: "Configurar mi taller" }));
+    return crearVacio("Publícalo con fotos, servicios y horario para aparecer en el mapa y recibir solicitudes.", enlace("/artesano/taller", { clase: "boton", texto: "Configurar mi taller" }), { icono: "reparacion", titulo: "Configura tu taller" });
   }
   const distribucion = distribucionDeResenas(resenas.items);
   const promedio = stats.rating_avg;
@@ -106,32 +106,40 @@ function pintar({ taller, stats, resenas }) {
         ? crear("p", { clase: "mi-taller__descripcion", texto: taller.description })
         : enlace("/artesano/taller", { clase: "mi-taller__sin-descripcion", texto: "Agrega una breve descripción de tu taller" }),
     ]),
-    crear("div", { clase: "tarjeta reputacion" }, [
-      crear("div", { clase: "reputacion__promedio" }, [
-        crear("strong", { texto: promedio === null ? "–" : promedio.toFixed(1) }),
-        crearEstrellas(promedio),
-        crear("span", { clase: "texto-secundario", texto: total === 1 ? "1 reseña" : `${total} reseñas` }),
-      ]),
-      crear(
-        "ul",
-        { clase: "reputacion__barras", attrs: { "aria-label": "Reseñas por estrellas" } },
-        [5, 4, 3, 2, 1].map((n) => {
-          const barra = crear("span", { clase: "reputacion__relleno" });
-          barra.style.width = `${(distribucion[/** @type {1|2|3|4|5} */ (n)] / maximo) * 100}%`;
-          return crear("li", { attrs: { "aria-label": `${n} estrellas: ${distribucion[/** @type {1|2|3|4|5} */ (n)]}` } }, [crear("span", { texto: String(n), attrs: { "aria-hidden": "true" } }), crear("span", { clase: "reputacion__barra" }, [barra])]);
-        }),
-      ),
-    ]),
-    crear("div", { clase: "presupuesto__datos" }, [
+    total === 0
+      ? crear("div", { clase: "tarjeta reputacion reputacion--vacia" }, [
+          crear("span", { clase: "reputacion__icono", attrs: { "aria-hidden": "true" } }, [icono("estrella", { tam: 22 })]),
+          crear("div", {}, [
+            crear("p", { clase: "reputacion__titulo", texto: "Aún no tienes reseñas" }),
+            crear("p", { clase: "tarjeta__detalle", texto: "Aparecen cuando un cliente califica un pedido entregado." }),
+          ]),
+        ])
+      : crear("div", { clase: "tarjeta reputacion" }, [
+          crear("div", { clase: "reputacion__promedio" }, [
+            crear("strong", { texto: promedio === null ? "–" : promedio.toFixed(1) }),
+            crearEstrellas(promedio),
+            crear("span", { clase: "texto-secundario", texto: total === 1 ? "1 reseña" : `${total} reseñas` }),
+          ]),
+          crear(
+            "ul",
+            { clase: "reputacion__barras", attrs: { "aria-label": "Reseñas por estrellas" } },
+            [5, 4, 3, 2, 1].map((n) => {
+              const barra = crear("span", { clase: "reputacion__relleno" });
+              barra.style.width = `${(distribucion[/** @type {1|2|3|4|5} */ (n)] / maximo) * 100}%`;
+              return crear("li", { attrs: { "aria-label": `${n} estrellas: ${distribucion[/** @type {1|2|3|4|5} */ (n)]}` } }, [crear("span", { texto: String(n), attrs: { "aria-hidden": "true" } }), crear("span", { clase: "reputacion__barra" }, [barra])]);
+            }),
+          ),
+        ]),
+    crear("div", { clase: "presupuesto__datos mi-taller__cifras" }, [
       crearCifra("Pedidos entregados", String(stats.orders.delivered)),
       crearCifra("A tiempo", textoATiempo(stats.orders.on_time_pct), "estadistica--exito"),
       crearCifra("En proceso", String(stats.orders.in_progress)),
       crearCifra("Listos para entregar", String(stats.orders.ready)),
     ]),
-    crear("section", { clase: "seccion" }, [
-      crear("h2", { clase: "seccion__titulo", texto: "Reseñas recientes" }),
-      crearListaResenas(resenas.items),
-    ]),
+    // Sin reseñas, la tarjeta de reputación ya lo dice: no se repite aquí.
+    resenas.items.length === 0
+      ? null
+      : crear("section", { clase: "seccion mi-taller__resenas" }, [crear("h2", { clase: "seccion__titulo", texto: "Reseñas recientes" }), crearListaResenas(resenas.items)]),
   ];
 }
 

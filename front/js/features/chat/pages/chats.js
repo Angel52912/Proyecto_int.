@@ -45,8 +45,8 @@ function crearFila(c, base, activa = null) {
 
 /** Diferencias por rol: a quién se le escribe y a dónde lleva cada conversación. */
 const POR_ROL = Object.freeze({
-  craftsman: { base: "/artesano/chat", contraparte: "Cliente", vacio: "Aún no tienes conversaciones.", presupuesto: "Presupuesto enviado" },
-  client: { base: "/chat", contraparte: "Taller", vacio: "Aún no tienes conversaciones. Pide una cotización a un taller para empezar a chatear.", presupuesto: "Te enviaron un presupuesto" },
+  craftsman: { base: "/artesano/chat", contraparte: "Cliente", vacio: "Cuando un cliente te pida una cotización, la conversación aparece aquí.", presupuesto: "Presupuesto enviado" },
+  client: { base: "/chat", contraparte: "Taller", vacio: "Pide una cotización a un taller y aquí podrás platicar con él.", presupuesto: "Te enviaron un presupuesto" },
 });
 
 /**
@@ -104,7 +104,9 @@ function crearPanelConversaciones(rol, activa) {
   const pintarLista = () => {
     const visibles = filtrarConversaciones(todas, entrada.value);
     return visibles.length === 0
-      ? crearVacio(todas.length === 0 ? textos.vacio : "Ninguna conversación coincide.", null, { icono: "chat" })
+      ? todas.length === 0
+        ? crearVacio(textos.vacio, rol === "client" ? enlace("/mapa", { clase: "boton", texto: "Buscar taller" }) : null, { icono: "chat", titulo: "Aún no tienes conversaciones" })
+        : crearVacio("Prueba con otro nombre o palabra.", null, { icono: "buscar", titulo: "Ninguna conversación coincide" })
       : crear("ul", { clase: "lista lista--separada" }, visibles.map((c) => crearFila(c, textos.base, activa)));
   };
   entrada.addEventListener("input", () => lista.replaceChildren(pintarLista()));

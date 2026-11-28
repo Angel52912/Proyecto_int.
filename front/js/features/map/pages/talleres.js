@@ -208,7 +208,7 @@ export async function renderTalleres({ consulta }) {
       () => buscarTalleres(filtros),
       (talleres) =>
         talleres.length === 0
-          ? crearVacio("No encontramos talleres con esos filtros. Prueba con otra colonia o quita filtros.")
+          ? crearVacio("Prueba con otra colonia o quita algún filtro.", null, { titulo: "Sin talleres con esos filtros" })
           : [
               crear("p", { clase: "talleres__conteo", attrs: { role: "status" }, texto: talleres.length === 1 ? "1 taller encontrado" : `${talleres.length} talleres encontrados` }),
               crear(

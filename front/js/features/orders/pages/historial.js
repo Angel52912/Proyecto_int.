@@ -203,7 +203,9 @@ function pintarHistorial({ pedidos, solicitudes, montos, calificacion }) {
     );
     lista.replaceChildren(
       visibles.length === 0
-        ? crearVacio(pedidos.some((p) => p.status === "delivered") ? "No hay entregas con esos filtros." : "Aún no has entregado pedidos. Aquí verás cada entrega.", null, { icono: "reloj" })
+        ? pedidos.some((p) => p.status === "delivered")
+          ? crearVacio("Prueba con otro mes o servicio.", null, { icono: "reloj", titulo: "Sin entregas con esos filtros" })
+          : crearVacio("Cada pedido que entregues quedará aquí, con su monto y si fue a tiempo.", null, { icono: "reloj", titulo: "Aún no hay entregas" })
         : document.documentElement.hasAttribute("data-escritorio")
           ? crearTabla(visibles, solicitudes, montos)
           : crear("ul", { clase: "lista" }, visibles.map((p) => crearFila(p, solicitudes.get(p.request_id), montos.get(p.id)))),

@@ -1150,3 +1150,120 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
   font-size: 14px;
   font-weight: 600;
 }
+
+/* ── Ficha del taller ── */
+/* "Precio desde" informativo en un recuadro suave: el naranja sólido queda solo para «Solicitar cotización». */
+.precio-desde {
+  border: 1px solid var(--color-cuero-suave);
+  background: var(--color-cuero-suave);
+  color: var(--color-espresso);
+}
+
+.precio-desde__etiqueta {
+  color: var(--color-cuero-oscuro);
+  font-weight: 600;
+  opacity: 1;
+}
+
+.precio-desde__nota {
+  color: var(--color-texto-suave);
+  opacity: 1;
+}
+
+.perfil-taller__estado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.perfil-taller__abre {
+  color: var(--color-texto-suave);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── Pantallas vacías: ícono en un círculo suave, título, una frase y la acción que sigue ── */
+.estado-vacio {
+  gap: var(--espacio-2);
+  padding: 40px var(--espacio-3);
+  color: var(--color-texto-suave);
+}
+
+.estado-vacio__icono {
+  width: 72px;
+  height: 72px;
+  margin-bottom: var(--espacio-2);
+  border: 0;
+  background: var(--color-cuero-suave);
+  box-shadow: none;
+  color: var(--color-cuero);
+}
+
+.estado-vacio__icono .icono {
+  width: 30px;
+  height: 30px;
+}
+
+.estado-vacio__icono::after {
+  content: none;
+}
+
+.estado-vacio .estado-vacio__titulo {
+  color: var(--color-espresso);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.estado-vacio > p:not(.estado-vacio__titulo) {
+  max-width: 36ch;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.estado-vacio > .boton {
+  margin-top: var(--espacio-2);
+  padding: 0 var(--espacio-4);
+}
+
+/* ── Mi taller ── */
+/* Iniciales del taller en suave, como los demás avatares (el naranja sólido queda para la acción principal). */
+.mi-taller__perfil .foto--inicial {
+  background: var(--color-cuero-suave);
+  color: var(--color-cuero-oscuro);
+  box-shadow: none;
+}
+
+.mi-taller__cifras .tarjeta {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.mi-taller__cifras .estadistica {
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.reputacion--vacia {
+  grid-template-columns: auto 1fr;
+}
+
+.reputacion--vacia p {
+  margin: 0;
+}
+
+.reputacion__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-aviso-suave);
+  color: var(--color-miel);
+}
+
+.reputacion__titulo {
+  font-weight: 700;
+}
