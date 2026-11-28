@@ -13,7 +13,7 @@ export const NOMBRE_FASE_CORTO = Object.freeze({ 1: "Inspección", 2: "Desinfecc
 
 /** @type {Readonly<Record<string, { texto: string, tono: "miel" | "cenote" | "exito" | "cuero" | "error" | "neutra" }>>} */
 export const ESTADO_ORDEN = Object.freeze({
-  in_progress: { texto: "En proceso", tono: "miel" },
+  in_progress: { texto: "En proceso", tono: "cenote" },
   ready: { texto: "Listo", tono: "exito" },
   delivered: { texto: "Entregado", tono: "exito" },
   cancelled: { texto: "Cancelado", tono: "error" },

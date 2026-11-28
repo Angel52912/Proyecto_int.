@@ -32,3 +32,13 @@ test("pantalla vacía con título, frase y acción", () => {
   expect(vacio.textContent).toContain("Pide una cotización.");
   expect(vacio.lastElementChild).toBe(boton);
 });
+
+test("tabla de Mis pedidos en PC: la acción de cada fila", async () => {
+  const { accionDePedido } = await import("../../js/features/orders/pages/pedidos.js");
+  const base = { ruta: "/pedido/1", activo: true, pendienteCalificar: false, pedido: null };
+  expect(accionDePedido({ ...base, pendienteCalificar: true })).toBe("Calificar");
+  expect(accionDePedido({ ...base, pedido: { phase: 4, status: "ready" } })).toBe("Recoger");
+  expect(accionDePedido({ ...base, pedido: { phase: 2, status: "in_progress" } })).toBe("Ver seguimiento");
+  expect(accionDePedido({ ...base, ruta: "/solicitar/t1" })).toBe("Terminar solicitud");
+  expect(accionDePedido({ ...base, ruta: "/chat/s1" })).toBe("Abrir chat");
+});

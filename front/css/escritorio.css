@@ -593,3 +593,77 @@ html[data-escritorio] .mi-taller__contenido > .mi-taller__resenas {
 html[data-escritorio] .mi-taller .pantalla__cuerpo > :is(.boton, a.boton) {
   max-width: 320px;
 }
+
+/* ── Mis pedidos en PC: tabla con la acción de cada fila ── */
+html[data-escritorio] .pedidos .pantalla__cuerpo {
+  max-width: 1040px;
+}
+
+.pedidos__tabla-contenedor {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  overflow-x: auto;
+}
+
+.pedidos__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.pedidos__tabla th {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-borde);
+  background: var(--color-superficie-suave);
+  color: var(--color-texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.pedidos__tabla td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-borde);
+  vertical-align: middle;
+}
+
+.pedidos__tabla tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.pedidos__tabla tbody tr:hover {
+  background: var(--color-superficie-suave);
+}
+
+.pedidos__fila--listo .pedidos__servicio {
+  color: var(--color-exito);
+}
+
+.pedidos__servicio {
+  font-weight: 600;
+}
+
+.pedidos__folio {
+  color: var(--color-texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.pedidos__avance {
+  min-width: 180px;
+}
+
+.pedidos__avance p {
+  margin: 0 0 4px;
+  font-size: 12px;
+}
+
+.pedidos__accion {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.pedidos__accion .boton-texto {
+  font-size: 14px;
+  text-decoration: none;
+}

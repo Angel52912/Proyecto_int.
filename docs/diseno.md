@@ -149,6 +149,39 @@ Cada tarjeta del Tablero lleva su acción directa ("Hacer presupuesto", "Entrega
 - **Tarjeta de presupuesto en el chat:** borde naranja, precio grande, Rechazar (secundario) y Aceptar (principal).
 - **Aviso flotante:** aparece abajo unos segundos; si trae ruta, se puede tocar para abrir la pantalla.
 
+## Pantallas grandes (PC y tableta)
+
+Todo lo de PC vive en `front/css/escritorio.css` y solo aplica con `html[data-escritorio]` (1024 px o más) o en
+tableta (768 a 1023 px): el celular no cambia.
+
+- **PC:** barra lateral blanca con logo, nombres de las pestañas y el perfil abajo (Mi perfil o Mi taller).
+  - **Buscar:** lista de talleres a la izquierda y mapa a la derecha; al pasar el ratón por un taller se marca su pin.
+  - **Chats:** lista de conversaciones a la izquierda y la conversación abierta a la derecha.
+  - **Seguimiento:** avance a la izquierda; taller, total y botones fijos a la derecha.
+  - **Inicio:** lo del cliente a la izquierda; mapa chico y talleres cercanos a la derecha.
+  - **Tablero:** tres columnas (Nuevas, En proceso, Listos). **Mi taller:** dos columnas.
+  - **Historial y Mis pedidos:** tablas con la acción de cada fila.
+  - **Formularios cortos** (Pedir cotización, Calificar, Recoger): tarjeta de 640 px al centro.
+- **Tableta:** barra lateral angosta con íconos y el contenido de una columna a 680 px al centro.
+- La lista de Chats del cliente queda alineada a la izquierda a propósito (centrada se veía forzada).
+
+## Comportamientos
+
+- **Volver** regresa a la pantalla anterior del historial. Al terminar un formulario se cambia de pantalla sin dejarlo
+  en el historial (`irSinRegreso`), para que Volver no regrese al formulario vacío.
+- **Fotos:** las que no están dentro de un enlace se amplían al tocarlas, con flechas entre fotos de la misma pantalla.
+- **Pantallas vacías:** ícono, título, una frase y la acción que sigue (`crearVacio(texto, accion, { icono, titulo })`).
+- **Código de verificación incorrecto:** el aviso va justo debajo de las casillas (abajo lo tapaba el teclado).
+- **Chat:** en PC, Enter envía y Shift+Enter hace salto de línea; en pantallas táctiles Enter es salto de línea.
+
+## Mapa
+
+- OpenStreetMap con Leaflet y Nominatim, sin llave (decisión del equipo: gratis). Google Maps queda listo como opción
+  con llave (`apis/config-mapa.js`, guía en `docs/mapa-google.md`).
+- OpenStreetMap no conoce bien los números de Mérida, así que en **Mi taller manda el talabartero**: al tocar el mapa
+  o arrastrar el pin solo se llenan los campos vacíos y lo distinto se ofrece como sugerencia; con el pin ya fijo,
+  escribir la dirección no lo mueve (botón «Mover el pin a esta dirección» para un cambio de local).
+
 ## Reglas de interfaz
 
 - Mobile-first; en escritorio la barra de navegación pasa al costado.

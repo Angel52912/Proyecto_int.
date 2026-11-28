@@ -1,4 +1,5 @@
-// 16 · Mis pedidos (Cliente), nuevo front: apartados "En curso" e "Historial" con solicitudes y pedidos.
+// 16 · Mis pedidos (Cliente), nuevo front: apartados "En curso" e "Historial" con solicitudes y pedidos. En PC es una
+// tabla con la acción de cada fila (Ver seguimiento, Recoger, Calificar…).
 import { api as apiMapa } from "../../map/index.js";
 import { NOMBRE_SERVICIO } from "../../map/componentes.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
@@ -99,13 +100,60 @@ function crearTarjeta(e) {
 }
 
 /**
+ * Qué toca hacer con un pedido o solicitud (texto del enlace de la tabla de PC).
+ * @param {Elemento} e
+ * @returns {string}
+ */
+export function accionDePedido(e) {
+  if (e.pendienteCalificar) return "Calificar";
+  if (e.pedido?.status === "ready") return "Recoger";
+  if (e.pedido) return "Ver seguimiento";
+  if (e.ruta.startsWith("/solicitar/")) return "Terminar solicitud";
+  return e.activo ? "Abrir chat" : "Ver detalle";
+}
+
+/**
+ * PC: tabla con una fila por pedido o solicitud (servicio, taller, folio, estado, avance o fecha y la acción).
+ * @param {Elemento[]} lista
+ * @returns {HTMLElement}
+ */
+function crearTabla(lista) {
+  const encabezados = ["Servicio", "Taller", "Folio", "Estado", "Avance", ""];
+  return crear("div", { clase: "pedidos__tabla-contenedor" }, [
+    crear("table", { clase: "pedidos__tabla" }, [
+      crear("caption", { clase: "oculto-visual", texto: "Mis pedidos" }),
+      crear("thead", {}, [crear("tr", {}, encabezados.map((t) => crear("th", { texto: t, attrs: { scope: "col" } })))]),
+      crear(
+        "tbody",
+        {},
+        lista.map((e) =>
+          crear("tr", { clase: e.pedido?.status === "ready" ? "pedidos__fila--listo" : "" }, [
+            crear("td", { clase: "pedidos__servicio", texto: e.titulo }),
+            crear("td", { texto: e.taller }),
+            crear("td", { clase: "pedidos__folio", texto: e.folio }),
+            crear("td", {}, [crearInsignia(e.insignia.texto, e.insignia.tono)]),
+            crear("td", { clase: "pedidos__avance" }, [
+              e.pedido
+                ? crear("div", {}, [crear("p", { clase: "pedido-tarjeta__fase", texto: textoDeAvance(e.pedido, { corto: true }) }), crearPasos(e.pedido)])
+                : crear("span", { clase: "texto-secundario", texto: e.aviso ?? formatearFecha(e.fecha) }),
+            ]),
+            crear("td", { clase: "pedidos__accion" }, [enlace(e.ruta, { clase: "boton-texto", texto: accionDePedido(e) })]),
+          ]),
+        ),
+      ),
+    ]),
+  ]);
+}
+
+/**
  * @param {Elemento[]} lista
  * @param {{ titulo: string, texto: string }} vacio
  */
-const crearLista = (lista, vacio) =>
-  lista.length === 0
-    ? crearVacio(vacio.texto, enlace("/mapa", { clase: "boton", texto: "Buscar taller" }), { icono: "pedidos", titulo: vacio.titulo })
-    : crear("ul", { clase: "lista" }, lista.map(crearTarjeta));
+const crearLista = (lista, vacio) => {
+  if (lista.length === 0) return crearVacio(vacio.texto, enlace("/mapa", { clase: "boton", texto: "Buscar taller" }), { icono: "pedidos", titulo: vacio.titulo });
+  // En PC, tabla (como el Historial del talabartero); en el celular, tarjetas.
+  return document.documentElement.hasAttribute("data-escritorio") ? crearTabla(lista) : crear("ul", { clase: "lista" }, lista.map(crearTarjeta));
+};
 
 /** @param {Elemento[]} elementos */
 function pintarPedidos(elementos) {
