@@ -1010,3 +1010,143 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
 .tablero__bloque--solo-pc {
   display: none;
 }
+
+/* ── Código de verificación: el error va justo debajo de las casillas (visible aunque esté abierto el teclado) ── */
+.acceso__error-codigo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-2);
+  margin: var(--espacio-2) 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radio);
+  background: var(--color-error-suave);
+  color: var(--color-error);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.acceso__error-codigo:empty {
+  display: none;
+}
+
+.acceso__error-codigo .icono {
+  flex: none;
+  margin-top: 2px;
+}
+
+.codigo--error input {
+  border-color: var(--color-error);
+  background: var(--color-error-suave);
+}
+
+@keyframes sacudir-codigo {
+  0%,
+  100% {
+    transform: none;
+  }
+
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.codigo--sacudir {
+  animation: sacudir-codigo 360ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codigo--sacudir {
+    animation: none;
+  }
+}
+
+/* ── Fotos que se pueden ampliar (ui/ampliar-foto.js) ── */
+.foto--ampliable {
+  cursor: zoom-in;
+}
+
+.foto--ampliable:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.visor-foto {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgb(10 10 12 / 92%);
+}
+
+.visor-foto::backdrop {
+  background: rgb(10 10 12 / 60%);
+}
+
+.visor-foto[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.visor-foto__imagen {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 120px);
+  border-radius: var(--radio);
+  object-fit: contain;
+}
+
+.visor-foto__boton {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tactil-min);
+  height: var(--tactil-min);
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.visor-foto__boton:hover {
+  background: rgb(255 255 255 / 24%);
+}
+
+.visor-foto__boton:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.visor-foto__cerrar {
+  top: calc(var(--espacio-3) + env(safe-area-inset-top));
+  right: var(--espacio-3);
+}
+
+.visor-foto__anterior {
+  left: var(--espacio-3);
+}
+
+.visor-foto__siguiente {
+  right: var(--espacio-3);
+}
+
+.visor-foto__contador {
+  position: absolute;
+  bottom: calc(var(--espacio-4) + env(safe-area-inset-bottom));
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}

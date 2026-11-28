@@ -1,5 +1,6 @@
 import { USAR_API_SIMULADA } from "../../apis/config.js";
 import { crearRouter } from "./router.js";
+import { instalarAmpliarFotos } from "./ui/ampliar-foto.js";
 import { instalarAvisoConexion } from "./ui/conexion.js";
 import { instalarDeteccionEscritorio } from "./ui/escritorio.js";
 import { instalarAlternadorVista } from "./ui/vista.js";
@@ -43,6 +44,7 @@ const contenedor = document.getElementById("app");
 if (contenedor !== null) {
   instalarDeteccionEscritorio();
   instalarInsignias();
+  instalarAmpliarFotos();
   crearRouter({ rutas, contenedor, obtenerSesion: sesionActual }).iniciar();
   instalarAlternadorVista();
   instalarAvisoConexion();

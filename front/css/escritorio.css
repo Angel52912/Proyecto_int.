@@ -548,3 +548,12 @@ html[data-escritorio] :where(.pantalla:not(.pantalla--con-nav)) > :is(.pantalla_
   margin-left: auto;
   margin-right: auto;
 }
+
+/* Sin contorno alrededor de la columna de contenido (venía del diseño anterior, cuando en pantallas grandes se veía
+   la columna de celular): junto a la barra lateral quedaba como una doble línea. En Buscar no se notaba porque el
+   mapa ocupa todo el ancho. La barra lateral ya tiene su propio borde. */
+@media (min-width: 720px) {
+  html:not([data-vista="movil"]) .pantalla {
+    box-shadow: none;
+  }
+}

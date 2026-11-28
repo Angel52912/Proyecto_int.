@@ -41,7 +41,21 @@ export function renderCodigo() {
     return crear("p", { clase: "estado-cargando", texto: "Cargando…" });
   }
 
-  const aviso = crear("p", { clase: "campo__error", attrs: { "aria-live": "polite" } });
+  // El error va justo debajo de las casillas: abajo, junto a Confirmar, lo tapaba el teclado del celular y parecía
+  // que el código "solo se borraba" (reporte de Milton).
+  const aviso = crear("p", { clase: "acceso__error-codigo", attrs: { role: "alert" } });
+  /** @param {string} texto */
+  const mostrarError = (texto) => {
+    aviso.replaceChildren(icono("cerrar", { tam: 16 }), crear("span", { texto }));
+    grupo.classList.remove("codigo--sacudir");
+    // Se fuerza el reinicio de la animación para que se sacuda también en el segundo intento.
+    void grupo.offsetWidth;
+    grupo.classList.add("codigo--error", "codigo--sacudir");
+  };
+  const limpiarError = () => {
+    aviso.replaceChildren();
+    grupo.classList.remove("codigo--error");
+  };
   const casillas = Array.from({ length: LONGITUD_CODIGO }, (_, indice) =>
     /** @type {HTMLInputElement} */ (
       crear("input", {
@@ -68,7 +82,7 @@ export function renderCodigo() {
 
   casillas.forEach((casilla, indice) => {
     casilla.addEventListener("input", () => {
-      grupo.classList.remove("codigo--error");
+      limpiarError();
       const valor = casilla.value;
       casilla.value = "";
       if (valor.replace(/\D/g, "") === "") return;
@@ -106,13 +120,13 @@ export function renderCodigo() {
       on: {
         click: async () => {
           /** @type {HTMLButtonElement} */ (boton).disabled = true;
-          aviso.textContent = "";
+          limpiarError();
           try {
             await api.resendEmailCode(correo);
             // La cuenta regresiva vuelve a empezar: es la señal de que el código nuevo salió.
             iniciarCuenta();
           } catch (error) {
-            aviso.textContent = mensajeDeError(error);
+            mostrarError(mensajeDeError(error));
             /** @type {HTMLButtonElement} */ (boton).disabled = false;
           }
         },
@@ -145,19 +159,17 @@ export function renderCodigo() {
           evento.preventDefault();
           const codigo = casillas.map((c) => c.value).join("");
           if (codigo.length !== LONGITUD_CODIGO) {
-            aviso.textContent = `Escribe los ${LONGITUD_CODIGO} dígitos del código.`;
-            grupo.classList.add("codigo--error");
+            mostrarError(`Escribe los ${LONGITUD_CODIGO} dígitos del código.`);
             casillas.find((c) => c.value === "")?.focus();
             return;
           }
           confirmar.disabled = true;
-          aviso.textContent = "";
+          limpiarError();
           try {
             await api.verifyEmailCode(correo, codigo);
             await continuarTrasEntrar();
           } catch (error) {
-            aviso.textContent = mensajeDeError(error);
-            grupo.classList.add("codigo--error");
+            mostrarError(mensajeDeError(error, { invalid_code: "El código no es correcto o ya venció. Revísalo o pide uno nuevo." }));
             casillas.forEach((c) => {
               c.value = "";
             });
@@ -175,8 +187,9 @@ export function renderCodigo() {
       crear("p", { clase: "acceso__texto" }, [`Escribe el código de ${LONGITUD_CODIGO} dígitos que enviamos a `, crear("span", { clase: "acceso__correo", texto: correo }), "."]),
       USAR_API_SIMULADA ? crear("p", { clase: "aviso aviso--miel aviso--simulado", texto: "Modo simulado: el código es 123456." }) : null,
       grupo,
+      aviso,
       reenvio,
-      crear("div", { clase: "acceso__pie" }, [aviso, confirmar]),
+      crear("div", { clase: "acceso__pie" }, [confirmar]),
     ],
   );
 
