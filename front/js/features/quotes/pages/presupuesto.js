@@ -3,14 +3,16 @@ import { api as apiMapa } from "../../map/index.js";
 import { api as apiSolicitudes } from "../../requests/index.js";
 import { diasHasta, formatearFecha } from "../../../lib/fechas.js";
 import { formatearMxn } from "../../../lib/money.js";
-import { crear, enlace, ir } from "../../../ui/dom.js";
+import { crear, enlace } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { crearFoto } from "../../../ui/foto.js";
 import { icono } from "../../../ui/iconos.js";
 import { agregarChatEnBarra, crearBoton, crearEstrellas, crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { mensajeDeError } from "../../../ui/mensajes.js";
 import { api } from "../index.js";
-import { ESTADO_PRESUPUESTO } from "../tarjeta.js";
+import { ESTADO_PRESUPUESTO, descripcionDelDetalle, responderPresupuesto } from "../tarjeta.js";
+
+export { descripcionDelDetalle };
 
 /**
  * Conceptos del desglose. `detail` es libre (contrato): se aceptan `conceptos` o `items` como `[{ concepto, monto }]`.
@@ -25,16 +27,6 @@ export function conceptosDelDetalle(detalle) {
       concepto: String(c.concepto ?? c.nombre ?? c.label ?? "Concepto"),
       monto: typeof c.monto === "number" ? c.monto : typeof c.amount === "number" ? c.amount : null,
     }));
-}
-
-/**
- * Texto descriptivo del trabajo dentro de `detail`.
- * @param {Record<string, unknown>} detalle
- * @returns {string}
- */
-export function descripcionDelDetalle(detalle) {
-  const texto = detalle.descripcion ?? detalle.description ?? detalle.detalle ?? detalle.nota;
-  return typeof texto === "string" ? texto : "";
 }
 
 /**
@@ -61,14 +53,9 @@ function pintarPresupuesto({ presupuesto, solicitud, taller }) {
    * @param {HTMLButtonElement[]} botones
    */
   async function responder(aceptar, botones) {
-    const pregunta = aceptar
-      ? `¿Aceptar el presupuesto de ${formatearMxn(presupuesto.amount_mxn)}? Pagas al recoger tu calzado.`
-      : "¿Rechazar este presupuesto? El taller podrá enviarte otro.";
-    if (!window.confirm(pregunta)) return;
     botones.forEach((b) => (b.disabled = true));
     try {
-      const resultado = await api.respondQuote(presupuesto.id, aceptar);
-      ir(resultado.order_id ? `/pedido/${resultado.order_id}` : `/chat/${presupuesto.request_id}`);
+      if (!(await responderPresupuesto(presupuesto, aceptar))) botones.forEach((b) => (b.disabled = false));
     } catch (error) {
       aviso.replaceChildren(
         crear("p", { clase: "aviso aviso--error", attrs: { role: "alert" }, texto: mensajeDeError(error, { invalid_state: "Este presupuesto ya no está vigente o el taller no está disponible." }) }),

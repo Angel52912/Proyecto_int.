@@ -525,3 +525,218 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
 .solicitar__acciones > .boton[hidden] {
   display: none;
 }
+
+/* ── Chat: mensajes propios en azul marino, los del otro en blanco con borde ── */
+.chat__mensaje--propio .chat__texto {
+  border-color: var(--color-cenote);
+  background: var(--color-cenote);
+  color: #fff;
+}
+
+.chat__enviar {
+  background: var(--color-cenote);
+  color: #fff;
+}
+
+.chat__sistema span {
+  background: var(--color-arena);
+  color: var(--color-texto-suave);
+}
+
+/* Tarjeta del presupuesto dentro del chat: borde en el acento mientras está vigente. */
+.chat__mensaje--tarjeta {
+  max-width: 88%;
+}
+
+.tarjeta-presupuesto {
+  align-items: stretch;
+  gap: 4px;
+  min-width: 240px;
+  border: 1px solid var(--color-borde);
+}
+
+.tarjeta-presupuesto--vigente {
+  border: 1.5px solid var(--color-cuero);
+}
+
+.tarjeta-presupuesto > .insignia {
+  align-self: flex-start;
+}
+
+.tarjeta-presupuesto__etiqueta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-cuero-oscuro);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tarjeta-presupuesto__monto {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.tarjeta-presupuesto__detalle {
+  margin: 4px 0 !important;
+  font-size: 14px;
+}
+
+.tarjeta-presupuesto__acciones {
+  display: flex;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+}
+
+.tarjeta-presupuesto__acciones .boton {
+  flex: 2;
+  min-height: 44px;
+  padding: 0 var(--espacio-3);
+}
+
+.tarjeta-presupuesto__acciones .boton--secundario {
+  flex: 1;
+}
+
+.tarjeta-presupuesto__detalle-enlace {
+  align-self: center;
+  text-decoration: none;
+}
+
+/* ── Seguimiento del pedido ── */
+.seguimiento__resumen {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+}
+
+.seguimiento__resumen > .foto {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+}
+
+.seguimiento__resumen .insignia {
+  align-self: flex-start;
+}
+
+.seguimiento__entrega strong {
+  color: var(--color-espresso);
+}
+
+.seguimiento__aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-2);
+  padding: 12px 14px;
+  border-radius: var(--radio);
+  background: var(--color-info-suave);
+  color: var(--color-cenote);
+}
+
+.seguimiento__aviso--listo {
+  background: var(--color-exito-suave);
+  color: var(--color-exito);
+}
+
+.seguimiento__aviso .icono {
+  flex: none;
+  margin-top: 1px;
+}
+
+.seguimiento__aviso p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.seguimiento__aviso .seguimiento__aviso-titulo {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Línea de tiempo: hecha (verde con palomita), actual (azul marino con anillo), pendiente (borde gris). */
+.linea-tiempo {
+  gap: 0;
+  padding: 0;
+}
+
+.linea-tiempo__paso {
+  position: relative;
+  gap: 12px;
+  padding-bottom: var(--espacio-3);
+}
+
+.linea-tiempo__paso:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  bottom: 2px;
+  left: 13px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--color-borde);
+}
+
+.linea-tiempo__paso--hecha:not(:last-child)::before {
+  background: var(--color-exito);
+}
+
+.linea-tiempo__marca {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--color-borde-fuerte);
+  background: var(--color-superficie);
+  color: var(--color-texto-tenue);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.linea-tiempo__paso--hecha .linea-tiempo__marca {
+  border-color: var(--color-exito);
+  background: var(--color-exito);
+  color: #fff;
+}
+
+.linea-tiempo__paso--actual .linea-tiempo__marca {
+  border-color: var(--color-cenote);
+  background: var(--color-cenote);
+  box-shadow: 0 0 0 4px var(--color-info-suave);
+  color: #fff;
+}
+
+.linea-tiempo__paso--actual .linea-tiempo__nombre {
+  color: var(--color-cenote);
+}
+
+.linea-tiempo__paso--pendiente .linea-tiempo__nombre {
+  color: var(--color-texto-tenue);
+}
+
+.linea-tiempo__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.linea-tiempo__foto {
+  width: 64px;
+  height: 48px;
+  margin-top: 4px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.seguimiento__total {
+  padding-top: var(--espacio-3);
+  border-top: 1px solid var(--color-borde);
+  color: var(--color-texto-suave);
+  font-size: 14px;
+}
+
+.seguimiento__total strong {
+  color: var(--color-espresso);
+  font-size: 17px;
+}

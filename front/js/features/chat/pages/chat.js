@@ -44,6 +44,7 @@ function pintarConversacion(rol, solicitud, pantalla) {
       crearTarjetaPresupuesto(/** @type {string} */ (m.quote_id), {
         ruta: (p) => (esCliente ? `/presupuesto/${p.id}` : p.status === "sent" ? `/artesano/solicitud/${solicitud.id}` : null),
         textoBoton: esCliente ? "Ver presupuesto" : "Rectificar presupuesto",
+        responder: esCliente,
       }),
   });
   alSalir(chat.destruir);
