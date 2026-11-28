@@ -42,3 +42,12 @@ test("tabla de Mis pedidos en PC: la acción de cada fila", async () => {
   expect(accionDePedido({ ...base, ruta: "/solicitar/t1" })).toBe("Terminar solicitud");
   expect(accionDePedido({ ...base, ruta: "/chat/s1" })).toBe("Abrir chat");
 });
+
+test("modo simulado: entrar como cliente también abre la sesión de Mi perfil", async () => {
+  const acceso = await import("../../../apis/api-inicio-sesion/api.mock.js");
+  acceso.reiniciarSimulacion();
+  acceso.fijarSesionSimulada({ sesion: true, uid: "u-cliente", rol: "client", nombre: "Cliente Simulado" });
+  expect(await acceso.getMyProfile()).toMatchObject({ id: "u-cliente", role: "client", full_name: "Cliente Simulado" });
+  acceso.fijarSesionSimulada({ sesion: false });
+  await expect(acceso.getMyProfile()).rejects.toMatchObject({ code: "not_authenticated" });
+});

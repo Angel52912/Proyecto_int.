@@ -54,7 +54,24 @@ Cada estado tiene un color fuerte (texto e ícono) y uno suave (fondo de la etiq
 
 ### Modo oscuro
 
-**Pospuesto.** El nuevo front se entrega primero solo en claro; el modo oscuro se diseña después sobre esta paleta.
+Se activa solo si el sistema está en oscuro, o a mano con el selector "Tema de color" de Mi perfil y Mi taller
+(Automático, Claro u Oscuro; se guarda en el dispositivo). Mismos tokens con otros valores (`front/css/tokens.css`).
+El acento y el apoyo son más claros para leerse sobre el fondo oscuro, y el texto encima de ellos pasa a casi negro
+(`--color-sobre-color`). Contraste medido: todo 5.2:1 o más.
+
+| Rol | Claro | Oscuro |
+|---|---|---|
+| Fondo | `#F7F7F8` | `#121214` |
+| Superficie (tarjetas) | `#FFFFFF` | `#1C1C20` |
+| Borde | `#E4E4E7` | `#303036` |
+| Texto | `#18181B` | `#F4F4F5` (15.5:1) |
+| Texto secundario | `#52525B` | `#B4B4BD` (8.3:1) |
+| Acento | `#C2410C` | `#FB8A4A` (7.1:1; texto encima `#18181B`, 7.5:1) |
+| Apoyo | `#1F3A5F` | `#8BB3EA` (7.9:1) |
+| Éxito / Aviso / Error | `#15803D` / `#A16207` / `#B91C1C` | `#4ADE80` / `#FBBF24` / `#F87171` |
+| Mensajes propios del chat | `#1F3A5F` | `#284A75` con texto claro (8.2:1) |
+
+En oscuro, los mosaicos del mapa se atenúan, y Verificar entrega es oscura en los dos temas.
 
 ## Tipografía y forma
 

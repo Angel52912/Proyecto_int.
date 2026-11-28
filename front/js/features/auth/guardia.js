@@ -63,9 +63,17 @@ async function perfilSimulado() {
  */
 export async function sincronizarSesionSimulada({ sesion, rol = null }) {
   if (!USAR_API_SIMULADA) return;
-  const [simulacion, taller] = await Promise.all([import("../../../../apis/api-mixanab/requests/simulacion.js"), import("../../../../apis/api-mixanab/workshop/api.mock.js")]);
+  const [simulacion, taller, acceso] = await Promise.all([
+    import("../../../../apis/api-mixanab/requests/simulacion.js"),
+    import("../../../../apis/api-mixanab/workshop/api.mock.js"),
+    import("../../../../apis/api-inicio-sesion/api.mock.js"),
+  ]);
   simulacion.fijarSesionSimulada(sesion ? { sesion: true, rol } : { sesion: false });
   if (sesion && rol !== null) taller.fijarSesionSimulada({ rol });
+  // También la sesión de inicio de sesión: si no, Mi perfil decía "Inicia sesión" aunque ya se había entrado.
+  const uid = rol === "client" ? simulacion.UID_CLIENTE : rol === "craftsman" ? simulacion.UID_ARTESANO : rol === "admin" ? simulacion.UID_OTRO : undefined;
+  const nombre = rol === "client" ? "Cliente Simulado" : rol === "craftsman" ? "Artesano Simulado" : "Admin Simulado";
+  acceso.fijarSesionSimulada({ sesion, uid, rol, nombre });
 }
 
 /**

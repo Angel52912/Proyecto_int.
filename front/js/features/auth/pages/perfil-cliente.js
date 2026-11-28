@@ -6,6 +6,7 @@ import { icono } from "../../../ui/iconos.js";
 import { crearInsignia, crearPantalla } from "../../../ui/layout.js";
 import { crearAvatar } from "../avatar.js";
 import { cerrarSesion } from "../flujo.js";
+import { crearSelectorTema } from "../../../ui/tema.js";
 import { api } from "../index.js";
 
 /**
@@ -65,6 +66,7 @@ function pintar(datos) {
       crear("h2", { clase: "perfil-seccion__titulo", texto: "Mi actividad", attrs: { id: "perfil-accesos" } }),
       crear("ul", { clase: "perfil-lista" }, [crearOpcion("/pedidos", "pedidos", "Mis pedidos"), crearOpcion("/avisos", "campana", "Avisos")]),
     ]),
+    crearSelectorTema(),
     crear("button", { clase: "perfil-salir", attrs: { type: "button" }, on: { click: () => cerrarSesion() } }, [crear("span", { texto: "Cerrar sesión" })]),
   ];
 }

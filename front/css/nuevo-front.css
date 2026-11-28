@@ -5,7 +5,7 @@
 .boton {
   min-height: 48px;
   border-color: var(--color-cuero);
-  color: #fff;
+  color: var(--color-sobre-color);
   font-weight: 600;
 }
 
@@ -27,7 +27,7 @@
 .boton--cenote {
   border-color: var(--color-cenote);
   background: var(--color-cenote);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 /* Miel ya no es parte de la paleta: estos botones («Agregar horario», «Volver al tablero») son acciones secundarias.
@@ -244,18 +244,22 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
 .nav-inferior__marca {
   background: var(--color-cuero);
   box-shadow: none;
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 /* ── Avisos flotantes: oscuros y planos ── */
 .aviso-flotante {
   border-radius: var(--radio);
   background: var(--color-espresso);
-  color: #fff;
+  color: var(--color-hueso);
 }
 
 .aviso-flotante--info .icono {
-  color: #fdba8c;
+  color: var(--color-aviso-icono-info);
+}
+
+.aviso-flotante--exito .icono {
+  color: var(--color-aviso-icono-exito);
 }
 
 /* ── Inicio del cliente ── */
@@ -361,7 +365,7 @@ html[data-escritorio] .nav-inferior__enlace[aria-current="page"] {
 .chip--activo {
   border-color: var(--color-espresso);
   background: var(--color-espresso);
-  color: #fff;
+  color: var(--color-hueso);
 }
 
 /* ── Buscar taller: mapa casi a pantalla completa y panel blanco abajo ── */
@@ -624,14 +628,14 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
 
 /* ── Chat: mensajes propios en azul marino, los del otro en blanco con borde ── */
 .chat__mensaje--propio .chat__texto {
-  border-color: var(--color-cenote);
-  background: var(--color-cenote);
-  color: #fff;
+  border-color: var(--color-burbuja-propia);
+  background: var(--color-burbuja-propia);
+  color: var(--color-sobre-burbuja);
 }
 
 .chat__enviar {
-  background: var(--color-cenote);
-  color: #fff;
+  background: var(--color-burbuja-propia);
+  color: var(--color-sobre-burbuja);
 }
 
 .chat__sistema span {
@@ -792,14 +796,14 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
 .linea-tiempo__paso--hecha .linea-tiempo__marca {
   border-color: var(--color-exito);
   background: var(--color-exito);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .linea-tiempo__paso--actual .linea-tiempo__marca {
   border-color: var(--color-cenote);
   background: var(--color-cenote);
   box-shadow: 0 0 0 4px var(--color-info-suave);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .linea-tiempo__paso--actual .linea-tiempo__nombre {
@@ -1312,4 +1316,41 @@ html:not([data-escritorio]) :is(.mapa__tarjeta--abierta, .mapa__tarjeta--arrastr
 
 .taller__mover-pin[hidden] {
   display: none;
+}
+
+/* ── Modo oscuro: piezas que usan su propio color ── */
+/* Contador de no leídos: el texto sigue al tema (en oscuro el rojo es claro y el texto va oscuro). */
+.nav-inferior__contador {
+  color: var(--color-sobre-color);
+}
+
+/* Mosaicos de OpenStreetMap atenuados en oscuro (en claro el filtro es "none"). */
+.leaflet-tile-pane {
+  filter: var(--filtro-mosaicos);
+}
+
+/* Verificar entrega es oscura en los dos temas. */
+.pantalla--oscura {
+  background: #18181b;
+  color: #f4f4f5;
+}
+
+/* La hora de los mensajes propios va sobre la burbuja. */
+.chat__mensaje--propio .chat__hora {
+  color: var(--color-texto-tenue);
+}
+
+/* Selector de tema: la opción elegida como las pestañas (superficie y texto), no en el acento. */
+.selector-tema__opciones {
+  background: var(--color-arena);
+}
+
+.selector-tema__opcion {
+  color: var(--color-texto-suave);
+}
+
+.selector-tema__opcion[aria-pressed="true"] {
+  background: var(--color-superficie);
+  color: var(--color-espresso);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
 }

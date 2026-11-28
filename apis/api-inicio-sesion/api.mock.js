@@ -21,6 +21,24 @@ export function reiniciarSimulacion() {
   estado = estadoInicial();
 }
 
+/**
+ * Fija la sesión desde la pantalla "Modo simulado" (Entrar como cliente o artesano), igual que en los demás módulos.
+ * Si es el mismo usuario se conservan los cambios que ya hizo (nombre, foto, datos privados).
+ * @param {{ sesion: boolean, uid?: string, rol?: string | null, nombre?: string }} datos
+ */
+export function fijarSesionSimulada({ sesion, uid, rol = null, nombre = "" }) {
+  if (!sesion || !uid) {
+    estado.uid = null;
+    return;
+  }
+  if (estado.uid !== uid || estado.perfil === null) {
+    estado.perfil = { id: uid, role: rol, full_name: nombre, avatar_path: null, active: true };
+    estado.privados = null;
+  }
+  estado.uid = uid;
+  estado.perfil.role = rol;
+}
+
 /** @returns {string} */
 function exigirSesion() {
   if (!estado.uid) throw new ApiError("not_authenticated");

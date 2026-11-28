@@ -35,7 +35,7 @@ html[data-escritorio] .nav-inferior__marca {
   height: 36px;
   border-radius: 10px;
   background: var(--color-cuero);
-  color: #fff;
+  color: var(--color-sobre-color);
 }
 
 .nav-inferior__nombre {

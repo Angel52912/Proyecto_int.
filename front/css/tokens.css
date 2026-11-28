@@ -97,8 +97,99 @@
   --color-mapa-fondo: #eceef1;
   /* Barra de navegación blanca con borde arriba; la pestaña activa en el acento. */
   --color-nav: #fff;
+  /* Piezas con color propio por tema (modo oscuro abajo). */
+  --color-burbuja-propia: var(--color-cenote); /* Mensajes propios del chat */
+  --color-sobre-burbuja: #fff;
+  --color-aviso-icono-info: #fdba8c; /* Íconos de los avisos flotantes (fondo oscuro en claro, claro en oscuro) */
+  --color-aviso-icono-exito: #8fd3a8;
+  --filtro-mosaicos: none; /* Mosaicos del mapa: se atenúan en oscuro para no deslumbrar */
   color-scheme: light;
 }
 
-/* Modo oscuro: pospuesto (docs/diseno.md). Se diseñará después sobre esta paleta;
-   mientras tanto la app se ve siempre en claro aunque el sistema esté en oscuro. */
+/* ── Modo oscuro (paleta C) ──
+   Fondo casi negro, tarjetas un tono más claro y el acento y el apoyo más claros para leerse sobre fondo oscuro; el
+   texto encima de ellos pasa a casi negro (--color-sobre-color). Contrastes medidos: todos 5.2:1 o más.
+   Se activa con el sistema (prefers-color-scheme) o a mano con el selector de Perfil y Mi taller (<html data-tema>). */
+html[data-tema="oscuro"] {
+  --color-hueso: #121214; /* Fondo */
+  --color-espresso: #f4f4f5; /* Texto (17:1 sobre el fondo) */
+  --color-tinta: #f4f4f5;
+  --color-arena: #27272c;
+  --color-superficie: #1c1c20;
+  --color-superficie-suave: #222227;
+  --color-borde: #303036;
+  --color-borde-fuerte: #44444c;
+  --color-gris: #b4b4bd;
+  --color-texto-suave: #b4b4bd; /* 8.3:1 sobre tarjetas */
+  --color-texto-tenue: #8e8e98; /* 5.2:1 sobre tarjetas */
+  --color-cuero: #fb8a4a; /* Acento más claro: 7.1:1 como texto; el texto encima va oscuro (7.5:1) */
+  --color-cuero-oscuro: #fdb58c; /* Hover y texto sobre acento suave (8.6:1) */
+  --color-cuero-suave: #3b2114;
+  --color-cenote: #8bb3ea; /* Apoyo: 7.9:1 sobre tarjetas */
+  --color-cenote-oscuro: #b5cff3;
+  --color-cenote-suave: #17253a;
+  --color-info: #8bb3ea;
+  --color-info-suave: #17253a;
+  --color-exito: #4ade80;
+  --color-exito-suave: #10291a;
+  --color-aviso: #fbbf24;
+  --color-aviso-suave: #2e230c;
+  --color-error: #f87171;
+  --color-error-suave: #331516;
+  --color-miel: #f5b942;
+  --color-sobre-color: #18181b; /* Texto sobre acento, apoyo y estados */
+  --color-nav: #18181c;
+  --color-mapa-fondo: #1d2024;
+  --anillo-foco: 0 0 0 3px rgb(251 138 74 / 40%);
+  --sombra-1: 0 1px 2px rgb(0 0 0 / 40%);
+  --sombra-2: 0 4px 16px rgb(0 0 0 / 50%);
+  --color-burbuja-propia: #284a75; /* 8.2:1 con texto claro */
+  --color-sobre-burbuja: #f4f4f5;
+  --color-aviso-icono-info: #c2410c;
+  --color-aviso-icono-exito: #15803d;
+  --filtro-mosaicos: brightness(0.72) contrast(1.15) saturate(0.8);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-tema="claro"]) {
+    --color-hueso: #121214; /* Fondo */
+    --color-espresso: #f4f4f5; /* Texto (17:1 sobre el fondo) */
+    --color-tinta: #f4f4f5;
+    --color-arena: #27272c;
+    --color-superficie: #1c1c20;
+    --color-superficie-suave: #222227;
+    --color-borde: #303036;
+    --color-borde-fuerte: #44444c;
+    --color-gris: #b4b4bd;
+    --color-texto-suave: #b4b4bd; /* 8.3:1 sobre tarjetas */
+    --color-texto-tenue: #8e8e98; /* 5.2:1 sobre tarjetas */
+    --color-cuero: #fb8a4a; /* Acento más claro: 7.1:1 como texto; el texto encima va oscuro (7.5:1) */
+    --color-cuero-oscuro: #fdb58c; /* Hover y texto sobre acento suave (8.6:1) */
+    --color-cuero-suave: #3b2114;
+    --color-cenote: #8bb3ea; /* Apoyo: 7.9:1 sobre tarjetas */
+    --color-cenote-oscuro: #b5cff3;
+    --color-cenote-suave: #17253a;
+    --color-info: #8bb3ea;
+    --color-info-suave: #17253a;
+    --color-exito: #4ade80;
+    --color-exito-suave: #10291a;
+    --color-aviso: #fbbf24;
+    --color-aviso-suave: #2e230c;
+    --color-error: #f87171;
+    --color-error-suave: #331516;
+    --color-miel: #f5b942;
+    --color-sobre-color: #18181b; /* Texto sobre acento, apoyo y estados */
+    --color-nav: #18181c;
+    --color-mapa-fondo: #1d2024;
+    --anillo-foco: 0 0 0 3px rgb(251 138 74 / 40%);
+    --sombra-1: 0 1px 2px rgb(0 0 0 / 40%);
+    --sombra-2: 0 4px 16px rgb(0 0 0 / 50%);
+    --color-burbuja-propia: #284a75; /* 8.2:1 con texto claro */
+    --color-sobre-burbuja: #f4f4f5;
+    --color-aviso-icono-info: #c2410c;
+    --color-aviso-icono-exito: #15803d;
+    --filtro-mosaicos: brightness(0.72) contrast(1.15) saturate(0.8);
+    color-scheme: dark;
+  }
+}
