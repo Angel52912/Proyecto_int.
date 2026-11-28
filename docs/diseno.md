@@ -5,16 +5,25 @@ Prototipo: "MiXanab · Mockups" en Figma. Wireframes: enlace de Canva en el tabl
 
 ## Tokens
 
-| Color | Nombre | Hex |
-|---|---|---|
-| Principal | Cuero | `#7A4A2A` |
-| Secundario | Cenote | `#1F7A7A` |
-| Acento | Miel | `#E0A33A` |
-| Texto | Espresso | `#2B211B` |
-| Fondo | Hueso | `#FAF6F0` |
-| Superficie | Arena | `#E7DED3` |
+| Rol | Nombre | Hex | Uso |
+|---|---|---|---|
+| Fondo | Blanco cálido | `#F7F6F3` | Fondo de las pantallas |
+| Superficie | Blanco | `#FFFFFF` | Tarjetas, chat, formularios |
+| Superficie alterna | Gris arena | `#EFEDE8` | Filtros, pestañas, mensajes recibidos |
+| Borde | Gris claro | `#E2DED6` | Separadores y bordes |
+| Texto | Casi negro | `#1F1B16` | Títulos y texto (15.8:1) |
+| Texto secundario | Gris cálido | `#5E574F` | Detalles y fechas (6.6:1) |
+| **Acento** | **Cuero quemado** | **`#9C4A1F`** | Botones, pestaña activa, enlaces (6.2:1 con blanco) |
+| Acento oscuro | Cuero oscuro | `#7E3A16` | Hover y presionado |
+| Acento suave | Durazno claro | `#F6E8DF` | Lo seleccionado, mensajes enviados |
+| Secundario | Verde petróleo | `#0E6E66` | Información, mapa |
+| Barra de navegación | Casi negro | `#1F1B16` | Fondo de la barra; la pestaña activa en el acento |
 
-Estados de la guía: Éxito, Aviso, Error e Info (colores por definir en Figma).
+Rediseño de noviembre de 2026 (revisión: "poco intuitivo"): paleta moderna y minimalista con un solo acento.
+Los nombres de los tokens en `front/css/tokens.css` se conservan (`--color-cuero` es el acento, `--color-hueso` el fondo,
+`--color-espresso` el texto) para no tocar cada pantalla.
+
+Estados: Éxito `#17693B`, Aviso `#8C5007`, Error `#B42318`, Info `#0E6E66` (todos ≥5.4:1 sobre el fondo).
 
 | Uso | Fuente |
 |---|---|
@@ -43,7 +52,7 @@ Contraste mínimo medido en oscuro: 5.0:1 (texto gris sobre tarjeta suave); text
 Texto sobre botones de color: blanco en claro, `#1A1411` en oscuro (≥7.5:1). Sobre miel siempre espresso.
 
 Componentes de la guía: botón principal, botón secundario, mapa, campo de texto.
-Navegación inferior del cliente: Inicio · Mapa · Pedidos · Perfil.
+Navegación inferior del cliente: Inicio · Mapa · Pedidos · Chats · Perfil.
 Navegación inferior del artesano: Solicitudes · Tablero · Chats · Perfil.
 
 ## Pantallas por flujo

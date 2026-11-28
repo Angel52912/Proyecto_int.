@@ -111,8 +111,8 @@
   bottom: 0;
   z-index: 20;
   width: var(--nav-ancho);
-  /* Barra en cuero oscuro para distinguirla del contenido (fondo Hueso). */
-  background: var(--color-cuero-oscuro);
+  /* Barra casi negra para distinguirla del contenido (fondo claro). */
+  background: var(--color-nav);
   border-top: 0;
   border-right: var(--nav-borde-derecho);
   box-shadow: 0 -6px 20px rgb(43 33 27 / 18%);
@@ -123,7 +123,8 @@
 
 .nav-inferior ul {
   display: grid;
-  grid-template-columns: var(--nav-columnas);
+  /* Una columna por pestaña (el cliente tiene 5, el artesano y el admin 4); en escritorio, una sola. */
+  grid-template-columns: repeat(var(--nav-elementos, 4), minmax(0, 1fr));
   gap: 6px;
   max-width: var(--ancho-pantalla);
   margin: 0 auto;
@@ -158,13 +159,13 @@
   transform: scale(0.95);
 }
 
-/* Pestaña activa: botón miel con texto espresso (7.1:1). */
+/* Pestaña activa: botón en el acento con texto blanco (6.2:1). */
 .nav-inferior__enlace[aria-current="page"] {
   border-color: transparent;
-  background: var(--color-miel);
-  color: var(--color-tinta);
+  background: var(--color-cuero);
+  color: #fff;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgb(224 163 58 / 35%);
+  box-shadow: 0 4px 12px rgb(156 74 31 / 35%);
 }
 
 @media (hover: hover) {
@@ -420,3 +421,19 @@ html[data-escritorio] .alternador-vista {
 html[data-vista="movil"] .alternador-vista {
   bottom: calc(var(--alto-nav) + var(--espacio-3) + env(safe-area-inset-bottom));
 }
+
+html[data-escritorio] .nav-inferior ul {
+  grid-template-columns: 1fr;
+}
+
+/* Modo oscuro: la barra lleva un borde claro arriba (o a la derecha en escritorio) para separarse del fondo. */
+html[data-tema="oscuro"] .nav-inferior {
+  border-top: 1px solid rgb(255 255 255 / 8%);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-tema="claro"]) .nav-inferior {
+    border-top: 1px solid rgb(255 255 255 / 8%);
+  }
+}
+

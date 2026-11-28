@@ -79,7 +79,9 @@ describe("layout", () => {
     const pantalla = crearPantalla({ rol: "client", activa: "pedidos", titulo: "T", volver: "/inicio" }, [crear("p")]);
     expect(pantalla.querySelector("h1")?.textContent).toBe("T");
     expect(pantalla.querySelector('[aria-current="page"]')?.getAttribute("href")).toBe("#/pedidos");
-    expect(pantalla.querySelectorAll(".nav-inferior a")).toHaveLength(4);
+    // El cliente tiene 5 pestañas: Chats es acceso directo al chat desde las pantallas principales.
+    expect([...pantalla.querySelectorAll(".nav-inferior a")].map((a) => a.textContent)).toEqual(["Inicio", "Mapa", "Pedidos", "Chats", "Perfil"]);
+    expect(/** @type {HTMLElement} */ (pantalla.querySelector(".nav-inferior ul")).style.getPropertyValue("--nav-elementos")).toBe("5");
   });
   test("navegación del artesano", () => {
     const pantalla = crearPantalla({ rol: "craftsman", activa: "tablero" }, []);

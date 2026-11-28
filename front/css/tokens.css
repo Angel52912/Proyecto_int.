@@ -28,18 +28,18 @@
 }
 
 :root {
-  --color-cuero: #7a4a2a;
-  --color-cenote: #1f7a7a;
-  --color-miel: #e0a33a;
-  --color-espresso: #2b211b;
-  --color-hueso: #faf6f0;
-  --color-arena: #e7ded3;
+  --color-cuero: #9c4a1f; /* Acento único: botones, pestaña activa, enlaces (6.2:1 con blanco) */
+  --color-cenote: #0e6e66; /* Secundario: información, mapa */
+  --color-miel: #d99a2b; /* Solo estrellas y detalles pequeños */
+  --color-espresso: #1f1b16; /* Texto principal (15.8:1 sobre el fondo) */
+  --color-hueso: #f7f6f3; /* Fondo de las pantallas */
+  --color-arena: #efede8; /* Superficie alterna: filtros, pestañas, mensajes recibidos */
 
   /* Estados: Entregado / Abierto (verde), En proceso / Atención (ámbar), Urgente / Error (rojo). */
-  --color-exito: #2e7d4f;
-  --color-aviso: #8a5a08;
-  --color-error: #b3261e;
-  --color-info: #1f7a7a;
+  --color-exito: #17693b;
+  --color-aviso: #8c5007;
+  --color-error: #b42318;
+  --color-info: #0e6e66;
 
   --fuente-titulo: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
   --fuente-texto: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -57,36 +57,36 @@
   --tactil-min: 44px;
 
   /* Usados en los mockups de cliente y artesano. */
-  --color-gris: #655a51; /* ≥5:1 sobre Hueso, Arena y tarjetas suaves */
+  --color-gris: #5e574f; /* ≥5.9:1 sobre fondo, superficies y acento suave */
   --radio-tarjeta: 14px;
   --alto-nav: 60px;
 
   /* Profundidad y movimiento (componentes compartidos). */
-  --sombra-1: 0 1px 2px rgb(43 33 27 / 6%), 0 2px 8px rgb(43 33 27 / 6%);
-  --sombra-2: 0 2px 4px rgb(43 33 27 / 8%), 0 8px 24px rgb(43 33 27 / 10%);
-  --color-cuero-suave: #f1e6dd;
-  --degradado-marca: linear-gradient(135deg, var(--color-cuero) 0%, #a8683a 55%, var(--color-miel) 100%);
+  --sombra-1: 0 1px 2px rgb(31 27 22 / 5%), 0 1px 6px rgb(31 27 22 / 5%);
+  --sombra-2: 0 2px 4px rgb(31 27 22 / 6%), 0 8px 24px rgb(31 27 22 / 8%);
+  --color-cuero-suave: #f6e8df; /* Fondo de lo seleccionado y mensajes enviados */
+  --degradado-marca: linear-gradient(135deg, var(--color-cuero) 0%, #b8622f 100%);
   --transicion: 160ms ease;
 
   /* ── Sistema base (rediseño UI): neutros cálidos, interacción y estados ──
      Se conserva la paleta aprobada (docs/diseno.md); estos tokens ordenan superficies, bordes y estados. */
   --color-superficie: #fff;
-  --color-superficie-suave: #fdfaf6;
-  --color-borde: #ece4da;
-  --color-borde-fuerte: #d9cdbf;
+  --color-superficie-suave: #fbfaf8;
+  --color-borde: #e2ded6;
+  --color-borde-fuerte: #cfc9bf;
   --color-texto: var(--color-espresso);
-  --color-texto-suave: #6e6259; /* contraste 5.3:1 sobre Hueso */
+  --color-texto-suave: #5e574f; /* 6.6:1 sobre el fondo */
 
   /* Interacción de la marca: hover más oscuro y fondo suave para lo activo. */
-  --color-cuero-oscuro: #5f381f;
-  --color-cenote-oscuro: #175e5e;
-  --anillo-foco: 0 0 0 3px rgb(224 163 58 / 55%);
+  --color-cuero-oscuro: #7e3a16; /* Hover y presionado del acento (8.4:1 con blanco) */
+  --color-cenote-oscuro: #0a5650;
+  --anillo-foco: 0 0 0 3px rgb(156 74 31 / 35%);
 
   /* Estados: texto oscuro legible (≥4.5:1 sobre blanco) y fondo suave para etiquetas y avisos. */
-  --color-exito-suave: #e3f2e9;
-  --color-aviso-suave: #fcf0da;
-  --color-error-suave: #fbe4e2;
-  --color-info-suave: #dcefef;
+  --color-exito-suave: #e6f2ea;
+  --color-aviso-suave: #fbf0df;
+  --color-error-suave: #fce8e6;
+  --color-info-suave: #e2f1ef;
 
   --radio-chico: 8px;
   --radio-grande: 18px;
@@ -94,9 +94,11 @@
   /* Texto sobre un color de marca o de estado (botones, insignias). */
   --color-sobre-color: #fff;
   /* Espresso fijo: texto sobre miel; no cambia en modo oscuro. */
-  --color-tinta: #2b211b;
+  --color-tinta: #1f1b16;
   /* Fondo de los mapas mientras cargan. */
   --color-mapa-fondo: #e3ece2;
+  /* Barra de navegación: casi negro, con la pestaña activa en el acento. */
+  --color-nav: #1f1b16;
   color-scheme: light;
 }
 
@@ -131,6 +133,7 @@ html[data-tema="oscuro"] {
   --color-info-suave: #193333;
   --color-sobre-color: #1a1411;
   --color-mapa-fondo: #24302a;
+  --color-nav: #2e2722; /* Un tono más claro que el fondo para que la barra se distinga */
   --sombra-1: 0 1px 2px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 30%);
   --sombra-2: 0 2px 4px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 45%);
   color-scheme: dark;
@@ -163,6 +166,7 @@ html[data-tema="oscuro"] {
     --color-info-suave: #193333;
     --color-sobre-color: #1a1411;
     --color-mapa-fondo: #24302a;
+    --color-nav: #2e2722;
     --sombra-1: 0 1px 2px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 30%);
     --sombra-2: 0 2px 4px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 45%);
     color-scheme: dark;
@@ -177,19 +181,19 @@ html[data-tema="oscuro"] {
 .inicio__avatar,
 .acceso__ilustracion,
 .aviso-flotante {
-  --color-hueso: #faf6f0;
-  --color-espresso: #2b211b;
-  --color-arena: #e7ded3;
-  --color-cuero: #7a4a2a;
-  --color-cuero-oscuro: #5f381f;
-  --color-cuero-suave: #f1e6dd;
-  --color-cenote: #1f7a7a;
-  --color-miel: #e0a33a;
-  --color-exito: #2e7d4f;
-  --color-error: #b3261e;
-  --color-gris: #655a51; /* ≥5:1 sobre Hueso, Arena y tarjetas suaves */
+  --color-hueso: #f7f6f3;
+  --color-espresso: #1f1b16;
+  --color-arena: #efede8;
+  --color-cuero: #9c4a1f;
+  --color-cuero-oscuro: #7e3a16;
+  --color-cuero-suave: #f6e8df;
+  --color-cenote: #0e6e66;
+  --color-miel: #d99a2b;
+  --color-exito: #17693b;
+  --color-error: #b42318;
+  --color-gris: #5e574f;
   --color-superficie: #fff;
-  --color-borde: #ece4da;
-  --color-texto-suave: #6e6259;
+  --color-borde: #e2ded6;
+  --color-texto-suave: #5e574f;
   --color-sobre-color: #fff;
 }

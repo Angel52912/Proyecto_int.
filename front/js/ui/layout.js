@@ -7,9 +7,11 @@ import { icono } from "./iconos.js";
 /** Navegación inferior según docs/diseno.md. */
 export const NAVEGACION = Object.freeze({
   client: [
-    { id: "principal", ruta: "/principal", texto: "Principal", icono: "inicio" },
+    { id: "principal", ruta: "/principal", texto: "Inicio", icono: "inicio" },
     { id: "mapa", ruta: "/mapa", texto: "Mapa", icono: "mapa" },
     { id: "pedidos", ruta: "/pedidos", texto: "Pedidos", icono: "pedidos" },
+    // Acceso directo al chat desde cualquier pantalla principal (revisión: "poco intuitivo").
+    { id: "chats", ruta: "/chats", texto: "Chats", icono: "chat" },
     { id: "perfil", ruta: "/perfil", texto: "Perfil", icono: "perfil" },
   ],
   craftsman: [
@@ -43,7 +45,9 @@ export function crearNavegacion(rol, activa) {
   );
   // Logo de la marca: solo se ve en la barra lateral de escritorio (layout.css); decorativo.
   const marca = crear("span", { clase: "nav-inferior__marca", attrs: { "aria-hidden": "true" } }, [icono("destello", { tam: 22 })]);
-  return crear("nav", { clase: "nav-inferior", attrs: { "aria-label": "Navegación principal" } }, [marca, crear("ul", {}, elementos)]);
+  const lista = crear("ul", {}, elementos);
+  lista.style.setProperty("--nav-elementos", String(elementos.length));
+  return crear("nav", { clase: "nav-inferior", attrs: { "aria-label": "Navegación principal" } }, [marca, lista]);
 }
 
 /**
