@@ -1,5 +1,5 @@
 // Estructura común de las pantallas: barra superior (volver + título), cuerpo y navegación inferior por rol.
-import { crear, enlace } from "./dom.js";
+import { crear, enlace, volverConHistorial } from "./dom.js";
 import { icono } from "./iconos.js";
 
 /** @typedef {"client" | "craftsman" | "admin"} RolNavegacion */
@@ -103,7 +103,7 @@ export function crearPantalla(opciones, contenido) {
     opciones.titulo !== undefined || opciones.volver !== undefined || conPerfil
       ? crear("header", { clase: conPerfil ? "barra barra--raiz" : "barra" }, [
           opciones.volver !== undefined
-            ? enlace(opciones.volver, { clase: "barra__volver", attrs: { "aria-label": "Volver" } }, [icono("atras", { tam: 22 })])
+            ? enlace(opciones.volver ?? "/principal", { clase: "barra__volver", attrs: { "aria-label": "Volver", title: "Volver" }, on: { click: volverConHistorial } }, [icono("atras", { tam: 22 })])
             : null,
           crear("h1", { clase: "barra__titulo", texto: opciones.titulo ?? "" }),
           opciones.accion ?? null,

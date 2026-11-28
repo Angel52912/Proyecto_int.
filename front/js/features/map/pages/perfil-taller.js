@@ -59,23 +59,41 @@ function crearServicio(servicio) {
 }
 
 /** @param {any} taller */
+function crearPrecio(taller) {
+  return crear("div", { clase: "precio-desde" }, [
+    crear("div", {}, [crear("p", { clase: "precio-desde__etiqueta", texto: "Precio desde" }), crear("p", { clase: "precio-desde__monto", texto: formatearMxn(taller.price_from) })]),
+    crear("p", { clase: "precio-desde__nota", texto: "El precio final viene en el presupuesto. Pagas al recoger." }),
+  ]);
+}
+
+/** @param {any} taller */
 function crearAccionesRapidas(taller) {
   const botones = [];
   if (taller.lat !== null && taller.lng !== null) {
     botones.push(
-      crear("a", { clase: "accion-rapida", attrs: { href: urlComoLlegar(taller.lat, taller.lng), target: "_blank", rel: "noopener noreferrer" } }, [
-        icono("navegar", { tam: 18 }),
-        crear("span", { texto: "Cómo llegar" }),
-      ]),
+      crear("a", {
+        clase: "accion-rapida",
+        attrs: {
+          href: urlComoLlegar(taller.lat, taller.lng),
+          target: "_blank",
+          rel: "noopener noreferrer",
+          "aria-label": "Cómo llegar",
+          title: "Cómo llegar",
+        },
+      }, [icono("navegar", { tam: 20 })]),
     );
   }
   if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
     const compartir = () => navigator.share({ title: taller.name, text: `${taller.name} en MiXanab`, url: location.href }).catch(() => {});
     botones.push(
-      crear("button", { clase: "accion-rapida", attrs: { type: "button" }, on: { click: compartir } }, [icono("subir", { tam: 18 }), crear("span", { texto: "Compartir" })]),
+      crear("button", {
+        clase: "accion-rapida",
+        attrs: { type: "button", "aria-label": "Compartir", title: "Compartir" },
+        on: { click: compartir },
+      }, [icono("subir", { tam: 20 })]),
     );
   }
-  return botones.length === 0 ? null : crear("div", { clase: "acciones-rapidas" }, botones);
+  return botones.length === 0 ? null : crear("div", { clase: "acciones-rapidas", attrs: { "aria-label": "Acciones del taller" } }, botones);
 }
 
 /** @param {any} taller */
@@ -107,9 +125,12 @@ function pintarPerfil(taller) {
   const distancia = taller.distance_km === null ? "" : ` · ${taller.distance_km.toFixed(1)} km`;
   const estado = estadoDeHoy(taller);
 
+  const accionesRapidas = crearAccionesRapidas(taller);
   const acciones = crear("div", { clase: "acciones perfil-taller__acciones" }, [
     enlace(`/solicitar/${taller.id}`, { clase: "boton boton--bloque" }, [crear("span", { texto: "Solicitar cotización" })]),
   ]);
+  // Columna derecha en escritorio; en móvil sigue siendo un bloque más de la hoja.
+  const lateral = crear("div", { clase: "seccion perfil-taller__lateral" }, [crearPrecio(taller), crearHorario(taller), acciones]);
   // Si ya hay una solicitud viva con este taller, el botón de chat lleva a esa conversación.
   apiSolicitudes
     .listMyRequests()
@@ -120,7 +141,10 @@ function pintarPerfil(taller) {
     .catch(() => {});
 
   return [
-    crear("div", { clase: "perfil-taller__portada" }, [crearFoto(portada?.url, `Foto de ${taller.name}`, "perfil-taller__foto", taller.name)]),
+    crear("div", { clase: "perfil-taller__portada" }, [
+      crearFoto(portada?.url, `Foto de ${taller.name}`, "perfil-taller__foto", taller.name),
+      accionesRapidas,
+    ]),
     crear("article", { clase: "perfil-taller__hoja" }, [
       crear("header", { clase: "perfil-taller__encabezado" }, [
         crear("h1", { clase: "perfil-taller__nombre", texto: taller.name }),
@@ -131,15 +155,11 @@ function pintarPerfil(taller) {
         crear("p", { clase: "tarjeta__detalle linea-icono" }, [icono("mapa", { tam: 14 }), crear("span", { texto: `${taller.address}, ${taller.colonia}, Mérida` })]),
         crear("div", { clase: "perfil-taller__estado" }, [crearInsignia(estado.texto, estado.tono)]),
       ]),
-      crearAccionesRapidas(taller),
       crear("section", { clase: "seccion perfil-taller__seccion perfil-taller__servicios" }, [
         crear("h2", { clase: "seccion__titulo", texto: "Servicios" }),
         crear("ul", { clase: "lista servicios" }, taller.services.map(crearServicio)),
-        crear("div", { clase: "precio-desde" }, [
-          crear("div", {}, [crear("p", { clase: "precio-desde__etiqueta", texto: "Precio desde" }), crear("p", { clase: "precio-desde__monto", texto: formatearMxn(taller.price_from) })]),
-          crear("p", { clase: "precio-desde__nota", texto: "El precio final viene en el presupuesto. Pagas al recoger." }),
-        ]),
       ]),
+      lateral,
       crear("section", { clase: "seccion perfil-taller__seccion perfil-taller__trabajos" }, [
         crear("div", { clase: "seccion__encabezado" }, [
           crear("h2", { clase: "seccion__titulo", texto: "Trabajos recientes" }),
@@ -155,9 +175,7 @@ function pintarPerfil(taller) {
               ),
             ),
       ]),
-      crearHorario(taller),
     ]),
-    acciones,
   ];
 }
 

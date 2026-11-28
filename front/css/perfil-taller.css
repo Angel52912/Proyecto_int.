@@ -3,19 +3,34 @@
   position: absolute;
   left: 0;
   right: 0;
+  z-index: 30;
   max-width: var(--ancho-pantalla);
   margin-left: var(--pantalla-margen-izquierdo);
   margin-right: auto;
   background: none;
+  /* Si no, el blur de .barra se dibuja sobre los botones del banner y los deja grises/borrosos. */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* La barra cubre todo el ancho: deja pasar el toque hacia los botones del banner. */
+  pointer-events: none;
 }
 
 .perfil-taller .barra__volver {
   margin: var(--espacio-2) 0 0;
   background: var(--color-superficie);
+  pointer-events: auto;
 }
 
 .perfil-taller .pantalla__cuerpo {
-  padding: 0 0 calc(var(--alto-nav) + 100px);
+  /* 88 px deja sitio a la barra fija del CTA sin estirar la pantalla. */
+  padding: 0 0 88px;
+  /* La animación base deja un transform que convierte al cuerpo en bloque contenedor:
+     sin esto, el CTA fixed se coloca al final del cuerpo y queda fuera de la vista. */
+  animation: none;
+}
+
+html[data-navegacion] .perfil-taller .pantalla__cuerpo {
+  animation: none;
 }
 
 .perfil-taller__contenido {
@@ -23,10 +38,18 @@
   flex-direction: column;
 }
 
+.perfil-taller__portada {
+  position: relative;
+}
+
 .perfil-taller__portada .foto {
+  position: relative;
+  z-index: 10;
   width: 100%;
   height: var(--alto-portada);
   border-radius: 0;
+  /* El degradado de respaldo sigue ahí, pero no tapa ni intercepta los botones (z-20). */
+  pointer-events: none;
 }
 
 .perfil-taller__portada .foto--vacia .icono {
@@ -42,12 +65,15 @@
 .perfil-taller__hoja {
   display: flex;
   flex-direction: column;
-  gap: var(--espacio-4);
+  gap: 20px;
+  /* -mt-6: solapamiento ligero sobre el banner; el pt-8 deja 8 px de separación real del contenido. */
   margin-top: -24px;
-  padding: var(--espacio-4) var(--espacio-3);
+  padding: 32px var(--espacio-4) var(--espacio-4);
   border-radius: 24px 24px 0 0;
-  background: var(--color-hueso);
+  /* Tarjeta blanca sólida por encima del banner (ambos en z-10; esta va después en el DOM). */
+  background: var(--color-superficie);
   position: relative;
+  z-index: 10;
 }
 
 .perfil-taller__encabezado {
@@ -77,34 +103,52 @@
   gap: var(--espacio-2);
 }
 
-/* Acciones rápidas: Cómo llegar y Compartir. */
-.acciones-rapidas {
+/* Precio + Horario + CTA: una sola columna en móvil, columna derecha sticky en escritorio. */
+.perfil-taller__lateral {
   display: flex;
-  gap: var(--espacio-2);
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Acciones rápidas sobre el banner: circulares de solo ícono, alineadas con «Volver». */
+.acciones-rapidas {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  /* Por encima de .barra (z-index 10): si no, la barra transparente se queda con el toque. */
+  z-index: 20;
+  display: flex;
+  gap: 8px;
 }
 
 .accion-rapida {
-  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--espacio-2);
-  min-height: var(--tactil-min);
+  width: 44px;
+  height: 44px;
+  padding: 0;
   border: 1px solid var(--color-borde);
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--color-superficie);
   box-shadow: var(--sombra-1);
-  color: var(--color-cuero);
-  font: inherit;
-  font-size: var(--texto-secundario);
-  font-weight: 600;
+  color: var(--color-espresso);
   text-decoration: none;
   cursor: pointer;
-  transition: transform var(--transicion);
+  transition: transform var(--transicion), background-color var(--transicion);
+}
+
+.accion-rapida:hover {
+  background: var(--color-superficie-suave);
+}
+
+.accion-rapida:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
 }
 
 .accion-rapida:active {
-  transform: scale(0.97);
+  transform: scale(0.94);
 }
 
 /* Servicios. */
@@ -116,7 +160,7 @@
   display: flex;
   align-items: center;
   gap: var(--espacio-3);
-  padding: 12px var(--espacio-3);
+  padding: 12px;
   border-radius: var(--radio-tarjeta);
   background: var(--color-superficie);
   box-shadow: var(--sombra-1);
@@ -148,7 +192,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--espacio-1);
-  padding: var(--espacio-3);
+  width: 100%;
+  /* Equivale a max-w-md: no ocupa toda la columna en pantallas grandes. */
+  max-width: 448px;
+  padding: 12px;
   border-radius: var(--radio-tarjeta);
   background: var(--degradado-marca);
   color: var(--color-hueso);
@@ -179,8 +226,8 @@
 .carrusel {
   display: flex;
   gap: var(--espacio-2);
-  margin: 0 calc(-1 * var(--espacio-3));
-  padding: 2px var(--espacio-3) var(--espacio-2);
+  margin: 0 calc(-1 * var(--espacio-4));
+  padding: 2px var(--espacio-4) var(--espacio-2);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding: 0 var(--espacio-3);
@@ -205,7 +252,8 @@
 
 /* Horario: resumen con el día de hoy y flecha que gira al abrir. */
 .perfil-taller__horario {
-  padding: 0 var(--espacio-3);
+  /* Mismo relleno horizontal que la hoja (24 px) para que la columna derecha quede alineada. */
+  padding: 0 var(--espacio-4);
   border-radius: var(--radio-tarjeta);
   background: var(--color-superficie);
   box-shadow: var(--sombra-1);
@@ -268,63 +316,96 @@
   }
 }
 
-.perfil-taller__acciones {
+.perfil-taller .perfil-taller__acciones {
   position: fixed;
   left: 0;
   right: 0;
   bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom));
-  max-width: var(--ancho-pantalla);
-  margin-left: var(--pantalla-margen-izquierdo);
-  margin-right: auto;
-  padding: var(--espacio-3);
-  background: linear-gradient(transparent, var(--color-hueso) 30%);
+  z-index: 25;
+  width: 100%;
+  max-width: none;
+  /* .acciones base lleva margin-top: auto; aquí debe ir con el resto del bloque lateral. */
+  margin: 0;
+  padding: 12px var(--espacio-3);
+  background: var(--color-superficie);
+  box-shadow: 0 -4px 16px rgb(24 24 27 / 10%);
 }
 
-/* ── Escritorio (≥1024px o vista PC del admin): dos columnas y botón dentro del flujo ──
-   Izquierda: encabezado y servicios. Derecha: acciones rápidas y horario. Abajo: trabajos a todo el ancho.
-   El botón "Solicitar cotización" deja de ser fijo (en PC no hay barra inferior) y queda pegado al pie al bajar. */
+/* ── Escritorio (≥1024px o vista PC del admin): columna izquierda de contenido y columna derecha de 320 px ──
+   Izquierda: encabezado, servicios y trabajos. Derecha: Precio desde + Horario + CTA, en un bloque sticky.
+   El CTA nunca queda al final de una columna alta: va pegado a ese bloque y con bottom: 16 px.
+   La pantalla ocupa todo el espacio a la derecha de la barra lateral: sin el max-width de 1120px que la centraba. */
+
+html[data-escritorio] .pantalla.perfil-taller {
+  position: relative;
+  width: calc(100% - var(--nav-ancho));
+  height: auto;
+  min-height: 100dvh;
+  max-width: none;
+  margin-left: var(--nav-ancho);
+  margin-right: 0;
+}
+
+html[data-escritorio] .perfil-taller .barra {
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+html[data-escritorio] .perfil-taller .pantalla__cuerpo,
+html[data-escritorio] .perfil-taller__contenido {
+  width: 100%;
+  max-width: none;
+}
 
 html[data-escritorio] .perfil-taller .pantalla__cuerpo {
-  padding-bottom: var(--espacio-4);
+  padding-bottom: 20px;
 }
 
 html[data-escritorio] .perfil-taller__hoja {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 1fr) 320px;
   grid-template-areas:
-    "encabezado rapidas"
-    "servicios horario"
+    "encabezado lateral"
+    "servicios lateral"
     "trabajos trabajos";
   align-items: start;
-  gap: var(--espacio-4) 40px;
-  margin-top: -40px;
-  padding: 36px 40px var(--espacio-4);
-  border-radius: 28px 28px 0 0;
+  gap: 20px 24px;
+  /* Mismo solapamiento y relleno que en móvil: 8 px de separación real bajo el banner. */
+  margin-top: -24px;
+  padding: 32px var(--espacio-4) 20px;
+  border-radius: 24px 24px 0 0;
 }
 
 html[data-escritorio] .perfil-taller__encabezado { grid-area: encabezado; }
-html[data-escritorio] .perfil-taller .acciones-rapidas { grid-area: rapidas; align-self: end; }
 html[data-escritorio] .perfil-taller__servicios { grid-area: servicios; }
-html[data-escritorio] .perfil-taller__horario { grid-area: horario; }
+html[data-escritorio] .perfil-taller__lateral { grid-area: lateral; }
 html[data-escritorio] .perfil-taller__trabajos { grid-area: trabajos; }
+
+/* La columna derecha se queda visible al bajar; precio y CTA viajan con ella. */
+html[data-escritorio] .perfil-taller__lateral {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
 
 html[data-escritorio] .perfil-taller .carrusel {
   margin: 0;
   padding: 2px 0 var(--espacio-2);
 }
 
-html[data-escritorio] .perfil-taller__acciones {
+html[data-escritorio] .perfil-taller .perfil-taller__acciones {
   position: sticky;
-  bottom: var(--espacio-3);
+  bottom: 16px;
   left: auto;
   right: auto;
-  width: min(420px, 100%);
+  width: 100%;
   max-width: none;
-  margin: 0 40px 0 auto;
-  padding: 0;
-  background: none;
-}
-
-html[data-escritorio] .perfil-taller__acciones .boton {
-  box-shadow: 0 8px 24px rgb(122 74 42 / 30%);
+  margin: 0;
+  padding: 12px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-2);
 }

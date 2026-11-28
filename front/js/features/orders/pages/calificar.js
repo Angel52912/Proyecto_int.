@@ -1,7 +1,7 @@
 // 15 · Califica tu experiencia (CU-06): estrellas, etiquetas, reseña opcional y Enviar calificación (sin edición posterior).
 import { api as apiMapa } from "../../map/index.js";
 import { validarCalificacion } from "../../../../../apis/lib/validate.js";
-import { crear, enlace } from "../../../ui/dom.js";
+import { crear, enlace, volverConHistorial } from "../../../ui/dom.js";
 import { cargarEn } from "../../../ui/estados.js";
 import { icono } from "../../../ui/iconos.js";
 import { crearBoton, crearEstrellas, crearPantalla } from "../../../ui/layout.js";
@@ -143,7 +143,7 @@ function pintarCalificar({ pedido, resena, taller }) {
 /** @param {import("../../../router.js").Contexto} contexto */
 export async function renderCalificar({ params }) {
   const contenido = crear("div", { clase: "calificar__contenido" });
-  const cerrar = enlace("/pedidos", { clase: "barra__volver", attrs: { "aria-label": "Cerrar" } }, [icono("cerrar")]);
+  const cerrar = enlace("/pedidos", { clase: "barra__volver", attrs: { "aria-label": "Cerrar", title: "Cerrar" }, on: { click: volverConHistorial } }, [icono("cerrar")]);
   const pantalla = crearPantalla({ titulo: "Califica tu experiencia", accion: cerrar, clase: "calificar" }, [contenido]);
   cargarEn(
     contenido,

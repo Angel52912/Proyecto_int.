@@ -64,3 +64,48 @@ export function enlace(ruta, opciones = {}, hijos = []) {
 export function ir(ruta) {
   window.location.hash = `#${ruta}`;
 }
+
+const CLAVE_NAVEGACIONES = "mixanab:navegaciones-internas";
+let contadorInstalado = false;
+
+/** Cuenta los cambios de hash para distinguir "llegué desde otra pantalla" de "abrí en directo". */
+function instalarContadorNavegaciones() {
+  if (contadorInstalado || typeof window === "undefined") return;
+  contadorInstalado = true;
+  window.addEventListener("hashchange", () => {
+    try {
+      const actual = Number(window.sessionStorage.getItem(CLAVE_NAVEGACIONES) ?? "0");
+      window.sessionStorage.setItem(CLAVE_NAVEGACIONES, String(actual + 1));
+    } catch {
+      // Sin sessionStorage (modo privado) seguimos con la heurística de history.length.
+    }
+  });
+}
+
+// Se instala al cargar el módulo, antes de que el usuario navegue por primera vez.
+if (typeof window !== "undefined") instalarContadorNavegaciones();
+
+/**
+ * Manejador común de los botones «Volver»: prefiere el historial del navegador para regresar
+ * exactamente a la pantalla anterior. Si no hubo navegación interna, deja que el enlace siga su
+ * `href` de respaldo (por ejemplo `#/principal` cuando se abrió la pantalla en directo).
+ * @param {MouseEvent} evento
+ */
+export function volverConHistorial(evento) {
+  // Clic con modificador o rueda: se respeta para abrir el destino de respaldo en otra pestaña.
+  if (evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) return;
+  if (typeof window === "undefined" || !window.history || window.history.length <= 1) return;
+  instalarContadorNavegaciones();
+
+  let huboOrigen = false;
+  try {
+    huboOrigen = Number(window.sessionStorage.getItem(CLAVE_NAVEGACIONES) ?? "0") > 0;
+  } catch {
+    // Sin sessionStorage: una pestaña nueva arranca con about:blank + la URL (length 2).
+    huboOrigen = window.history.length > 2;
+  }
+  if (!huboOrigen) return;
+
+  evento.preventDefault();
+  window.history.back();
+}

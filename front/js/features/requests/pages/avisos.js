@@ -136,7 +136,8 @@ export function renderAvisos(rol) {
       })
       .catch(() => {});
 
-    return crearPantalla({ titulo: "Avisos", volver: rol === "client" ? "/" : "/artesano/solicitudes", clase: "avisos" }, [
+    // history.back() lleva a la pantalla real de origen; el href solo es el respaldo si se abrió en directo.
+    return crearPantalla({ titulo: "Avisos", volver: rol === "client" ? "/principal" : "/artesano/solicitudes", clase: "avisos" }, [
       crear("div", { clase: "avisos__acciones" }, [marcarTodas]),
       aviso,
       contenido,
